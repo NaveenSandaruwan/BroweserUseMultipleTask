@@ -119,7 +119,7 @@ def log_response(response: AgentOutput, registry=None, logger=None) -> None:
 Context = TypeVar('Context')
 
 
-AgentHookFunc = Callable[['Agent'], Awaitable[None]]
+AgentHookFunc = Callable [['Agent'], Awaitable[None]]
 
 
 class Agent(Generic[Context, AgentStructuredOutput]):
@@ -140,13 +140,13 @@ class Agent(Generic[Context, AgentStructuredOutput]):
 		initial_actions: list[dict[str, dict[str, Any]]] | None = None,
 		# Cloud Callbacks
 		register_new_step_callback: (
-			Callable[['BrowserStateSummary', 'AgentOutput', int], None]  # Sync callback
-			| Callable[['BrowserStateSummary', 'AgentOutput', int], Awaitable[None]]  # Async callback
+			Callable [['BrowserStateSummary', 'AgentOutput', int], None]  # Sync callback
+			| Callable [['BrowserStateSummary', 'AgentOutput', int], Awaitable[None]]  # Async callback
 			| None
 		) = None,
 		register_done_callback: (
-			Callable[['AgentHistoryList'], Awaitable[None]]  # Async Callback
-			| Callable[['AgentHistoryList'], None]  # Sync Callback
+			Callable [['AgentHistoryList'], Awaitable[None]]  # Async Callback
+			| Callable [['AgentHistoryList'], None]  # Sync Callback
 			| None
 		) = None,
 		register_external_agent_status_raise_error_callback: Callable[[], Awaitable[bool]] | None = None,
@@ -462,6 +462,12 @@ class Agent(Generic[Context, AgentStructuredOutput]):
 		self._external_pause_event = asyncio.Event()
 		self._external_pause_event.set()
 
+		# Initialize ElementPositionService to store element positions in the current folder
+		from browser_use.browser.element_position_service import ElementPositionService
+		import os
+		import pathlib
+		self.element_position_service = ElementPositionService(pathlib.Path(os.getcwd()))
+
 	@property
 	def logger(self) -> logging.Logger:
 		"""Get instance-specific logger with task ID in the name"""
@@ -692,14 +698,15 @@ class Agent(Generic[Context, AgentStructuredOutput]):
 		self.logger.debug(f'📸 Requesting browser state with include_screenshot=True, cached={use_cache}')
 		browser_state_summary = await self.browser_session.get_browser_state_summary(
 			cache_clickable_elements_hashes=True,
-			include_screenshot=True,  # always capture even if use_vision=False so that cloud sync is useful (it's fast now anyway)
+			include_screenshot=True,
 			cached=use_cache,
 			include_recent_events=self.include_recent_events,
 		)
-		if browser_state_summary.screenshot:
-			self.logger.debug(f'📸 Got browser state WITH screenshot, length: {len(browser_state_summary.screenshot)}')
-		else:
-			self.logger.debug('📸 Got browser state WITHOUT screenshot')
+		# Store element positions in current folder
+		await self.element_position_service.store_element_positions(
+			getattr(browser_state_summary, 'dom_state', None),
+			getattr(self, 'state', None) and getattr(self.state, 'n_steps', 0)
+		)
 
 		# Check for new downloads after getting browser state (catches PDF auto-downloads and previous step downloads)
 		await self._check_and_update_downloads(f'Step {self.state.n_steps}: after getting browser state')
@@ -1143,7 +1150,7 @@ class Agent(Generic[Context, AgentStructuredOutput]):
 
 		token_summary = self.token_cost_service.get_usage_tokens_for_model(self.llm.model)
 
-		# Prepare action_history data correctly
+		# Prepare action_history data
 		action_history_data = []
 		for item in self.history.history:
 			if item.model_output and item.model_output.action:
