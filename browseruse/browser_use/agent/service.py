@@ -2098,7 +2098,7 @@ class Agent(Generic[Context, AgentStructuredOutput]):
 		
 		print("Continuous browser control session ended.")
 		
-	def continuous_browser_control_sync(self, initial_task: str = None, max_steps_per_task: int = 20) -> None:
+	def continuous_browser_control_sync(self, initial_task: str = None, max_steps_per_task: int = 5) -> None:
 		"""
 		Synchronous wrapper around continuous_browser_control for easier usage without asyncio.
 		
