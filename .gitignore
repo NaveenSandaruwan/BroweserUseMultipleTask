@@ -5,7 +5,7 @@ __pycache__/
 *.pyd
 *.pyc
 *.env
-
+*.venv/
 env/
 build/
 dist/

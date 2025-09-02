@@ -20,7 +20,7 @@ async def main():
         )
 
         agent = Agent(
-            task="Go to GeeksforGeeks data structures and algorithms",
+            task="Go to Scratch Education and create",
             llm=llm,
             browser_profile=profile
         )
@@ -28,8 +28,8 @@ async def main():
         try:
             # Use the continuous_browser_control with initial task
             await agent.continuous_browser_control(
-                initial_task="Go to GeeksforGeeks data structures and algorithms", 
-                max_steps_per_task=15
+                initial_task="Go to Scratch Education and create", 
+                max_steps_per_task=5
             )
         except QueueShutDown:
             print("\n⚠️ Event queue was shut down. This is a known issue with continuous operation.")
