@@ -1,2 +1,2 @@
-.\.venv\Scripts\Activate
+.\brvenv\Scripts\Activate
 GOOGLE_API_KEY=
