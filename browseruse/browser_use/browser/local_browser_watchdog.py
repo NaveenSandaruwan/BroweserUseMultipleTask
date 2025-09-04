@@ -117,7 +117,7 @@ class LocalBrowserWatchdog(BaseWatchdog):
 				assert '--user-data-dir' in str(launch_args), (
 					'User data dir must be set somewhere in launch args to a non-default path, otherwise Chrome will not let us attach via CDP'
 				)
-
+				print(f'--remote-debugging-port={debug_port}')
 				# Get browser executable
 				# Priority: custom executable > fallback paths > playwright subprocess
 				if profile.executable_path:

@@ -1,27 +1,41 @@
-import sys
-import asyncio
-from browser_use import Agent, ChatGoogle, BrowserProfile
-from dotenv import load_dotenv
+import pychrome
+import requests
+import json
 
+DEBUG_PORT = 8093
 
+# Get available targets (tabs, extension pages, etc.)
+targets = requests.get(f"http://127.0.0.1:{DEBUG_PORT}/json").json()
 
-load_dotenv()
+# Pick the first normal webpage tab (where your content.js is injected)
+tab_info = next(t for t in targets if t["type"] == "page" and t["url"].startswith("http"))
+print("Using tab:", tab_info["url"])
 
-llm = ChatGoogle(model="gemini-2.0-flash")
+# Attach to that tab
+browser = pychrome.Browser(url=f"http://127.0.0.1:{DEBUG_PORT}")
+tab = browser.list_tab()[0]   # or use browser.list_tab()[id] if needed
+tab.start()
+tab.Runtime.enable()
 
-async def main():
-    profile = BrowserProfile(
-        user_data_dir=r"C:\Users\MSI20\AppData\Local\Google\Chrome\User Data",
-        profile="Default",   
-    )
+def send_avatar_cmd(cmd, **kwargs):
+    """Send a command to the avatar via postMessage."""
+    message = {
+        "type": "AVATAR_CMD",
+        "cmd": cmd,
+        **kwargs
+    }
+    js_code = f"window.postMessage({json.dumps(message)}, '*');"
+    tab.Runtime.evaluate(expression=js_code)
 
-    agent = Agent(
-        task="Go to GeeksforGeeks data structures and algorithms",
-        llm=llm,
-        browser_profile=profile   
-    )
+# === Example Commands ===
+send_avatar_cmd("move", dx=50, dy=0)       # move right
+send_avatar_cmd("move", dx=0, dy=50)       # move down
+send_avatar_cmd("center")                  # center on screen
+send_avatar_cmd("resize", size=120)        # resize avatar
+send_avatar_cmd("color", color="red")      # change border color
+send_avatar_cmd("teleport", x=200, y=100)  # jump to coords
+send_avatar_cmd("rotate", deg=45)          # rotate avatar
+send_avatar_cmd("hide")                    # hide avatar
+send_avatar_cmd("show")                    # show avatar
 
-    await agent.run()
-
-if __name__ == "__main__":
-    asyncio.run(main())
+print("Commands sent to avatar!")
