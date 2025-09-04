@@ -15,7 +15,7 @@ async def main():
     try:
         profile = BrowserProfile(
             user_data_dir=USER_DATA_DIR,  # your new clean profile folder
-            profile="Default",
+            profile="Profile 1",
             chrome_executable_path=CHROME_EXECUTABLE_PATH, # adjust if Chrome is elsewhere
             keep_alive=True,
             enable_default_extensions=True
