@@ -1,4 +1,5 @@
 .env
+scratch_block_descriptions
 __pycache__/
 *.py[cod]
 *.pyo

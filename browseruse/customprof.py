@@ -12,7 +12,7 @@ llm = ChatGoogle(model="gemini-2.0-flash")
 async def main():
     try:
         profile = BrowserProfile(
-            user_data_dir=r"E:\VS CODE\Agentic AI\profile",  # your new clean profile folder
+            user_data_dir=r"C:\Users\malit\OneDrive\Desktop\OBO\use_data",  # your new clean profile folder
             profile="Default",
             chrome_executable_path=r"C:\Program Files\Google\Chrome\Application\chrome.exe", # adjust if Chrome is elsewhere
             keep_alive=True,
