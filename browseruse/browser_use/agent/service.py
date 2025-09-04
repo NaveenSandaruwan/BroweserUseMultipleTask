@@ -2120,5 +2120,139 @@ class Agent(Generic[Context, AgentStructuredOutput]):
 		return asyncio.run(self.continuous_browser_control(initial_task=initial_task, max_steps_per_task=max_steps_per_task))
 
 
+import asyncio
+import logging
+from typing import Any, Optional, TypeVar, Union
 
+from browser_use.agent.service import Agent
+from browser_use.agent.views import AgentHistoryList
+
+T = TypeVar('T')
+logger = logging.getLogger(__name__)
+
+async def execute_task(
+    agent: Agent, 
+    task: str, 
+    max_steps: int = 20,
+    on_task_start: callable = None,
+    on_task_end: callable = None
+) -> AgentHistoryList:
+    """
+    Execute a single task using an existing agent while preserving the browser session.
+    
+    Args:
+        agent: An initialized Agent instance with an active browser session
+        task: String containing the task to execute
+        max_steps: Maximum steps to take for this task
+        on_task_start: Optional callback function called before task execution
+        on_task_end: Optional callback function called after task execution
+        
+    Returns:
+        AgentHistoryList: The history of the completed task
+    """
+    # Check if agent is already initialized
+    if not hasattr(agent, 'browser_session') or agent.browser_session is None:
+        raise ValueError("Agent must be initialized with a browser session")
+    
+    # Reset consecutive failures counter but keep browser state
+    agent.state.consecutive_failures = 0
+    
+    # Reinitialize eventbus to prevent potential QueueShutDown errors
+    try:
+        from bubus import EventBus
+        agent.eventbus = EventBus(name=f'Agent_{str(agent.id)[-4:]}')
+    except Exception as e:
+        logger.warning(f"Could not reinitialize event bus: {e}")
+    
+    # Add new task to the agent
+    agent.add_new_task(task)
+    logger.info(f"Executing task: {task}")
+    
+    if on_task_start:
+        on_task_start(agent)
+    
+    try:
+        # Run the task
+        result = await agent.run(max_steps=max_steps)
+        
+        if on_task_end:
+            on_task_end(agent, result)
+            
+        return result
+    except Exception as e:
+        logger.error(f"Error executing task: {type(e).__name__}: {e}")
+        # Re-raise to let caller handle the exception
+        raise
+
+
+def execute_task_sync(
+    agent: Agent, 
+    task: str, 
+    max_steps: int = 20,
+    on_task_start: callable = None,
+    on_task_end: callable = None
+) -> AgentHistoryList:
+    """
+    Synchronous version of execute_task.
+    
+    Args:
+        agent: An initialized Agent instance with an active browser session
+        task: String containing the task to execute
+        max_steps: Maximum steps to take for this task
+        on_task_start: Optional callback function called before task execution
+        on_task_end: Optional callback function called after task execution
+        
+    Returns:
+        AgentHistoryList: The history of the completed task
+    """
+    # Get the current event loop if one exists, or create a new one
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    
+    # Run the task in the current event loop
+    return loop.run_until_complete(
+        execute_task(agent, task, max_steps, on_task_start, on_task_end)
+    )
+
+
+async def create_persistent_agent(initial_task: str, **agent_kwargs) -> Agent:
+    """
+    Create an Agent instance with a persistent browser session.
+    
+    Args:
+        initial_task: Initial task description for the agent
+        **agent_kwargs: Additional keyword arguments for Agent constructor
+        
+    Returns:
+        Agent: Initialized agent with browser session ready for multiple tasks
+    """
+    from browser_use.browser import BrowserProfile
+    
+    # Configure browser profile with keep_alive=True
+    browser_profile = agent_kwargs.pop('browser_profile', None)
+    if browser_profile is None:
+        browser_profile = BrowserProfile(keep_alive=True)
+    else:
+        # Ensure keep_alive is set to True
+        browser_profile.keep_alive = True
+    
+    # Create agent with persistent browser profile
+    agent = Agent(
+        task=initial_task,
+        browser_profile=browser_profile,
+        **agent_kwargs
+    )
+    
+    return agent
+
+
+def create_persistent_agent_sync(initial_task: str, **agent_kwargs) -> Agent:
+    """
+    Synchronous wrapper around create_persistent_agent.
+    """
+    import asyncio
+    return asyncio.run(create_persistent_agent(initial_task, **agent_kwargs))
 
