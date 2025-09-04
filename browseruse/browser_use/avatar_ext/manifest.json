@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Avatar Controller Extension",
+  "version": "1.0",
+  "description": "Displays a controllable avatar image on web pages",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["images/avatar.png"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": ["<all_urls>"]
+  
+}
