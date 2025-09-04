@@ -49,7 +49,7 @@ elements = extract_simplified_elements(data)
 
 # 6️⃣ Convert to text for LLM
 element_text = "\n".join(
-    [f"{e['id']}: tag={e['tag']}, text={e['text']}, visible={e['visible']}, x={e['x']}"
+    [f"{e['id']}: tag={e['tag']}, text={e['text']}, visible={e['visible']}, x={round(e['x']) if e['x'] is not None else e['x']}, y={round(e['y']) if e['y'] is not None else e['y']}"
      for e in elements]
 )
 
