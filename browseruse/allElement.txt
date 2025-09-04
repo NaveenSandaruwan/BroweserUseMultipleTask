@@ -1,0 +1,108 @@
+Motion
+  move steps - Move sprite forward by given steps.
+  turn clockwise - Rotate sprite clockwise.
+  turn counterclockwise - Rotate sprite counterclockwise.
+  go to position - Instantly move sprite to coordinates.
+  glide - Smoothly move sprite to a position.
+  point in direction - Face sprite in specific direction.
+  point towards - Turn sprite to face another object.
+  change x - Move horizontally by value.
+  set x - Place sprite at exact x.
+  change y - Move vertically by value.
+  set y - Place sprite at exact y.
+  go to random position - Move sprite to random location.
+  if on edge bounce - Bounce when sprite touches stage edge.
+  set rotation style - Change how sprite rotates.
+
+Looks
+  say message - Display a speech bubble.
+  think message - Display a thought bubble.
+  show - Make sprite visible.
+  hide - Make sprite invisible.
+  switch costume - Change sprite costume.
+  next costume - Move to next costume.
+  switch backdrop - Change stage background.
+  next backdrop - Move to next background.
+  change size - Increase/decrease sprite size.
+  set size - Set exact size.
+  change color effect - Adjust sprite’s color effect.
+  set color effect - Apply specific color effect.
+  clear graphic effects - Remove visual effects.
+
+Sound
+  play sound - Play chosen sound.
+  start sound - Play sound until finished.
+  stop all sounds - Stop every sound playing.
+  change pitch effect - Adjust sound pitch.
+  set pitch effect - Set specific sound pitch.
+  clear sound effects - Remove sound effects.
+  change volume - Raise/lower volume.
+  set volume - Fix volume level.
+  volume - Report current volume.
+
+Events
+  when green flag clicked - Trigger when project starts.
+  when key pressed - Trigger on key press.
+  when this sprite clicked - Trigger on sprite click.
+  when backdrop switches - Trigger when backdrop changes.
+  when loudness - Trigger when sound is loud.
+  broadcast message - Send message to all sprites.
+  broadcast and wait - Send message then wait.
+
+Control
+  wait seconds - Pause script.
+  repeat times - Repeat actions fixed number.
+  forever - Repeat actions infinitely.
+  if then - Run code only if true.
+  if then else - Run code for true/false.
+  wait until - Pause until condition true.
+  repeat until - Repeat until condition met.
+  stop - Stop script/project.
+  create clone - Duplicate sprite.
+  delete clone - Remove sprite clone.
+
+Sensing
+  touching object - Check collision with object.
+  touching color - Detect touching color.
+  color is touching - Check color overlap.
+  distance to - Report distance to object.
+  ask and wait - Ask user input.
+  answer - Report user answer.
+  key pressed - Detect key press.
+  mouse down - Detect mouse click.
+  mouse x - Report mouse x position.
+  mouse y - Report mouse y position.
+  loudness - Report microphone loudness.
+  timer - Report elapsed time.
+  reset timer - Reset timer.
+  current date/time - Report date/time.
+  days since 2000 - Report days since year 2000.
+  username - Report logged-in username.
+
+Operators
+  add - Add two numbers.
+  subtract - Subtract one number.
+  multiply - Multiply numbers.
+  divide - Divide numbers.
+  pick random - Random number between two.
+  greater than - True if left > right.
+  less than - True if left < right.
+  equals - True if equal.
+  and - True if both conditions.
+  or - True if either condition.
+  not - True if condition false.
+  join text - Combine strings.
+  letter of text - Extract letter from string.
+  length of text - Count characters.
+  contains text - Check if string has text.
+  mod - Remainder after division.
+  round - Round number.
+  math functions - Square root, abs, etc.
+
+Variables
+  set variable - Assign value to variable.
+  change variable - Increase/decrease variable.
+  show variable - Display variable on stage.
+  hide variable - Hide variable from stage.
+  make variable - Create new variable.
+
