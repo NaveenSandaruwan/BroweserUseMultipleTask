@@ -76,6 +76,8 @@ async def main():
             print("\n🧹 Cleaning up resources...")
             try:
                 await agent.close()
+                if hasattr(agent, 'browser_session') and agent.browser_session:
+                    await agent.browser_session.kill()
                 print("✅ Browser session closed successfully")
             except Exception as e:
                 print(f"⚠️ Error during cleanup: {e}")
