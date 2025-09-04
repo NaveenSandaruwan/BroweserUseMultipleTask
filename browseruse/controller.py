@@ -33,7 +33,7 @@ class AvatarController:
     #     # Use your existing Chrome profile (optional - remove these lines for clean profile)
     #     # options.add_argument("--user-data-dir=/path/to/chrome/profile")
     #     # options.add_argument("--profile-directory=Default")
-        
+            
     #     # Browser window settings
     #     options.add_argument("--start-maximized")        # Start with maximized window
     #     options.add_argument("--disable-notifications")  # Disable browser notifications
