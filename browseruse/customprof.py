@@ -4,17 +4,19 @@ from browser_use import Agent, ChatGoogle, BrowserProfile
 from dotenv import load_dotenv
 # Import the QueueShutDown exception to handle it specifically
 from bubus.service import QueueShutDown
+import os
 
 load_dotenv()
 
 llm = ChatGoogle(model="gemini-2.0-flash")
-
+USER_DATA_DIR = os.getenv("USER_DATA_DIR")
+CHROME_EXECUTABLE_PATH = os.getenv("CHROME_EXECUTABLE_PATH")
 async def main():
     try:
         profile = BrowserProfile(
-            user_data_dir=r"C:\Users\malit\OneDrive\Desktop\OBO\use_data",  # your new clean profile folder
+            user_data_dir=USER_DATA_DIR,  # your new clean profile folder
             profile="Default",
-            chrome_executable_path=r"C:\Program Files\Google\Chrome\Application\chrome.exe", # adjust if Chrome is elsewhere
+            chrome_executable_path=CHROME_EXECUTABLE_PATH, # adjust if Chrome is elsewhere
             keep_alive=True,
             enable_default_extensions=True
         )
