@@ -39,14 +39,21 @@ async def main():
         print("   The browser state will persist between tasks")
         
         # Process tasks in a loop
+        # Example usage in your script
         while True:
-            task = input("\n🔷 Enter your task (or 'exit' to quit): ")
+            task = input("\n🔷 Enter your task (or 'refresh' to update browser state, or 'exit' to quit): ")
             
-            if task.lower() in ['exit', 'quit', 'q']:
+            if task.lower() == 'exit':
                 print("\n👋 Exiting and closing browser...")
                 break
+            elif task.lower() == 'refresh':
+                print("\n🔄 Refreshing browser state after manual navigation...")
+                result = await execute_task(agent, "This page changed, get familiar with it", max_steps=15)
+                print("✅ Browser state refreshed - the agent now knows the current page state")
+                continue
             
             print(f"\n🔄 Executing task: {task}")
+            # Execute task as before...
             try:
                 # Execute the task while maintaining browser state
                 result = await execute_task(agent, task, max_steps=15)

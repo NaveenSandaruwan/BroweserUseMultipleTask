@@ -2255,4 +2255,3 @@ def create_persistent_agent_sync(initial_task: str, **agent_kwargs) -> Agent:
     """
     import asyncio
     return asyncio.run(create_persistent_agent(initial_task, **agent_kwargs))
-
