@@ -7,7 +7,7 @@ from datetime import datetime
 
 # 1️⃣ Load API key from .env
 load_dotenv()
-API_KEY = os.getenv("GEMINI_API_KEY")
+API_KEY = os.getenv("GOOGLE_API_KEY")
 PATH = os.getenv("ELEMENT_FILE_PATH")
 
 if not API_KEY:
@@ -22,7 +22,7 @@ genai.configure(api_key=API_KEY)
 json_dir = PATH
 
 # 4️⃣ Get latest JSON file automatically
-list_of_files = glob.glob(os.path.join(json_dir, "*.json"))
+list_of_files = glob.glob(os.path.join(json_dir))
 if not list_of_files:
     print("⚠️ No JSON files found in the element_data folder.")
     exit()
