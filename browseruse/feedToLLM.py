@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 # 1️⃣ Load API key and path
 load_dotenv()
-API_KEY = os.getenv("GEMINI_API_KEY")
+API_KEY = os.getenv("GOOGLE_API_KEY")
 PATH = os.getenv("ELEMENT_FILE_PATH")
 
 if not API_KEY:
@@ -18,7 +18,7 @@ if not PATH:
 genai.configure(api_key=API_KEY)
 
 # 3️⃣ Get latest JSON file
-list_of_files = glob.glob(os.path.join(PATH, "*.json"))
+list_of_files = glob.glob(os.path.join(PATH))
 if not list_of_files:
     print("⚠️ No JSON files found.")
     exit()
@@ -56,9 +56,9 @@ element_text = "\n".join(
 # 7️⃣ Create model
 model = genai.GenerativeModel("gemini-2.0-flash")
 
-with open("allElement.txt", "r") as file:
+with open("browseruse\\allElement.txt", "r") as file:
     content = file.read()
-    print(content)
+    # print(content)
 
 
 # 8️⃣ Intro rules

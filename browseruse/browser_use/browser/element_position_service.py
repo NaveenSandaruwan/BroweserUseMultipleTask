@@ -30,7 +30,7 @@ class ElementPositionService:
 
     async def store_element_positions(self, dom_state, step_number: int) -> Path:
         """Store element positions in a JSON file"""
-        filename = f"elements_step_{step_number}.json"
+        filename = f"elements.json"
         file_path = self.elements_dir / filename
 
         element_data = {}
