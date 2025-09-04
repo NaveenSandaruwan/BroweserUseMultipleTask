@@ -41,6 +41,7 @@ def extract_simplified_elements(data):
             "text": el.get("text_content"),
             "visible": el.get("is_visible"),
             "x": el.get("bounding_box", {}).get("x"),
+            "y": el.get("bounding_box", {}).get("y")
         })
     return elements
 
@@ -54,6 +55,11 @@ element_text = "\n".join(
 
 # 7️⃣ Create model
 model = genai.GenerativeModel("gemini-2.0-flash")
+
+with open("allElement.txt", "r") as file:
+    content = file.read()
+    print(content)
+
 
 # 8️⃣ Intro rules
 rules = """
@@ -70,12 +76,12 @@ Here are the rules for interpreting JSON elements:
 - Always mention block name and its position (e.g., 1,2,3..).
 - Positions must always be sequential like 1,2,3..
 - Positions should be based on the order of appearance in the JSON data.
-- Output the child used blocks and other blocks mane as blocks separately.
-
+- Output the child used blocks and other blocks mane as blocks separately with x and y values.
+Block list: {content}
 IMPORTANT:
 - Only label the blocks and create the position list:
-  ex:1.go to.
-    
+  ex:1.go to X:50.155522255, Y:502.84544565.
+- befor give the lables first check if the block is in above    
 """
 
 # 9️⃣ Send initial context
@@ -102,16 +108,16 @@ while True:
 Based on the Scratch block labeling below :
 list of blocks with positions:
     {response.text}
-
+Block list: {content}
 Question: {question}
-when you give me block as anwser firt look if there is similar block in above list and return block name and position only bellow format
-if not sujjest block whish is in Scratch and how to get that block.
+when you give me block as anwser firt look if there is similar block in above list of blocks with positions and return block name and position only bellow format
+if not suggest block whish is in Scratch and how to get that block use Block list for that.
 Answer in this exact format:
 Use a `<block name>` block from the page in `<position>` and change it to `<user's request>`.
 give small explanation about that block also.
 
-If no relevant block is found, respond exactly:
-I couldn't find a relevant block to answer your question.
+If no relevant block is found in list of blocks with positions respond exactly:
+give me that block from Block list and how to get that block.
 """
     answer = model.generate_content(qa_prompt)
     print("\n📝 Answer:\n", answer.text, "\n")
