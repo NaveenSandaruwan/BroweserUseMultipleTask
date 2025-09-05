@@ -1,7 +1,7 @@
 import pychrome
 import time
 
-DEBUG_PORT = 8093
+DEBUG_PORT = 9222
 browser = pychrome.Browser(url=f"http://127.0.0.1:{DEBUG_PORT}")
 tab = browser.list_tab()[0]
 tab.start()
