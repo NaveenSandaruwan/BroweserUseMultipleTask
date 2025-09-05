@@ -265,6 +265,12 @@ class AvatarController:
             try:
                 data = await request.json()
                 text = data.get('text', '')
+                
+                # Print with visible formatting in console
+                print("\n" + "=" * 60)
+                print(f"🎤 SPEECH RECEIVED: \"{text}\"")
+                print("=" * 60)
+                
                 logger.info(f"Received speech: '{text}'")
                 
                 # Call registered callbacks
