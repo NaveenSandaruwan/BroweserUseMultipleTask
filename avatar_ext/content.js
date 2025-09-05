@@ -226,28 +226,16 @@ function setupSpeechRecognition(micButton, micStatus) {
     }, 1000);
   };
 
+  // In content.js, find this section and modify it:
   recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript;
-    console.log("Python Avatar: Speech recognized:", transcript);
-
-    // Send the result to the Python controller
-    micStatus.textContent = `"${transcript}"`;
-
-    // Use custom event for reliable communication
-    const speechEvent = new CustomEvent("pythonAvatarSpeech", {
-      detail: { text: transcript },
-    });
-    window.dispatchEvent(speechEvent);
-
-    // Also use fetch API as a backup
-    fetch("http://localhost:8000/speech", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: transcript }),
-    }).catch((err) => {
-      console.error("Error sending speech to Python:", err);
-      // Don't update UI here since we're using both methods
-    });
+      const transcript = event.results[0][0].transcript;
+      console.log("Python Avatar: Speech recognized:", transcript);
+  
+      // Use custom event only - remove the fetch call
+      const speechEvent = new CustomEvent("pythonAvatarSpeech", {
+          detail: { text: transcript }
+      });
+      window.dispatchEvent(speechEvent);
   };
 
   recognition.onerror = (event) => {
