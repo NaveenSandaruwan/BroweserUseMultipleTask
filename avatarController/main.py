@@ -11,6 +11,22 @@ logger = logging.getLogger(__name__)
 # Global controller reference
 controller = None
 
+# Helper function for clipboard operations
+async def read_and_speak_clipboard():
+    """Read from clipboard and speak the contents"""
+    if controller:
+        clipboard_text = await controller.read_from_clipboard()
+        if clipboard_text:
+            # Truncate if too long
+            if len(clipboard_text) > 50:
+                display_text = clipboard_text[:50] + "..."
+            else:
+                display_text = clipboard_text
+                
+            await controller.speak(f"Clipboard contains: {display_text}")
+        else:
+            await controller.speak("Clipboard is empty or access denied")
+
 # Process speech input
 def on_speech_received(text):
     """Process recognized speech"""
@@ -42,7 +58,25 @@ def on_speech_received(text):
         asyncio.create_task(controller.speak("Goodbye! Have a nice day!"))
     
     elif "help" in text:
-        asyncio.create_task(controller.speak("You can ask me to move to specific coordinates by saying 'move to X Y'"))
+        help_text = "You can use these commands:\n" + \
+                   "- 'move to X Y': Move to coordinates\n" + \
+                   "- 'copy TEXT': Copy text to clipboard\n" + \
+                   "- 'read clipboard': Read from clipboard\n" + \
+                   "- 'hello/goodbye': Greetings"
+        asyncio.create_task(controller.speak(help_text))
+    
+    elif text.startswith("copy "):
+        # Extract text to copy
+        text_to_copy = text[5:]  # Remove "copy " prefix
+        if text_to_copy:
+            asyncio.create_task(controller.copy_to_clipboard(text_to_copy))
+            asyncio.create_task(controller.speak(f"Copied to clipboard"))
+        else:
+            asyncio.create_task(controller.speak("Nothing to copy"))
+    
+    elif "read clipboard" in text:
+        # Read from clipboard
+        asyncio.create_task(read_and_speak_clipboard())
     
     else:
         asyncio.create_task(controller.speak(f"I heard: {text}"))
@@ -54,6 +88,8 @@ async def interactive_mode():
     print("Commands:")
     print("  move X Y - Move avatar to position X,Y")
     print("  say TEXT - Make avatar say something")
+    print("  copy TEXT - Copy text to clipboard")
+    print("  paste - Read from clipboard")
     print("  exec CODE - Execute JavaScript code")
     print("  exit - Exit the program")
     print("----------------------------------")
@@ -83,6 +119,21 @@ async def interactive_mode():
                 text = parts[1]
                 await controller.speak(text)
             
+            elif cmd == "copy" and len(parts) > 1:
+                text = parts[1]
+                success = await controller.copy_to_clipboard(text)
+                if success:
+                    print(f"Copied to clipboard: {text}")
+                else:
+                    print("Failed to copy to clipboard")
+            
+            elif cmd == "paste":
+                text = await controller.read_from_clipboard()
+                if text:
+                    print(f"Clipboard content: {text}")
+                else:
+                    print("Failed to read from clipboard or clipboard is empty")
+            
             elif cmd == "exec" and len(parts) > 1:
                 js_code = parts[1]
                 result = await controller.evaluate_javascript(js_code)
@@ -101,6 +152,8 @@ async def main():
                       help='Chrome DevTools Protocol debugger URL')
     parser.add_argument('--speech-server-port', type=int, default=8000,
                       help='Port for the speech recognition server')
+    parser.add_argument('--content-path', 
+                      help='Path to content.js file (optional, will try to auto-detect)')
     
     args = parser.parse_args()
     
@@ -110,9 +163,17 @@ async def main():
     try:
         # Connect to Chrome
         logger.info("Connecting to Chrome...")
-        connected = await controller.connect()
-        if not connected:
-            logger.error("Failed to connect to Chrome or find avatar extension")
+        try:
+            connected = await controller.connect(content_path=args.content_path)
+            if not connected:
+                logger.error("Failed to connect to Chrome or find avatar extension")
+                return
+        except UnicodeDecodeError as e:
+            logger.error(f"Character encoding error when reading content.js: {e}")
+            logger.info("Try running with --content-path parameter to specify the correct path")
+            return
+        except Exception as e:
+            logger.error(f"Error connecting to Chrome: {e}")
             return
         
         # Register speech callback

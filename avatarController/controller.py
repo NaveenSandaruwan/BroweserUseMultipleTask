@@ -28,8 +28,12 @@ class AvatarController:
         self.message_id = 0
         self.pending_commands = {}
     
-    async def connect(self) -> bool:
-        """Connect to a Chrome tab with the avatar extension running"""
+    async def connect(self, content_path=None) -> bool:
+        """Connect to a Chrome tab with the avatar extension running
+        
+        Args:
+            content_path: Optional path to content.js file
+        """
         try:
             # First, get list of available tabs through HTTP
             logger.info(f"Connecting to Chrome DevTools at {self.chrome_debugger_url}")
@@ -75,7 +79,7 @@ class AvatarController:
                 logger.warning("Avatar extension not detected, injecting script")
                 
                 # Inject the avatar script directly
-                return await self.inject_avatar_script()
+                return await self.inject_avatar_script(content_path)
                 
         except Exception as e:
             logger.error(f"Error connecting to Chrome: {e}")
@@ -124,10 +128,41 @@ class AvatarController:
             return result['result'].get('value')
         return None
     
-    async def inject_avatar_script(self) -> bool:
-        """Inject the avatar script directly into the page"""
+    async def inject_avatar_script(self, content_path=None) -> bool:
+        """Inject the avatar script directly into the page
+        
+        Args:
+            content_path: Optional path to content.js file
+        """
         try:
-            with open("e:\\VS CODE\\Agentic AI\\BrowserUse\\avatar_ext\\content.js", "r") as f:
+            import os
+            
+            # Use provided path if available
+            if content_path and os.path.exists(content_path):
+                content_file = content_path
+            else:
+                # Get the path to the content.js file
+                # Try multiple possible locations for better compatibility
+                possible_paths = [
+                    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "avatar_ext", "content.js"),
+                    os.path.join(os.path.dirname(os.path.abspath(__file__)), "../avatar_ext/content.js"),
+                    "e:\\VS CODE\\Agentic AI\\BrowserUse\\avatar_ext\\content.js"
+                ]
+                
+                content_file = None
+                for path in possible_paths:
+                    if os.path.exists(path):
+                        content_file = path
+                        break
+                
+                if not content_file:
+                    logger.error("Could not find content.js file")
+                    return False
+            
+            logger.info(f"Using content script at: {content_file}")
+            
+            # Use utf-8 encoding to handle special characters
+            with open(content_file, "r", encoding="utf-8") as f:
                 avatar_script = f.read()
                 
             # Inject the script
@@ -140,13 +175,23 @@ class AvatarController:
                 logger.info("Avatar script injected for future page loads")
                 
                 # Also execute in current page
-                eval_result = await self.send_command(
-                    "Runtime.evaluate",
-                    {"expression": avatar_script}
-                )
-                
-                # Verify the script was injected correctly
-                check = await self.evaluate_javascript("typeof window.pythonAvatarControl !== 'undefined'")
+                try:
+                    eval_result = await self.send_command(
+                        "Runtime.evaluate",
+                        {"expression": avatar_script}
+                    )
+                    
+                    # Verify the script was injected correctly
+                    check = await self.evaluate_javascript("typeof window.pythonAvatarControl !== 'undefined'")
+                except Exception as e:
+                    logger.error(f"Error executing script: {e}")
+                    # Try a simplified version to check if it's a syntax error
+                    try:
+                        await self.evaluate_javascript("console.log('Testing connection')")
+                        logger.info("Basic JavaScript execution works, but avatar script has errors")
+                    except:
+                        logger.error("Cannot execute any JavaScript in this context")
+                    return False
                 if check:
                     logger.info("Avatar script successfully injected into current page")
                     return True
@@ -185,6 +230,28 @@ class AvatarController:
         else:
             logger.warning(f"Failed to make avatar speak: '{text}'")
             return False
+    
+    async def copy_to_clipboard(self, text: str) -> bool:
+        """Copy text to clipboard"""
+        # Escape quotes in the text
+        text = text.replace('"', '\\"')
+        result = await self.evaluate_javascript(f'window.pythonAvatarControl && window.pythonAvatarControl.copyToClipboard("{text}")')
+        if result:
+            logger.info(f"Copied to clipboard: '{text[:30]}{'...' if len(text) > 30 else ''}'")
+            return True
+        else:
+            logger.warning(f"Failed to copy to clipboard")
+            return False
+    
+    async def read_from_clipboard(self) -> Optional[str]:
+        """Read text from clipboard"""
+        result = await self.evaluate_javascript('window.pythonAvatarControl && window.pythonAvatarControl.readFromClipboard()')
+        if result:
+            logger.info(f"Read from clipboard: '{result[:30]}{'...' if len(result) > 30 else ''}'")
+            return result
+        else:
+            logger.warning("Failed to read from clipboard")
+            return None
     
     def register_speech_callback(self, callback: Callable[[str], None]) -> None:
         """Register callback for speech recognition"""

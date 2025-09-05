@@ -22,7 +22,10 @@
   ],
   "permissions": [
     "scripting",
-    "activeTab"
+    "activeTab",
+    "clipboardWrite",
+    "clipboardRead",
+    "audioCapture"
   ],
   "host_permissions": [
     "<all_urls>"
