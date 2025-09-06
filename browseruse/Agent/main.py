@@ -1,177 +1,87 @@
+import os
 import asyncio
 import json
-import pychrome
-import requests
-import time
-from functools import partial
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+import google.generativeai as genai
+from dotenv import load_dotenv
 
-class AvatarController:
-    def __init__(self, debug_port=9222):
-        self.debug_url = f"http://127.0.0.1:{debug_port}"
-        self.browser = pychrome.Browser(url=self.debug_url)
-        self.tab = None
-        self.loop = None
-        self.last_speech = None
+# Load environment variables
+load_dotenv()
 
-    async def connect(self):
-        try:
-            # Store the event loop
-            self.loop = asyncio.get_running_loop()
-            
-            # Get raw debug info
-            response = requests.get(f"{self.debug_url}/json/list")
-            debug_info = response.json()
-            
-            print("\n🔍 Available Chrome pages:")
-            for info in debug_info:
-                print(f"""
-                Title: {info.get('title', 'Unknown')}
-                Type: {info.get('type', 'Unknown')}
-                URL: {info.get('url', 'Unknown')}
-                ID: {info.get('id', 'Unknown')}
-                """)
+# Configure Gemini
+genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
+model = genai.GenerativeModel('gemini-2.0-flash')
 
-            # Try to find existing tab with our extension
-            active_tab = None
-            for info in debug_info:
-                if info.get('type') == 'page' and info.get('url', '').startswith('http'):
-                    active_tab = info
-                    break
+app = FastAPI()
 
-            if active_tab:
-                # Get the tab object
-                for tab in self.browser.list_tab():
-                    if tab.id == active_tab['id']:
-                        self.tab = tab
-                        break
+# Allow CORS for local extension
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-                if self.tab:
-                    self.tab.start()
-                    
-                    # Enable necessary domains
-                    self.tab.Runtime.enable()
-                    self.tab.Page.enable()
-                    
-                    # Set up debug logging and speech event listener
-                    self.tab.Runtime.evaluate(expression='''
-                        // Debug logging
-                        console.log('Python Avatar: Setting up speech listener');
-                        
-                        // Function to handle speech
-                        function handleSpeech(event) {
-                            const text = event.detail.text;
-                            console.log('DEBUG: Speech event received:', text);
-                            // Send direct message to Python
-                            console.log('PYTHON_SPEECH_EVENT:' + text);
-                        }
-                        
-                        // Remove existing listener if any
-                        if (window._speechHandler) {
-                            window.removeEventListener('pythonAvatarSpeech', window._speechHandler);
-                        }
-                        
-                        // Add new listener
-                        window._speechHandler = handleSpeech;
-                        window.addEventListener('pythonAvatarSpeech', handleSpeech);
-                        
-                        // Debug confirmation
-                        console.log('Python Avatar: Speech listener setup complete');
-                    ''')
-                    
-                    # Add callback for console messages
-                    self.tab.Runtime.consoleAPICalled = self._handle_console_message
-                    
-                    print(f"✓ Connected to active tab: {active_tab['url']}")
-                    return True
+class ChatRequest(BaseModel):
+    text: str
 
-            print("\n❌ No suitable active tab found!")
-            print("\n🔧 Steps to fix:")
-            print("1. Make sure Chrome is running with: --remote-debugging-port=9222")
-            print("2. Open a webpage in Chrome (e.g., google.com)")
-            print("3. Load your extension in chrome://extensions/")
-            print("4. Enable Developer mode")
-            return False
+# System prompt to help Gemini understand command structure
+SYSTEM_PROMPT = """You are an AI assistant that can both answer questions and control an avatar on the screen.
+When users ask general questions, respond normally.
+When users ask you to perform actions, respond with a JSON command structure.
 
-        except Exception as e:
-            print(f"❌ Connection error: {str(e)}")
-            return False
+Commands available:
+1. Move avatar: When asked to move, respond with:
+   {"type": "command", "action": "move", "x": <x_position>, "y": <y_position>}
 
-    def _handle_console_message(self, **kwargs):
-        """Handle console messages from the browser"""
-        try:
-            if 'args' in kwargs:
-                for arg in kwargs['args']:
-                    if arg.get('type') == 'string':
-                        value = arg.get('value', '')
-                        
-                        # Debug print for all console messages
-                        print(f"Debug - Console message: {value}")
-                        
-                        if value.startswith('PYTHON_SPEECH_EVENT:'):
-                            text = value.replace('PYTHON_SPEECH_EVENT:', '').strip()
-                            if text != self.last_speech:
-                                self.last_speech = text
-                                print(f"\n🎤 Speech received: {text}")
-                                
-                                if self.loop and self.loop.is_running():
-                                    self.loop.create_task(self._process_speech_async(text))
-                                else:
-                                    print("❌ Event loop not available")
-        except Exception as e:
-            print(f"❌ Error handling console message: {str(e)}")
+For movement commands:
+- x and y should be between 0 and 1000
+- Interpret relative positions like "left", "right", "top", "bottom"
+- "left" = x:100, "right" = x:900, "top" = y:100, "bottom" = y:900
+- "center" = x:500, y:500
 
-    async def _process_speech_async(self, text):
-        """Process received speech text asynchronously"""
-        try:
-            if text:
-                print(f"🤖 Processing speech: {text}")
-                await self.send_message(f"I heard: {text}")
-            else:
-                print("❌ Empty speech text received")
-        except Exception as e:
-            print(f"❌ Error processing speech: {str(e)}")
+Examples:
+User: "Move to the right"
+Response: {"type": "command", "action": "move", "x": 900, "y": 500}
 
-    async def send_message(self, text):
-        if not self.tab:
-            print("❌ Not connected to any tab")
-            return
+User: "What is Python?"
+Response: {"type": "response", "text": "Python is a high-level programming language..."}
 
-        try:
-            result = self.tab.Runtime.evaluate(expression=f'''
-                try {{
-                    if (window.pythonAvatarControl && window.pythonAvatarControl.speak) {{
-                        window.pythonAvatarControl.speak({json.dumps(text)});
-                        "Message sent: " + {json.dumps(text)};
-                    }} else {{
-                        throw new Error("Avatar control not available");
-                    }}
-                }} catch (e) {{
-                    console.error('Error:', e);
-                    throw e;
-                }}
-            ''')
-            print(f"✓ Message sent: {text}")
-            
-        except Exception as e:
-            print(f"❌ Failed to send message: {str(e)}")
+Always respond with valid JSON containing either a command or a response."""
 
-async def main():
-    avatar = AvatarController()
+@app.post("/chat")
+async def chat_endpoint(req: ChatRequest):
+    user_text = req.text.strip()
+    if not user_text:
+        return {"type": "response", "text": "Please say something!"}
     
-    print("🔌 Connecting to Chrome...")
-    if await avatar.connect():
-        await avatar.send_message("Hello! I'm listening for your voice input.")
+    try:
+        # Create chat with system prompt
+        chat = model.start_chat(history=[])
+        
+        # Send system prompt and user message
+        response = chat.send_message(f"{SYSTEM_PROMPT}\n\nUser: {user_text}")
         
         try:
-            print("\n✓ Connection established")
-            print("🎤 Listening for speech... (Press Ctrl+C to exit)")
-            while True:
-                await asyncio.sleep(1)
-        except KeyboardInterrupt:
-            print("\n🛑 Shutting down...")
+            # Try to parse as JSON
+            result = json.loads(response.text)
+            return result
+        except json.JSONDecodeError:
+            # If not valid JSON, treat as regular response
+            return {
+                "type": "response",
+                "text": response.text
+            }
             
-        if avatar.tab:
-            avatar.tab.stop()
+    except Exception as e:
+        return {
+            "type": "response",
+            "text": f"Sorry, I had an error: {str(e)}"
+        }
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    import uvicorn
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

@@ -226,18 +226,73 @@ function setupSpeechRecognition(micButton, micStatus) {
     }, 1000);
   };
 
-  // In content.js, find this section and modify it:
-  recognition.onresult = (event) => {
+    recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       console.log("Python Avatar: Speech recognized:", transcript);
   
-      // Use custom event only - remove the fetch call
-      const speechEvent = new CustomEvent("pythonAvatarSpeech", {
-          detail: { text: transcript }
+      // Show immediate feedback
+      if (window.pythonAvatarControl && window.pythonAvatarControl.speak) {
+          window.pythonAvatarControl.speak("Processing...", 2000);
+      }
+  
+      // Send to FastAPI endpoint
+      fetch("http://127.0.0.1:8000/chat", {
+          method: "POST",
+          headers: { 
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ 
+              text: transcript 
+          })
+      })
+      .then(response => response.json())
+      .then(data => {
+          console.log("Server response:", data);
+          
+          if (!data || !data.type) {
+              throw new Error("Invalid response format");
+          }
+  
+          // Handle different response types
+          switch (data.type) {
+              case "command":
+                  handleCommand(data);
+                  break;
+              case "response":
+                  if (window.pythonAvatarControl) {
+                      window.pythonAvatarControl.speak(data.text, 8000);
+                  }
+                  break;
+              default:
+                  console.error("Unknown response type:", data.type);
+          }
+      })
+      .catch(error => {
+          console.error("Error:", error);
+          if (window.pythonAvatarControl) {
+              window.pythonAvatarControl.speak("Sorry, I encountered an error. Please try again.", 3000);
+          }
       });
-      window.dispatchEvent(speechEvent);
   };
-
+  
+  // Add this function to handle commands
+  function handleCommand(command) {
+      if (!command.action) {
+          console.error("No action specified in command");
+          return;
+      }
+  
+      switch (command.action) {
+          case "move":
+              if (window.pythonAvatarControl && typeof command.x === 'number' && typeof command.y === 'number') {
+                  window.pythonAvatarControl.move(command.x, command.y);
+                  window.pythonAvatarControl.speak("Moving to position " + command.x + ", " + command.y, 3000);
+              }
+              break;
+          default:
+              console.error("Unknown command action:", command.action);
+      }
+  }
   recognition.onerror = (event) => {
     console.error("Python Avatar: Recognition error", event.error);
     micStatus.textContent = `Error: ${event.error}`;
