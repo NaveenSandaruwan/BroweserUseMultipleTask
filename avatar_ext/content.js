@@ -1,14 +1,10 @@
-// Avatar controller content script
-
-// Create and inject avatar elements
+// ===== Avatar Creation =====
 function createAvatar() {
-  // Check if avatar already exists
   if (document.getElementById("python-avatar-container")) {
     console.log("Python Avatar: Avatar already exists");
     return;
   }
 
-  // Create the avatar container
   const avatarContainer = document.createElement("div");
   avatarContainer.id = "python-avatar-container";
   avatarContainer.style.cssText = `
@@ -20,10 +16,9 @@ function createAvatar() {
     flex-direction: column;
     align-items: center;
     pointer-events: none;
-    transition: all 0.3s ease;
+    transition: left 0.6s ease, top 0.6s ease;
   `;
 
-  // Create the avatar image - use inline SVG instead of external image for reliability
   const avatar = document.createElement("div");
   avatar.id = "python-avatar";
   avatar.innerHTML = `
@@ -44,7 +39,6 @@ function createAvatar() {
     box-shadow: 0 3px 10px rgba(0,0,0,0.3);
   `;
 
-  // Create speech bubble
   const speechBubble = document.createElement("div");
   speechBubble.id = "python-avatar-speech";
   speechBubble.style.cssText = `
@@ -60,7 +54,7 @@ function createAvatar() {
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   `;
 
-  // Create microphone button
+  // Mic button
   const micButton = document.createElement("button");
   micButton.id = "python-avatar-mic";
   micButton.innerHTML = "🎤";
@@ -78,17 +72,8 @@ function createAvatar() {
     cursor: pointer;
     z-index: 10001;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-    transition: all 0.2s ease;
   `;
-  // Add hover effect
-  micButton.onmouseover = () => {
-    micButton.style.transform = "scale(1.1)";
-  };
-  micButton.onmouseout = () => {
-    micButton.style.transform = "scale(1)";
-  };
 
-  // Create mic status indicator
   const micStatus = document.createElement("div");
   micStatus.id = "python-avatar-mic-status";
   micStatus.style.cssText = `
@@ -105,92 +90,88 @@ function createAvatar() {
     z-index: 10001;
   `;
 
-  // Create test button for permissions
-  const testButton = document.createElement("button");
-  testButton.id = "python-avatar-test";
-  testButton.innerHTML = "🔍";
-  testButton.title = "Test microphone permissions";
-  testButton.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    right: 80px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #34A853;
-    color: white;
-    font-size: 18px;
-    border: none;
-    cursor: pointer;
-    z-index: 10001;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-  `;
-
-  // Add click handler for testing permissions
-  testButton.addEventListener("click", async () => {
-    micStatus.textContent = "Checking permissions...";
-    micStatus.style.opacity = 1;
-
-    try {
-      // Request microphone permissions directly
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      console.log("Python Avatar: Microphone permission granted", stream);
-      micStatus.textContent = "Microphone permission: ✅ Granted";
-
-      // Release the tracks
-      stream.getTracks().forEach((track) => track.stop());
-
-      // Update UI after checking
-      setTimeout(() => {
-        micStatus.style.opacity = 0;
-      }, 3000);
-    } catch (err) {
-      console.error("Python Avatar: Microphone permission error", err);
-      micStatus.textContent = `Microphone permission: ❌ ${err.name}`;
-      setTimeout(() => {
-        micStatus.style.opacity = 0;
-      }, 3000);
-    }
-  });
-
-  // Append elements
   avatarContainer.appendChild(avatar);
   avatarContainer.appendChild(speechBubble);
   document.body.appendChild(avatarContainer);
   document.body.appendChild(micButton);
-  document.body.appendChild(testButton);
   document.body.appendChild(micStatus);
 
-  // Set up speech recognition
   setupSpeechRecognition(micButton, micStatus);
-
-  console.log("Python Avatar: Avatar initialized and ready for commands");
+  console.log("Python Avatar: Ready for structured commands ✅");
   return true;
 }
 
-// Handle speech recognition
-function setupSpeechRecognition(micButton, micStatus) {
-  // Try to use the standard SpeechRecognition first, then fall back to webkitSpeechRecognition
-  const SpeechRecognitionAPI =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
+// ===== Helpers =====
+function moveAvatar(x, y) {
+  const avatarContainer = document.getElementById("python-avatar-container");
+  if (avatarContainer && typeof x === "number" && typeof y === "number") {
+    avatarContainer.style.left = `${x}px`;
+    avatarContainer.style.top = `${y}px`;
+    return true;
+  }
+  return false;
+}
 
-  if (!SpeechRecognitionAPI) {
-    console.error(
-      "Python Avatar: Speech recognition not supported in this browser"
-    );
-    micStatus.textContent = "Speech recognition not supported";
-    micStatus.style.opacity = 1;
-    setTimeout(() => {
-      micStatus.style.opacity = 0;
-    }, 3000);
+function showSpeech(text, duration = 5000) {
+  const speechBubble = document.getElementById("python-avatar-speech");
+  if (speechBubble) {
+    speechBubble.textContent = text;
+    speechBubble.style.opacity = 1;
+    if (duration > 0) setTimeout(() => (speechBubble.style.opacity = 0), duration);
+  }
+}
+
+function moveNearElement(id, offsetX = 50, offsetY = -20) {
+  const element = document.getElementById(id);
+  const avatarContainer = document.getElementById("python-avatar-container");
+  if (element && avatarContainer) {
+    const rect = element.getBoundingClientRect();
+    avatarContainer.style.left = `${rect.left + window.scrollX + offsetX}px`;
+    avatarContainer.style.top = `${rect.top + window.scrollY + offsetY}px`;
+    return true;
+  }
+  return false;
+}
+
+// ===== Explain Handler =====
+function explainElement(command) {
+  let moved = false;
+
+  if (command.x != null && command.y != null) {
+    moved = moveAvatar(command.x, command.y);
+  }
+
+  if (!moved && command.id) {
+    moved = moveNearElement(command.id);
+  }
+
+  showSpeech(command.text || "Sorry, I don’t have enough information.", 6000);
+}
+
+// ===== Command Handler =====
+function handleCommand(command) {
+  if (!command || !command.action) {
+    console.error("Invalid command:", command);
     return;
   }
 
-  // Log that we found the API
-  console.log(
-    "Python Avatar: Speech recognition API found",
-    SpeechRecognitionAPI.name || "SpeechRecognition"
-  );
+  switch (command.action) {
+    case "move":
+      moveAvatar(command.x, command.y);
+      showSpeech(command.text || `Moving to (${command.x}, ${command.y})`, 3000);
+      break;
+    case "explain":
+      explainElement(command);
+      break;
+    default:
+      console.error("Unknown command action:", command.action);
+  }
+}
+
+// ===== Speech Recognition =====
+function setupSpeechRecognition(micButton, micStatus) {
+  const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognitionAPI) return console.error("Speech recognition not supported");
 
   const recognition = new SpeechRecognitionAPI();
   recognition.continuous = false;
@@ -200,217 +181,63 @@ function setupSpeechRecognition(micButton, micStatus) {
   let isListening = false;
 
   micButton.addEventListener("click", () => {
-    if (isListening) {
-      recognition.stop();
-    } else {
-      recognition.start();
-      micStatus.textContent = "Listening...";
-      micStatus.style.opacity = 1;
-    }
+    if (isListening) recognition.stop();
+    else recognition.start();
   });
 
   recognition.onstart = () => {
-    console.log("Python Avatar: Speech recognition started");
     isListening = true;
-    micButton.style.background = "#EA4335"; // Red when recording
+    micButton.style.background = "#EA4335";
     micStatus.textContent = "Listening...";
     micStatus.style.opacity = 1;
   };
 
   recognition.onend = () => {
-    console.log("Python Avatar: Speech recognition ended");
-    isListening = false;
-    micButton.style.background = "#4285f4"; // Blue when not recording
-    setTimeout(() => {
-      micStatus.style.opacity = 0;
-    }, 1000);
-  };
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      console.log("Python Avatar: Speech recognized:", transcript);
-  
-      // Show immediate feedback
-      if (window.pythonAvatarControl && window.pythonAvatarControl.speak) {
-          window.pythonAvatarControl.speak("Processing...", 2000);
-      }
-  
-      // Send to FastAPI endpoint
-      fetch("http://127.0.0.1:8000/chat", {
-          method: "POST",
-          headers: { 
-              "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ 
-              text: transcript 
-          })
-      })
-      .then(response => response.json())
-      .then(data => {
-          console.log("Server response:", data);
-          
-          if (!data || !data.type) {
-              throw new Error("Invalid response format");
-          }
-  
-          // Handle different response types
-          switch (data.type) {
-              case "command":
-                  handleCommand(data);
-                  break;
-              case "response":
-                  if (window.pythonAvatarControl) {
-                      window.pythonAvatarControl.speak(data.text, 8000);
-                  }
-                  break;
-              default:
-                  console.error("Unknown response type:", data.type);
-          }
-      })
-      .catch(error => {
-          console.error("Error:", error);
-          if (window.pythonAvatarControl) {
-              window.pythonAvatarControl.speak("Sorry, I encountered an error. Please try again.", 3000);
-          }
-      });
-  };
-  
-  // Add this function to handle commands
-  function handleCommand(command) {
-      if (!command.action) {
-          console.error("No action specified in command");
-          return;
-      }
-  
-      switch (command.action) {
-          case "move":
-              if (window.pythonAvatarControl && typeof command.x === 'number' && typeof command.y === 'number') {
-                  window.pythonAvatarControl.move(command.x, command.y);
-                  window.pythonAvatarControl.speak("Moving to position " + command.x + ", " + command.y, 3000);
-              }
-              break;
-          default:
-              console.error("Unknown command action:", command.action);
-      }
-  }
-  recognition.onerror = (event) => {
-    console.error("Python Avatar: Recognition error", event.error);
-    micStatus.textContent = `Error: ${event.error}`;
-    micStatus.style.opacity = 1;
-    setTimeout(() => {
-      micStatus.style.opacity = 0;
-    }, 3000);
     isListening = false;
     micButton.style.background = "#4285f4";
+    micStatus.style.opacity = 0;
+  };
 
-    // Additional logging for different error types
-    switch (event.error) {
-      case "not-allowed":
-        console.error("Python Avatar: Microphone permission denied");
-        micStatus.textContent = "Microphone permission denied";
-        break;
-      case "no-speech":
-        console.error("Python Avatar: No speech detected");
-        micStatus.textContent = "No speech detected";
-        break;
-      case "audio-capture":
-        console.error("Python Avatar: Audio capture failed");
-        micStatus.textContent = "Audio capture failed";
-        break;
-      case "network":
-        console.error("Python Avatar: Network error");
-        micStatus.textContent = "Network error";
-        break;
-      case "aborted":
-        console.log("Python Avatar: Recognition aborted");
-        micStatus.textContent = "Recognition stopped";
-        break;
-    }
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    console.log("Heard:", transcript);
+    showSpeech("Processing...", 2000);
+
+    fetch("http://127.0.0.1:8000/ask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: transcript }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Structured command:", data);
+        if (data.command) handleCommand(data.command);
+      })
+      .catch((err) => {
+        console.error("Error talking to agent:", err);
+        handleCommand({ action: "explain", text: "Sorry, something went wrong with the agent." });
+      });
+  };
+
+  recognition.onerror = (event) => {
+    console.error("Recognition error:", event.error);
+    micStatus.textContent = `Error: ${event.error}`;
+    micStatus.style.opacity = 1;
   };
 }
 
-// Function to move avatar to specific coordinates
-function moveAvatar(x, y) {
-  const avatarContainer = document.getElementById("python-avatar-container");
-  if (avatarContainer) {
-    avatarContainer.style.left = `${x}px`;
-    avatarContainer.style.top = `${y}px`;
-    console.log(`Python Avatar: Moved to (${x}, ${y})`);
-    return true;
-  }
-  return false;
-}
+// ===== Expose API =====
+window.pythonAvatarControl = {
+  move: moveAvatar,
+  speak: showSpeech,
+  explain: explainElement,
+  moveNearElement: moveNearElement,
+  handleCommand: handleCommand,
+};
 
-// Function to display speech bubble
-function showSpeech(text, duration = 5000) {
-  const speechBubble = document.getElementById("python-avatar-speech");
-  if (speechBubble) {
-    speechBubble.textContent = text;
-    speechBubble.style.opacity = 1;
-    console.log(`Python Avatar: Says "${text}"`);
-
-    if (duration > 0) {
-      setTimeout(() => {
-        speechBubble.style.opacity = 0;
-      }, duration);
-    }
-    return true;
-  }
-  return false;
-}
-
-// Initialize avatar when the page is loaded
+// ===== Initialize =====
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", createAvatar);
 } else {
   createAvatar();
 }
-
-// Function to handle clipboard operations safely
-async function handleClipboard(text, operation = "copy") {
-  try {
-    if (operation === "copy") {
-      await navigator.clipboard.writeText(text);
-      console.log("Python Avatar: Text copied to clipboard successfully");
-      return true;
-    } else if (operation === "read") {
-      const clipText = await navigator.clipboard.readText();
-      console.log("Python Avatar: Text read from clipboard");
-      return clipText;
-    }
-  } catch (err) {
-    console.error("Python Avatar: Clipboard operation failed:", err);
-    // Try fallback method for copying
-    if (operation === "copy") {
-      try {
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        textArea.style.position = "fixed"; // Prevent scrolling to bottom
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        const successful = document.execCommand("copy");
-        document.body.removeChild(textArea);
-        if (successful) {
-          console.log("Python Avatar: Text copied using fallback method");
-          return true;
-        } else {
-          console.error("Python Avatar: Fallback clipboard copy failed");
-        }
-      } catch (err) {
-        console.error("Python Avatar: Fallback clipboard error:", err);
-      }
-    }
-    return false;
-  }
-}
-
-// Expose functions to global scope for CDP access
-window.pythonAvatarControl = {
-  move: moveAvatar,
-  speak: showSpeech,
-  copyToClipboard: (text) => handleClipboard(text, "copy"),
-  readFromClipboard: () => handleClipboard("", "read"),
-};
-
-console.log("Python Avatar: Content script loaded");
