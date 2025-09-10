@@ -50,7 +50,7 @@ async def main():
                 break
             elif task.lower() == 'refresh':
                 print("\n🔄 Refreshing browser state after manual navigation...")
-                result = await execute_task(agent, "This page changed, get familiar with it", max_steps=15)
+                result = await execute_task(agent, "This page changed, get familiar with it", max_steps=5)
                 print("✅ Browser state refreshed - the agent now knows the current page state")
                 continue
             elif task.lower() == 'perms help':
