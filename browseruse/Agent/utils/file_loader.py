@@ -45,3 +45,5 @@ def load_element_descriptions(txt_path=r"E:\VS CODE\Agentic AI\BrowserUse\browse
     with open(txt_path, 'r', encoding='utf-8') as f:
         descriptions = [line.strip() for line in f if line.strip()]
     return descriptions
+
+# print(load_element_descriptions())

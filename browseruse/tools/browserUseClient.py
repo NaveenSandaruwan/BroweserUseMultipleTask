@@ -2,6 +2,10 @@
 import socket
 
 def send_task(task: str):
+    ''' User can do action on website like button press, scrolling, 
+    searching, filling text boxes, navigating to another site 
+    but cannot do drag and drop like actions. '''
+
     host = "127.0.0.1"
     port = 65432
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -12,6 +16,6 @@ def send_task(task: str):
 
 
 if __name__ == "__main__":
-    send_task("Go to scratch.mit.edu")
-    # send_task("Go to geeksforgeeks.org")
+    # send_task("go to scratch educattion")
+    send_task("Go to create")
     # send_task("exit")   # gracefully shut down worker

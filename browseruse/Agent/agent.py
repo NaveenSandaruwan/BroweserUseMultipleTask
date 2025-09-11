@@ -1,10 +1,18 @@
 from google import genai
-from utils.file_loader import load_latest_json
-from utils.element_parser import extract_simplified_elements, convert_elements_to_text
-from utils.tools import build_block_labeling_prompt, build_qa_prompt
-from langgraph.graph import StateGraph, END
+from utils.file_loader import load_and_extract_elements, load_element_descriptions
+from utils.prompt_rules import RULES
+import sys
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from tools.dragTool import Toolbox
+from tools.browserUseClient import send_task
+from langgraph.graph import StateGraph, END
+
+# Add the parent directory of `tools` to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+
 from dotenv import load_dotenv
+from dataclasses import dataclass
 
 load_dotenv()
 
@@ -20,43 +28,123 @@ def llm_call(prompt: str, model="gemini-2.0-flash"):
     )
     return response.text.strip()
 
-# State for LangGraph
-class AgentState(dict):
-    pass
+dragTool = Toolbox()
 
-# Labeling step
-def labeling_step(state: AgentState):
-    json_data, _ = load_latest_json(os.getenv("ELEMENT_FILE_PATH"))
-    print(len(json_data))
-    elements = extract_simplified_elements(json_data)
-    element_text = convert_elements_to_text(elements)
+from typing import TypedDict, List
 
-    with open(PATH, "r") as f:
-        block_list = f.read()
+class AgentState(TypedDict, total=False):
+    rules: str
+    labeled_blocks: List[dict]
+    element_description: str
+    question: str
+    answer: str
+    task_type: str
+    result: str
 
-    print("Element text length:", len(element_text))
-    prompt = build_block_labeling_prompt(element_text, block_list)
-    result = llm_call(prompt)
-    state["labeled_blocks"] = result
-    return state
+# Define the agent graph
+class AgentGraph:
+    def __init__(self):
+        # Use dict state, easier with LangGraph
+        self.graph = StateGraph(AgentState)
 
-# QA step
-def qa_step(state: AgentState):
-    question = state["question"]
-    with open(r"E:\VS CODE\Agentic AI\BrowserUse\browseruse\allElement.txt", "r") as f:
-        block_list = f.read()
-    print("Block list length:", len(block_list))
-    prompt = build_qa_prompt(state["labeled_blocks"], block_list, question)
-    result = llm_call(prompt)
-    state["answer"] = result
-    return state
+        # Define the workflow steps (nodes)
+        self.graph.add_node("refresh_data", self.refresh_data)
+        self.graph.add_node("load_files", self.load_files)
+        self.graph.add_node("process_rules", self.process_rules)
+        self.graph.add_node("analyze_question", self.analyze_question)
+        self.graph.add_node("assist_user", self.assist_user)
+        self.graph.add_node("generate_answer", self.generate_answer)
+        self.graph.add_node("get_result", self.get_result)
 
-# LangGraph workflow
-workflow = StateGraph(AgentState)
-workflow.add_node("label_blocks", labeling_step)
-workflow.add_node("qa", qa_step)
-workflow.add_edge("label_blocks", "qa")
-workflow.set_entry_point("label_blocks")
-workflow.set_finish_point("qa")
+        # Define the workflow edges
+        self.graph.set_entry_point("refresh_data")
+        self.graph.add_edge("refresh_data", "load_files")
 
-agent = workflow.compile()
+        self.graph.add_edge("load_files", "process_rules")
+        self.graph.add_edge("process_rules", "analyze_question")
+        self.graph.add_edge("analyze_question", "assist_user")
+        self.graph.add_edge("analyze_question", "generate_answer")
+
+        self.graph.add_conditional_edges(
+            "analyze_question",
+            lambda state: state["task_type"],  # decision key
+            {
+                "drag_and_drop": "assist_user",
+                "generate_answer": "generate_answer",
+            },
+        )
+        self.graph.add_edge("assist_user", "get_result")
+        self.graph.add_edge("generate_answer", "get_result")
+        self.graph.add_edge("get_result", END)
+
+        # Compile the graph
+        self.app = self.graph.compile()
+
+    # === Nodes ===
+    def refresh_data(self, state: AgentState):
+        """Refresh the element data files."""
+        send_task("refresh") 
+        return "load_files"
+
+    def load_files(self, state: AgentState):
+        """Load labeled blocks and element descriptions."""
+        print(f"DEBUG: State before load_files: {state} (type: {type(state)})")
+        
+        # Load labeled blocks
+        labeled_blocks = load_and_extract_elements()
+        state["labeled_blocks"] = labeled_blocks
+        print(f"🔍 Found {len(labeled_blocks)} labeled blocks.")
+        
+        # Load element descriptions
+        element_description = load_element_descriptions()
+        state["element_description"] = element_description
+        print(f"📝 Loaded element descriptions.")
+        
+        return "process_rules"
+
+
+    def process_rules(self, state: AgentState):
+        """Load rules for the agent."""
+        state["rules"] = RULES
+        return "analyze_question"
+
+    def analyze_question(self, state: AgentState):
+        """Analyze the user's question to determine the task type."""
+        question = state.get("question", "")
+        if "drag" in question.lower() or "drop" in question.lower():
+            state["task_type"] = "drag_and_drop"
+            return "assist_user"
+        else:
+            state["task_type"] = "generate_answer"
+            return "generate_answer"
+
+
+
+    def assist_user(self, state: AgentState):
+        """Assist the user by dragging and dropping blocks."""
+        for block in state.get("labeled_blocks", []):
+            x_start, y_start, x_end, y_end = block["x_start"], block["y_start"], block["x_end"], block["y_end"]
+            dragTool.drag_and_drop(x_start, y_start, x_end, y_end)
+        state["result"] = "Drag-and-drop assistance completed."
+        return "get_result"
+
+    def generate_answer(self, state: AgentState):
+        """Generate an answer to the user's question."""
+        prompt = f"Rules: {state['rules']}\nDescription: {state['element_description']}\nQuestion: {state['question']}"
+        state["answer"] = llm_call(prompt)
+        state["result"] = f"Answer: {state['answer']}"
+        return "get_result"
+
+    def get_result(self, state: AgentState):
+        """Return the agent's result."""
+        return END
+
+if __name__ == "__main__":
+    agent = AgentGraph()
+    question = input("Enter your question: ")
+
+    # Initialize the state as a dictionary
+    initial_state = {"question": question}
+    result = agent.app.invoke(initial_state)
+    print("Result:", result.get("result"))
+    # print(agent.app.get_graph().draw_mermaid())
