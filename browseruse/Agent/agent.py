@@ -41,7 +41,6 @@ class AgentState(TypedDict, total=False):
     task_type: str
     result: str
 
-# Define the agent graph
 class AgentGraph:
     def __init__(self):
         # Use dict state, easier with LangGraph
@@ -59,11 +58,8 @@ class AgentGraph:
         # Define the workflow edges
         self.graph.set_entry_point("refresh_data")
         self.graph.add_edge("refresh_data", "load_files")
-
         self.graph.add_edge("load_files", "process_rules")
         self.graph.add_edge("process_rules", "analyze_question")
-        self.graph.add_edge("analyze_question", "assist_user")
-        self.graph.add_edge("analyze_question", "generate_answer")
 
         self.graph.add_conditional_edges(
             "analyze_question",
@@ -83,8 +79,8 @@ class AgentGraph:
     # === Nodes ===
     def refresh_data(self, state: AgentState):
         """Refresh the element data files."""
-        send_task("refresh") 
-        return "load_files"
+        send_task("refresh")
+        return state  # Return the updated state
 
     def load_files(self, state: AgentState):
         """Load labeled blocks and element descriptions."""
@@ -100,51 +96,63 @@ class AgentGraph:
         state["element_description"] = element_description
         print(f"📝 Loaded element descriptions.")
         
-        return "process_rules"
-
+        return state  # Return the updated state
 
     def process_rules(self, state: AgentState):
         """Load rules for the agent."""
         state["rules"] = RULES
-        return "analyze_question"
+        return state  # Return the updated state
 
     def analyze_question(self, state: AgentState):
         """Analyze the user's question to determine the task type."""
         question = state.get("question", "")
         if "drag" in question.lower() or "drop" in question.lower():
             state["task_type"] = "drag_and_drop"
-            return "assist_user"
         else:
             state["task_type"] = "generate_answer"
-            return "generate_answer"
-
-
+        return state  # Return the updated state
 
     def assist_user(self, state: AgentState):
         """Assist the user by dragging and dropping blocks."""
+        print("Hubaaaaa")
         for block in state.get("labeled_blocks", []):
             x_start, y_start, x_end, y_end = block["x_start"], block["y_start"], block["x_end"], block["y_end"]
             dragTool.drag_and_drop(x_start, y_start, x_end, y_end)
         state["result"] = "Drag-and-drop assistance completed."
-        return "get_result"
+        return state  # Return the updated state
 
     def generate_answer(self, state: AgentState):
         """Generate an answer to the user's question."""
-        prompt = f"Rules: {state['rules']}\nDescription: {state['element_description']}\nQuestion: {state['question']}"
+        # Convert labeled_blocks to a string (e.g., JSON format) for inclusion in the prompt
+        labeled_blocks_str = "\n".join([str(block) for block in state.get("labeled_blocks", [])])
+    
+        # Construct the prompt with labeled_blocks included
+        prompt = (
+            f"Rules: {state['rules']}\n"
+            f"Description: {state['element_description']}\n"
+            f"Labeled Blocks:\n{labeled_blocks_str}\n"
+            f"Question: {state['question']}"
+        )
+    
+        # Call the LLM with the constructed prompt
         state["answer"] = llm_call(prompt)
         state["result"] = f"Answer: {state['answer']}"
-        return "get_result"
+        return state  # Return the updated state
 
     def get_result(self, state: AgentState):
         """Return the agent's result."""
-        return END
+        return state  # Return the final state
+    
 
 if __name__ == "__main__":
     agent = AgentGraph()
-    question = input("Enter your question: ")
+    while True:
+        question = input("Enter your question (or type 'exit' to quit): ")
+        if question.strip().lower() == "exit":
+            break
 
-    # Initialize the state as a dictionary
-    initial_state = {"question": question}
-    result = agent.app.invoke(initial_state)
-    print("Result:", result.get("result"))
+        # Initialize the state as a dictionary
+        initial_state = {"question": question}
+        result = agent.app.invoke(initial_state)
+        print("Result:", result.get("result"))
     # print(agent.app.get_graph().draw_mermaid())

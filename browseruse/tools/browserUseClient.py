@@ -16,6 +16,6 @@ def send_task(task: str):
 
 
 if __name__ == "__main__":
-    # send_task("go to scratch educattion")
+    send_task("go to scratch educattion")
     send_task("Go to create")
     # send_task("exit")   # gracefully shut down worker
