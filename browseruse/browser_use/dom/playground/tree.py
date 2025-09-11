@@ -21,7 +21,7 @@ async def main():
 			disable_security=True,
 			wait_for_network_idle_page_load_time=1,
 			headless=False,
-			args=['--incognito'],
+			# args=['--incognito'],
 		),
 	)
 	# async with httpx.AsyncClient() as client:

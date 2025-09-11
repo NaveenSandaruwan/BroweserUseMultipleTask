@@ -3,6 +3,7 @@ import asyncio
 from dotenv import load_dotenv
 from browser_use import Agent, ChatGoogle, BrowserProfile
 from browser_use.agent.service import execute_task, create_persistent_agent
+from browser_use.browser.permissions_manager import BrowserPermissionsManager
 
 # Load environment variables
 load_dotenv()
@@ -18,10 +19,10 @@ async def main():
     try:
         print("🚀 Starting persistent browser session...")
         
-        # Create browser profile with keep_alive=True to maintain the session
-        profile = BrowserProfile(
+        # Create browser profile with permissions manager
+        # Use the convenience method for voice-enabled applications
+        profile = BrowserPermissionsManager.create_voice_enabled_profile(
             user_data_dir=USER_DATA_DIR,  # your new clean profile folder
-            profile="Default",
             chrome_executable_path=CHROME_EXECUTABLE_PATH,  # adjust if Chrome is elsewhere
             keep_alive=True,
             enable_default_extensions=True
@@ -37,19 +38,79 @@ async def main():
         print("✅ Agent initialized with browser session")
         print("📝 You can now enter tasks to execute sequentially")
         print("   The browser state will persist between tasks")
+        print("🔐 You can also manage permissions with commands like 'perms mic'")
         
         # Process tasks in a loop
         # Example usage in your script
         while True:
-            task = input("\n🔷 Enter your task (or 'refresh' to update browser state, or 'exit' to quit): ")
+            task = input("\n🔷 Enter your task (or 'refresh' to update browser state, 'perms help' for permissions, 'exit' to quit): ")
             
             if task.lower() == 'exit':
                 print("\n👋 Exiting and closing browser...")
                 break
             elif task.lower() == 'refresh':
                 print("\n🔄 Refreshing browser state after manual navigation...")
-                result = await execute_task(agent, "This page changed, get familiar with it", max_steps=15)
+                result = await execute_task(agent, "This page changed, get familiar with it", max_steps=5)
                 print("✅ Browser state refreshed - the agent now knows the current page state")
+                continue
+            elif task.lower() == 'perms help':
+                print("\n🔐 Permission Commands:")
+                print("  - 'perms show': Show current permissions")
+                print("  - 'perms mic': Enable microphone")
+                print("  - 'perms camera': Enable camera")
+                print("  - 'perms geo': Enable geolocation")
+                print("  - 'perms media': Enable all media permissions (mic+camera)")
+                print("  - 'perms reset': Reset to default permissions")
+                continue
+            elif task.lower() == 'perms show':
+                print(f"\n🔐 Current permissions: {agent.browser_session.browser_profile.permissions}")
+                continue
+            elif task.lower() in ['perms mic', 'perms microphone']:
+                try:
+                    await BrowserPermissionsManager.grant_permissions(
+                        agent.browser_session, ['microphone']
+                    )
+                    print("✅ Microphone permission granted")
+                except Exception as e:
+                    print(f"❌ Error granting permission: {e}")
+                continue
+            elif task.lower() in ['perms camera', 'perms cam']:
+                try:
+                    await BrowserPermissionsManager.grant_permissions(
+                        agent.browser_session, ['camera']
+                    )
+                    print("✅ Camera permission granted")
+                except Exception as e:
+                    print(f"❌ Error granting permission: {e}")
+                continue
+            elif task.lower() in ['perms geo', 'perms geolocation']:
+                try:
+                    await BrowserPermissionsManager.grant_permissions(
+                        agent.browser_session, ['geolocation']
+                    )
+                    print("✅ Geolocation permission granted")
+                except Exception as e:
+                    print(f"❌ Error granting permission: {e}")
+                continue
+            elif task.lower() in ['perms media']:
+                try:
+                    await BrowserPermissionsManager.grant_permissions(
+                        agent.browser_session, ['microphone', 'camera']
+                    )
+                    print("✅ All media permissions granted (microphone, camera)")
+                except Exception as e:
+                    print(f"❌ Error granting permissions: {e}")
+                continue
+            elif task.lower() == 'perms reset':
+                try:
+                    await BrowserPermissionsManager.reset_permissions(agent.browser_session)
+                    # Re-grant default permissions
+                    await BrowserPermissionsManager.grant_permissions(
+                        agent.browser_session, ['clipboardReadWrite', 'notifications']
+                    )
+                    print("✅ Permissions reset to defaults")
+                except Exception as e:
+                    print(f"❌ Error resetting permissions: {e}")
                 continue
             
             print(f"\n🔄 Executing task: {task}")

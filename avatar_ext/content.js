@@ -1,146 +1,243 @@
-(function () {
-  console.log("Avatar Extension loaded");
-  
-  // Create the avatar image element
-  let avatar = document.createElement("img");
-  avatar.src = chrome.runtime.getURL("images/avatar.png"); // Path to your avatar image
-  avatar.id = "py-controlled-avatar";
-  
-  // Set initial styling for the avatar
-  // avatar.style.position = "fixed";        // Fixed positioning so it stays in viewport
-  // avatar.style.left = "50px";             // Initial X position
-  // avatar.style.top = "50px";              // Initial Y position
-  // avatar.style.width = "80px";            // Avatar width
-  // avatar.style.height = "80px";           // Avatar height
-  // avatar.style.zIndex = "9999";           // High z-index to appear on top
-  // avatar.style.borderRadius = "50%";      // Make it circular
-  // avatar.style.border = "3px solid #4CAF50"; // Green border
-  // avatar.style.cursor = "pointer";        // Pointer cursor on hover
-  // avatar.style.transition = "all 0.2s ease"; // Smooth animations
-  // avatar.style.boxShadow = "0 4px 8px rgba(0,0,0,0.3)"; // Shadow effect
-  
-  Object.assign(avatar.style, {
-        position: "fixed",
-        left: "50px",
-        top: "50px",
-        width: "80px",
-        height: "80px",
-        zIndex: "9999",
-        borderRadius: "50%",
-        border: "3px solid #4CAF50",
-        cursor: "pointer",
-        transition: "all 0.2s ease",
-        pointerEvents: "none"
-    });
-
-  // Add the avatar to the page
-  document.body.appendChild(avatar);
-
-  // Position tracking object
-  let pos = { x: 50, y: 50 };
-  
-  // Function to update avatar position on screen
-  function updatePos() {
-    // Prevent avatar from going off-screen
-    pos.x = Math.max(0, Math.min(window.innerWidth - 80, pos.x));
-    pos.y = Math.max(0, Math.min(window.innerHeight - 80, pos.y));
-    
-    avatar.style.left = pos.x + "px";
-    avatar.style.top = pos.y + "px";
+// ===== Avatar Creation =====
+function createAvatar() {
+  if (document.getElementById("python-avatar-container")) {
+    console.log("Python Avatar: Avatar already exists");
+    return;
   }
 
-  // Listen for messages from Python (via Selenium WebDriver)
-  window.addEventListener("message", (event) => {
-    // Check if message is valid and for our extension
-    if (!event.data || event.data.type !== "AVATAR_CMD") return;
-    
-    const cmd = event.data.cmd; // Extract command type
-    console.log("Received command:", cmd, event.data);
+  const avatarContainer = document.createElement("div");
+  avatarContainer.id = "python-avatar-container";
+  avatarContainer.style.cssText = `
+    position: fixed;
+    top: 100px;
+    left: 100px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    transition: left 0.6s ease, top 0.6s ease;
+  `;
 
-    // Handle different command types
-    if (cmd === "move") {
-      // Move avatar by specified amounts
-      pos.x += event.data.dx || 0;  // Move horizontally
-      pos.y += event.data.dy || 0;  // Move vertically
-      updatePos();
-      
-    } else if (cmd === "hide") {
-      // Hide the avatar
-      avatar.style.display = "none";
-      
-    } else if (cmd === "show") {
-      // Show the avatar
-      avatar.style.display = "block";
-      
-    } else if (cmd === "center") {
-      // Center avatar on screen
-      pos.x = (window.innerWidth / 2) - 40;   // Center horizontally
-      pos.y = (window.innerHeight / 2) - 40;  // Center vertically
-      updatePos();
-      
-    } else if (cmd === "rotate") {
-      // Rotate avatar by specified degrees
-      avatar.style.transform = `rotate(${event.data.deg || 0}deg)`;
-      
-    } else if (cmd === "teleport") {
-      // Jump to specific coordinates
-      pos.x = event.data.x || pos.x;
-      pos.y = event.data.y || pos.y;
-      updatePos();
-      
-    } else if (cmd === "resize") {
-      // Change avatar size
-      const size = event.data.size || 80;
-      avatar.style.width = size + "px";
-      avatar.style.height = size + "px";
-      
-    } else if (cmd === "color") {
-      // Change border color
-      avatar.style.border = `3px solid ${event.data.color || '#4CAF50'}`;
-    }
+  const avatar = document.createElement("div");
+  avatar.id = "python-avatar";
+  avatar.innerHTML = `
+    <svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="38" fill="#3776AB" />
+      <circle cx="40" cy="40" r="30" fill="#FFD43B" />
+      <circle cx="30" cy="30" r="8" fill="#000" />
+      <circle cx="50" cy="30" r="8" fill="#000" />
+      <path d="M25 50 Q40 65 55 50" stroke="#000" stroke-width="3" fill="transparent" />
+    </svg>
+  `;
+  avatar.style.cssText = `
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+  `;
+
+  const speechBubble = document.createElement("div");
+  speechBubble.id = "python-avatar-speech";
+  speechBubble.style.cssText = `
+    background: white;
+    border: 2px solid #333;
+    border-radius: 10px;
+    padding: 8px 12px;
+    margin-top: 10px;
+    max-width: 250px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  `;
+
+  // Mic button
+  const micButton = document.createElement("button");
+  micButton.id = "python-avatar-mic";
+  micButton.innerHTML = "🎤";
+  micButton.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #4285f4;
+    color: white;
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
+    z-index: 10001;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  `;
+
+  const micStatus = document.createElement("div");
+  micStatus.id = "python-avatar-mic-status";
+  micStatus.style.cssText = `
+    position: fixed;
+    bottom: 75px;
+    right: 20px;
+    padding: 5px 10px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    border-radius: 5px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10001;
+  `;
+
+  avatarContainer.appendChild(avatar);
+  avatarContainer.appendChild(speechBubble);
+  document.body.appendChild(avatarContainer);
+  document.body.appendChild(micButton);
+  document.body.appendChild(micStatus);
+
+  setupSpeechRecognition(micButton, micStatus);
+  console.log("Python Avatar: Ready for structured commands ✅");
+  return true;
+}
+
+// ===== Helpers =====
+function moveAvatar(x, y) {
+  const avatarContainer = document.getElementById("python-avatar-container");
+  if (avatarContainer && typeof x === "number" && typeof y === "number") {
+    avatarContainer.style.left = `${x}px`;
+    avatarContainer.style.top = `${y}px`;
+    return true;
+  }
+  return false;
+}
+
+function showSpeech(text, duration = 5000) {
+  const speechBubble = document.getElementById("python-avatar-speech");
+  if (speechBubble) {
+    speechBubble.textContent = text;
+    speechBubble.style.opacity = 1;
+    if (duration > 0) setTimeout(() => (speechBubble.style.opacity = 0), duration);
+  }
+}
+
+function moveNearElement(id, offsetX = 50, offsetY = -20) {
+  const element = document.getElementById(id);
+  const avatarContainer = document.getElementById("python-avatar-container");
+  if (element && avatarContainer) {
+    const rect = element.getBoundingClientRect();
+    avatarContainer.style.left = `${rect.left + window.scrollX + offsetX}px`;
+    avatarContainer.style.top = `${rect.top + window.scrollY + offsetY}px`;
+    return true;
+  }
+  return false;
+}
+
+// ===== Explain Handler =====
+function explainElement(command) {
+  let moved = false;
+
+  if (command.x != null && command.y != null) {
+    moved = moveAvatar(command.x, command.y);
+  }
+
+  if (!moved && command.id) {
+    moved = moveNearElement(command.id);
+  }
+
+  showSpeech(command.text || "Sorry, I don’t have enough information.", 6000);
+}
+
+// ===== Command Handler =====
+function handleCommand(command) {
+  if (!command || !command.action) {
+    console.error("Invalid command:", command);
+    return;
+  }
+
+  switch (command.action) {
+    case "move":
+      moveAvatar(command.x, command.y);
+      showSpeech(command.text || `Moving to (${command.x}, ${command.y})`, 3000);
+      break;
+    case "explain":
+      explainElement(command);
+      break;
+    default:
+      console.error("Unknown command action:", command.action);
+  }
+}
+
+// ===== Speech Recognition =====
+function setupSpeechRecognition(micButton, micStatus) {
+  const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognitionAPI) return console.error("Speech recognition not supported");
+
+  const recognition = new SpeechRecognitionAPI();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = "en-US";
+
+  let isListening = false;
+
+  micButton.addEventListener("click", () => {
+    if (isListening) recognition.stop();
+    else recognition.start();
   });
 
-  // Keyboard controls for manual movement
-  document.addEventListener("keydown", (e) => {
-    const step = e.shiftKey ? 40 : 20; // Larger steps when holding Shift
-    
-    switch(e.key) {
-      case "ArrowUp":
-        pos.y -= step;
-        e.preventDefault(); // Prevent page scrolling
-        break;
-      case "ArrowDown":
-        pos.y += step;
-        e.preventDefault();
-        break;
-      case "ArrowLeft":
-        pos.x -= step;
-        e.preventDefault();
-        break;
-      case "ArrowRight":
-        pos.x += step;
-        e.preventDefault();
-        break;
-      case " ": // Spacebar to center
-        pos.x = (window.innerWidth / 2) - 40;
-        pos.y = (window.innerHeight / 2) - 40;
-        e.preventDefault();
-        break;
-    }
-    updatePos();
-  });
+  recognition.onstart = () => {
+    isListening = true;
+    micButton.style.background = "#EA4335";
+    micStatus.textContent = "Listening...";
+    micStatus.style.opacity = 1;
+  };
 
-  // Handle window resize to keep avatar in bounds
-  window.addEventListener("resize", updatePos);
-  
-  // Add click handler for fun interaction
-  avatar.addEventListener("click", () => {
-    // Bounce effect on click
-    avatar.style.transform = "scale(1.2)";
-    setTimeout(() => {
-      avatar.style.transform = "scale(1)";
-    }, 200);
-  });
-  
-  console.log("Avatar Extension fully initialized");
-})();
+  recognition.onend = () => {
+    isListening = false;
+    micButton.style.background = "#4285f4";
+    micStatus.style.opacity = 0;
+  };
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    console.log("Heard:", transcript);
+    showSpeech("Processing...", 2000);
+
+    fetch("http://127.0.0.1:8000/ask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: transcript }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Structured command:", data);
+        if (data.command) handleCommand(data.command);
+      })
+      .catch((err) => {
+        console.error("Error talking to agent:", err);
+        handleCommand({ action: "explain", text: "Sorry, something went wrong with the agent." });
+      });
+  };
+
+  recognition.onerror = (event) => {
+    console.error("Recognition error:", event.error);
+    micStatus.textContent = `Error: ${event.error}`;
+    micStatus.style.opacity = 1;
+  };
+}
+
+// ===== Expose API =====
+window.pythonAvatarControl = {
+  move: moveAvatar,
+  speak: showSpeech,
+  explain: explainElement,
+  moveNearElement: moveNearElement,
+  handleCommand: handleCommand,
+};
+
+// ===== Initialize =====
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", createAvatar);
+} else {
+  createAvatar();
+}

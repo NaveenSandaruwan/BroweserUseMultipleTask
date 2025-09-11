@@ -1,8 +1,18 @@
 {
-  "manifest_version": 3,
-  "name": "Avatar Controller Extension",
+  "name": "Avatar Controller",
+  "description": "An avatar that can be controlled via Python with speech capabilities",
   "version": "1.0",
-  "description": "Displays a controllable avatar image on web pages",
+  "manifest_version": 3,
+  "action": {
+    "default_icon": {
+      "16": "images/avatar.png",
+      "48": "images/avatar.png",
+      "128": "images/avatar.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
@@ -10,16 +20,18 @@
       "run_at": "document_end"
     }
   ],
-  "web_accessible_resources": [
-    {
-      "resources": ["images/avatar.png"],
-      "matches": ["<all_urls>"]
-    }
-  ],
   "permissions": [
+    "scripting",
     "activeTab",
-    "scripting"
+    "clipboardWrite",
+    "clipboardRead",
+    "audioCapture"
   ],
-  "host_permissions": ["<all_urls>"]
-  
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "web_accessible_resources": [{
+    "resources": ["images/*"],
+    "matches": ["<all_urls>"]
+  }]
 }

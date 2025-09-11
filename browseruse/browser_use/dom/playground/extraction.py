@@ -28,7 +28,7 @@ async def test_focus_vs_all_elements():
 			disable_security=False,
 			wait_for_network_idle_page_load_time=1,
 			headless=False,
-			args=['--incognito'],
+			# args=['--incognito'],
 		),
 	)
 
