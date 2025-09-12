@@ -32,7 +32,7 @@ async def agent_worker(agent):
 
         print(f"\n🔄 Executing task: {task}")
         try:
-            result = await execute_task(agent, task, max_steps=15)
+            result = await execute_task(agent, task, max_steps=5)
             if result.is_successful():
                 print(f"✅ Success in {result.total_duration_seconds():.1f}s")
             else:
