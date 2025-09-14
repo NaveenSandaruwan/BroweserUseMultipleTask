@@ -17,3 +17,7 @@ dist/
 *.log
 *brvenv/
 element_data/
+.AppleDouble
+.LSOverride
+*.swp
+*.swo
