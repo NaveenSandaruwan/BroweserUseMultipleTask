@@ -6,7 +6,7 @@ import socket
 import threading
 from dotenv import load_dotenv
 
-sys.path.append(r"E:\VS CODE\Agentic AI\BrowserUse\browseruse")
+sys.path.append(r"/Users/bishmajayasundara/Documents/sem 5/BroweserUseMultipleTask/browseruse")
 from browser_use import ChatGoogle
 from browser_use.agent.service import execute_task, create_persistent_agent
 from browser_use.browser.permissions_manager import BrowserPermissionsManager
