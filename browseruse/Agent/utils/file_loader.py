@@ -13,6 +13,7 @@ def load_and_extract_elements(json_path= r"E:\VS CODE\Agentic AI\BrowserUse\elem
         data = json.load(f)
 
     elements = []
+    print("xxxxx")
     for item in data.values():
         tag_name = item.get('tag_name', '')
         text_content = item.get('text_content', '')

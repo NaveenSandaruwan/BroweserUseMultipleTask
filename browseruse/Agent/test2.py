@@ -21,12 +21,18 @@ model = ChatGoogleGenerativeAI(
 )
 
 
-file_agent = create_react_agent(
+element_expert_agent = create_react_agent(
     model = model,
-    tools = [load_and_extract_elements, load_element_descriptions],
-    name='file_agent',
-    prompt= '''you are a file expert. You have the all knowledge about website elements and thier descriptions. when user asks about a website element, 
-    go though two functions and get idea and give structured answer to give student.'''
+    tools = [load_and_extract_elements],
+    name='element_expert',
+    prompt='''You are an expert in extracting and understanding website elements. When the user asks about website elements like explain a block or x,y coordinates, use your tool to extract and provide structured information about them.'''
+)
+
+description_expert_agent = create_react_agent(
+    model = model,
+    tools = [load_element_descriptions],
+    name='description_expert',
+    prompt='''You are an expert in website element descriptions. When the user asks about descriptions of elements, use your tool to provide detailed and structured explanations.'''
 )
 
 drag_tool = Toolbox()
@@ -57,12 +63,12 @@ website_control_agent = create_react_agent(
 
 
 work_flow = create_supervisor(
-    [drag_agent, website_control_agent, file_agent],
+    [drag_agent, website_control_agent, element_expert_agent, description_expert_agent],
     model=model,
     prompt=(
-        'You are a team supervisor managing a drag expert, a website control agent, and a file agent.'
-        'First use file_agent to get knowledge about web site.'
-        'If user ask to explain something, using your knowledge which provided by file_agent, explain it to the user.'
+        'You are a team supervisor managing a drag expert, a website control agent, and an element expert.'
+        'First use element_expert_agent to get knowledge about web site elements.'
+        'If user ask to explain something, using your knowledge which provided by element_expert_agent and description_expert_agent explain it to the user.'
         'If you understand that user want to perform drag and drop operation, use drag_expert to perform the operation.'
         'Then extract the answer from the expert and return it to the user.'
     )
