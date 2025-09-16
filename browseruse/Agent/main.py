@@ -2,7 +2,8 @@ from typing import Optional
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from agent import agent  # your compiled LangGraph agent
+from agent import agent  # original agent
+from test2 import work_flow as enhanced_agent  # our new enhanced workflow
 
 # app = FastAPI()
 
@@ -19,13 +20,16 @@ class UserMessage(BaseModel):
     text: str
 
 
-def ask(msg):
+def ask(msg, use_enhanced=True):
     try:
         # Initialize agent state with "question"
         initial_state = {"question": msg.text}
 
-        # Invoke the agent
-        result_state = agent.invoke(initial_state)
+        # Choose which agent to use
+        selected_agent = enhanced_agent if use_enhanced else agent
+        
+        # Invoke the selected agent
+        result_state = selected_agent.invoke(initial_state)
 
         # Extract answer safely
         answer = result_state.get("answer", "Sorry, something went wrong with the agent.")
@@ -54,4 +58,9 @@ def ask(msg):
         }
     
 
-print(ask(UserMessage(text="What is move button?")))
+# Test both agents for comparison
+print("Original agent response:")
+print(ask(UserMessage(text="What is move button?"), use_enhanced=False))
+
+print("\nEnhanced agent response:")
+print(ask(UserMessage(text="What is move button?"), use_enhanced=True))
