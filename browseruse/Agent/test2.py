@@ -5,7 +5,9 @@ import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from dotenv import load_dotenv
 
+load_dotenv()
 from utils.file_loader import load_and_extract_elements, load_scratch_descriptions
 from tools.browserUseClient import send_task
 from tools.dragTool import Toolbox
@@ -13,7 +15,8 @@ import json
 
 
 
-GEMINIAPI = os.getenv("GOOGLE_API_KEY") or "AIzaSyBRYRYAjFStLg_xFoNFTaSsaphNuNkmd_I"
+GEMINIAPI = os.getenv("GOOGLE_API_KEY") 
+# print(GEMINIAPI)
 # print("GEMINI_API:", GEMINIAPI)  # Debugging line to check if the API key is loaded correctly
 model = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash",
@@ -32,14 +35,15 @@ def extract_all_element_text():
         dict: Dictionary with all text content available on the page
     """
     # Load elements.json directly for full access
-    elements_path = r"E:\VS CODE\Agentic AI\BrowserUse\element_data\elements.json"
+    elements_path = os.getenv("ELEMENT_FILE_PATH") 
+    # print("Elements JSON path:", elements_path)
     try:
         with open(elements_path, 'r', encoding='utf-8') as f:
             elements_data = json.load(f)
     except Exception as e:
         print(f"Error loading elements.json: {e}")
         return {"error": str(e)}
-    
+    print(f"Loaded {len(elements_data)} elements from JSON.")
     # Extract all text content only
     text_contents = []
     seen_texts = set()
@@ -132,14 +136,15 @@ def get_element_by_text_content(text_query: str):
         dict: Complete element details including all position data
     """
     # Load elements.json directly for full access to all position data
-    elements_path = r"E:\VS CODE\Agentic AI\BrowserUse\element_data\elements.json"
+    elements_path = os.getenv("ELEMENT_FILE_PATH")
+    # print("Elements JSON path 2:", elements_path)
     try:
         with open(elements_path, 'r', encoding='utf-8') as f:
             elements_data = json.load(f)
     except Exception as e:
         print(f"Error loading elements.json: {e}")
         return {"error": str(e)}
-    
+    # print(f"Loaded {len(elements_data)} elements from JSON. 2")
     # Find elements with matching text content
     matched_elements = []
     for element_id, element_info in elements_data.items():
@@ -442,7 +447,7 @@ website_control_agent = create_react_agent(
 # )
 
 # Define a function to load element descriptions
-def load_element_descriptions(txt_path=r"E:\VS CODE\Agentic AI\BrowserUse\browseruse\allElement.txt"):
+def load_element_descriptions(txt_path=os.getenv("ELEMENTS_DESCRIPTION_PATH")):
     """
     Reads a text file containing element descriptions, one per line, and returns a list of descriptions.
 

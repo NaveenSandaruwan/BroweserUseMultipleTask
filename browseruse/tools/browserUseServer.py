@@ -6,14 +6,17 @@ import socket
 import threading
 from dotenv import load_dotenv
 
-sys.path.append(r"E:\VS CODE\Agentic AI\BrowserUse\browseruse")
+load_dotenv()
+USER_DATA_DIR = os.getenv("USER_DATA_DIR")
+CHROME_EXECUTABLE_PATH = os.getenv("CHROME_EXECUTABLE_PATH")
+BROWSER_USE_PATH = os.getenv("BROWSER_USE_PATH")
+# print("BROWSER_USE_PATH:", BROWSER_USE_PATH)
+sys.path.append(BROWSER_USE_PATH)
 from browser_use import ChatGoogle
 from browser_use.agent.service import execute_task, create_persistent_agent
 from browser_use.browser.permissions_manager import BrowserPermissionsManager
 
-load_dotenv()
-USER_DATA_DIR = os.getenv("USER_DATA_DIR")
-CHROME_EXECUTABLE_PATH = os.getenv("CHROME_EXECUTABLE_PATH")
+
 
 llm = ChatGoogle(model="gemini-2.0-flash")
 
