@@ -2255,3 +2255,87 @@ def create_persistent_agent_sync(initial_task: str, **agent_kwargs) -> Agent:
     """
     import asyncio
     return asyncio.run(create_persistent_agent(initial_task, **agent_kwargs))
+
+
+async def capture_browser_state(agent: Agent) -> BrowserStateSummary:
+    """
+    Capture the current browser state including screenshots and DOM elements.
+    
+    This function triggers the screenshot mechanism and element position storage
+    without executing any agent reasoning or actions.
+    
+    Args:
+        agent: An initialized Agent instance with an active browser session
+        
+    Returns:
+        BrowserStateSummary: Object containing screenshot, DOM state, and other browser info
+    """
+    if not hasattr(agent, 'browser_session') or agent.browser_session is None:
+        raise ValueError("Agent must be initialized with a browser session")
+        
+    agent.logger.debug("📸 Manually capturing browser state with screenshots...")
+    
+    # Call the internal prepare_context method to get browser state with screenshots
+    browser_state_summary = await agent._prepare_context(None)
+    
+    agent.logger.info(f"✅ Browser state captured with {len(browser_state_summary.dom_state.selector_map)} interactive elements")
+    return browser_state_summary
+
+
+async def capture_element_positions(agent: Agent, output_dir: str | Path = None) -> tuple[BrowserStateSummary, Path]:
+    """
+    Capture browser state and save element positions to a specified directory.
+    
+    Args:
+        agent: An initialized Agent instance with an active browser session
+        output_dir: Directory to save element positions (defaults to current directory)
+        
+    Returns:
+        tuple: (BrowserStateSummary, Path to the saved element data file)
+    """
+    # Set up output directory
+    if output_dir:
+        from pathlib import Path
+        import os
+        output_path = Path(output_dir)
+        os.makedirs(output_path, exist_ok=True)
+        
+        # Create new element position service for this directory
+        from browser_use.browser.element_position_service import ElementPositionService
+        element_service = ElementPositionService(output_path)
+    else:
+        # Use agent's existing element position service
+        element_service = agent.element_position_service
+    
+    # Capture browser state
+    browser_state_summary = await capture_browser_state(agent)
+    
+    # Store element positions to specified directory (or default if not specified)
+    file_path = await element_service.store_element_positions(
+        browser_state_summary.dom_state,
+        agent.state.n_steps
+    )
+    
+    agent.logger.info(f"📊 Element positions stored at: {file_path}")
+    return browser_state_summary, file_path
+
+
+def capture_element_positions_sync(agent: Agent, output_dir: str | Path = None) -> tuple[BrowserStateSummary, Path]:
+    """
+    Synchronous wrapper for capture_element_positions.
+    
+    Args:
+        agent: An initialized Agent instance with an active browser session
+        output_dir: Directory to save element positions (defaults to current directory)
+        
+    Returns:
+        tuple: (BrowserStateSummary, Path to the saved element data file)
+    """
+    import asyncio
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    
+    return loop.run_until_complete(capture_element_positions(agent, output_dir))
