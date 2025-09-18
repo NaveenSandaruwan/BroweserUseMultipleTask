@@ -35,22 +35,37 @@ async def agent_worker(agent):
 
         print(f"\n🔄 Executing task: {task}")
         try:
-            if task == "refresh":
-                await execute_task(agent, task, max_steps=2)
-            result = await execute_task(agent, task, max_steps=5)
-            if result.is_successful():
-                print(f"✅ Success in {result.total_duration_seconds():.1f}s")
+            # Special task handling
+            if task == "refresh" or task == "screenshot":
+                try:
+                    print("\n📸 Taking screenshot and updating DOM...")
+                    
+                    # Use the function to capture browser state and elements
+                    from browser_use.agent.service import capture_element_positions
+                    browser_state, elements_file = await capture_element_positions(agent)
+                    
+                    print(f"✅ Screenshot captured with {len(browser_state.dom_state.selector_map)} elements")
+                    print(f"✅ Element data stored at: {elements_file}")
+                    
+                except Exception as e:
+                    print(f"❌ Error during refresh: {type(e).__name__}: {e}")
+                    import traceback
+                    traceback.print_exc()
             else:
-                print(f"❌ Failed in {result.total_duration_seconds():.1f}s")
-
-            if result.structured_output:
-                print("\n📊 Output:")
-                print(result.structured_output.model_dump_json(indent=2))
+                # ADDED: Execute regular tasks through the agent
+                print(f"🤖 Agent executing: {task}")
+                result = await execute_task(agent, task)
+                print(f"✅ Task completed: {task}")
+                # Optionally print result summary
+                if hasattr(result, 'output'):
+                    print(f"📝 Result: {result.output[:100]}..." if len(result.output) > 100 else f"📝 Result: {result.output}")
+                
         except Exception as e:
             print(f"❌ Error: {type(e).__name__}: {e}")
+            import traceback
+            traceback.print_exc()
         finally:
             task_queue.task_done()
-
 
 def socket_listener(loop):
     """Run a socket server in a thread that pushes tasks into asyncio queue."""
