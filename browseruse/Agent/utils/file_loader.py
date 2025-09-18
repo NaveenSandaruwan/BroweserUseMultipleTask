@@ -1,6 +1,9 @@
 import json
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
-def load_and_extract_elements(json_path= r"E:\VS CODE\Agentic AI\BrowserUse\element_data\elements.json"):
+def load_and_extract_elements(json_path=os.getenv("ELEMENT_FILE_PATH")):
     """
     Reads a JSON file containing element data, extracts 'tag_name', 'text_content', 'x', and 'y' from each item,
     and returns a structured list suitable for feeding to an LLM.
@@ -47,7 +50,7 @@ def load_and_extract_elements(json_path= r"E:\VS CODE\Agentic AI\BrowserUse\elem
 #         descriptions = [line.strip() for line in f if line.strip()]
 #     return descriptions
 
-def load_scratch_descriptions(json_path=r"E:\VS CODE\Agentic AI\BrowserUse\element_data\description.json"):
+def load_scratch_descriptions(json_path=os.getenv("ELEMENTS_DESCRIPTION_JSON_PATH")):
     """
     Reads a JSON file containing Scratch block descriptions and formats it as a readable string.
     

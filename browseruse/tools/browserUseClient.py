@@ -16,6 +16,7 @@ def send_task(task: str):
 
 
 if __name__ == "__main__":
-    send_task("go to scratch educattion")
-    send_task("Go to create")
-    # send_task("exit")   # gracefully shut down worker
+   
+    send_task("Go to https://scratch.mit.edu/projects/editor/?tutorial=getStarted")
+    send_task("go to operator section")   # gracefully shut down worker
+    #send_task("sroll down to see more blocks")
