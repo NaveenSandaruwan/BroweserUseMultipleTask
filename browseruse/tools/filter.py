@@ -22,7 +22,7 @@ def filter_json():
     filtered = []
     for obj in data.values():
         text = obj.get("text_content","")
-        if text is None:
+        if text is None or not obj.get("tag_name") == "text":
             continue
         if any(text.startswith(w) for w in words):
             filtered.append({
@@ -34,6 +34,7 @@ def filter_json():
 
     # Step 4: Print result
     #print(json.dumps(filtered, indent=2, ensure_ascii=False))
+    filtered = sorted(filtered, key=lambda item: item["y"])
     return filtered
 
 def find_used_blocks():
@@ -47,3 +48,14 @@ def find_used_blocks():
 
     # Step 4: Print result
 print(find_used_blocks())
+
+def grt_list_of_used_blocks():
+    used_blocks = find_used_blocks()
+    string = ""
+    count = 1
+    for block in used_blocks:
+        string = f"{string} {count}. {block['text_content']} Block \n"
+        count += 1
+    return string
+
+print(grt_list_of_used_blocks())
