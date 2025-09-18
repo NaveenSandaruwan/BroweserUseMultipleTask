@@ -33,7 +33,17 @@ def filter_json():
             })
 
     # Step 4: Print result
-    print(json.dumps(filtered, indent=2, ensure_ascii=False))
+    #print(json.dumps(filtered, indent=2, ensure_ascii=False))
     return filtered
 
-filter_json()
+def find_used_blocks():
+    find_used_blocks = []
+    filtered = filter_json()
+    for json_obj in filtered:
+        if json_obj["x"] > 310:
+            find_used_blocks.append(json_obj)
+    return find_used_blocks
+
+
+    # Step 4: Print result
+print(find_used_blocks())
