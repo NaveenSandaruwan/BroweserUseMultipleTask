@@ -28,8 +28,8 @@ def filter_json():
             filtered.append({
                 "tag_name": obj["tag_name"],
                 "text_content": obj["text_content"],
-                "x": obj["bounding_box"]["x"],
-                "y": obj["bounding_box"]["y"]
+                "x": round(obj["bounding_box"]["x"]),
+                "y": round(obj["bounding_box"]["y"])
             })
 
     # Step 4: Print result
@@ -47,7 +47,7 @@ def find_used_blocks():
 
 
     # Step 4: Print result
-print(find_used_blocks())
+print(filter_json())
 
 def grt_list_of_used_blocks():
     used_blocks = find_used_blocks()
@@ -58,4 +58,4 @@ def grt_list_of_used_blocks():
         count += 1
     return string
 
-print(grt_list_of_used_blocks())
+# print(grt_list_of_used_blocks())
