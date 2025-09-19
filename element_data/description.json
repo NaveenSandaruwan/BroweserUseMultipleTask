@@ -1,110 +1,133 @@
 {
-  "Motion": [
-    {"name": "move steps", "description": "Move sprite forward by given steps."},
-    {"name": "turn clockwise", "description": "Rotate sprite clockwise."},
-    {"name": "turn counterclockwise", "description": "Rotate sprite counterclockwise."},
-    {"name": "go to position", "description": "Instantly move sprite to coordinates."},
-    {"name": "glide", "description": "Smoothly move sprite to a position."},
-    {"name": "point in direction", "description": "Face sprite in specific direction."},
-    {"name": "point towards", "description": "Turn sprite to face another object."},
-    {"name": "change x", "description": "Move horizontally by value."},
-    {"name": "set x", "description": "Place sprite at exact x."},
-    {"name": "change y", "description": "Move vertically by value."},
-    {"name": "set y", "description": "Place sprite at exact y."},
-    {"name": "go to random position", "description": "Move sprite to random location."},
-    {"name": "if on edge bounce", "description": "Bounce when sprite touches stage edge."},
-    {"name": "set rotation style", "description": "Change how sprite rotates."}
-  ],
-  "Looks": [
-    {"name": "say message", "description": "Display a speech bubble."},
-    {"name": "think message", "description": "Display a thought bubble."},
-    {"name": "show", "description": "Make sprite visible."},
-    {"name": "hide", "description": "Make sprite invisible."},
-    {"name": "switch costume", "description": "Change sprite costume."},
-    {"name": "next costume", "description": "Move to next costume."},
-    {"name": "switch backdrop", "description": "Change stage background."},
-    {"name": "next backdrop", "description": "Move to next background."},
-    {"name": "change size", "description": "Increase/decrease sprite size."},
-    {"name": "set size", "description": "Set exact size."},
-    {"name": "change color effect", "description": "Adjust sprite’s color effect."},
-    {"name": "set color effect", "description": "Apply specific color effect."},
-    {"name": "clear graphic effects", "description": "Remove visual effects."}
-  ],
-  "Sound": [
-    {"name": "play sound", "description": "Play chosen sound."},
-    {"name": "start sound", "description": "Play sound until finished."},
-    {"name": "stop all sounds", "description": "Stop every sound playing."},
-    {"name": "change pitch effect", "description": "Adjust sound pitch."},
-    {"name": "set pitch effect", "description": "Set specific sound pitch."},
-    {"name": "clear sound effects", "description": "Remove sound effects."},
-    {"name": "change volume", "description": "Raise/lower volume."},
-    {"name": "set volume", "description": "Fix volume level."},
-    {"name": "volume", "description": "Report current volume."}
-  ],
-  "Events": [
-    {"name": "when green flag clicked", "description": "Trigger when project starts."},
-    {"name": "when key pressed", "description": "Trigger on key press."},
-    {"name": "when this sprite clicked", "description": "Trigger on sprite click."},
-    {"name": "when backdrop switches", "description": "Trigger when backdrop changes."},
-    {"name": "when loudness", "description": "Trigger when sound is loud."},
-    {"name": "broadcast message", "description": "Send message to all sprites."},
-    {"name": "broadcast and wait", "description": "Send message then wait."}
-  ],
-  "Control": [
-    {"name": "wait seconds", "description": "Pause script."},
-    {"name": "repeat times", "description": "Repeat actions fixed number."},
-    {"name": "forever", "description": "Repeat actions infinitely."},
-    {"name": "if then", "description": "Run code only if true."},
-    {"name": "if then else", "description": "Run code for true/false."},
-    {"name": "wait until", "description": "Pause until condition true."},
-    {"name": "repeat until", "description": "Repeat until condition met."},
-    {"name": "stop", "description": "Stop script/project."},
-    {"name": "create clone", "description": "Duplicate sprite."},
-    {"name": "delete clone", "description": "Remove sprite clone."}
-  ],
-  "Sensing": [
-    {"name": "touching object", "description": "Check collision with object."},
-    {"name": "touching color", "description": "Detect touching color."},
-    {"name": "color is touching", "description": "Check color overlap."},
-    {"name": "distance to", "description": "Report distance to object."},
-    {"name": "ask and wait", "description": "Ask user input."},
-    {"name": "answer", "description": "Report user answer."},
-    {"name": "key pressed", "description": "Detect key press."},
-    {"name": "mouse down", "description": "Detect mouse click."},
-    {"name": "mouse x", "description": "Report mouse x position."},
-    {"name": "mouse y", "description": "Report mouse y position."},
-    {"name": "loudness", "description": "Report microphone loudness."},
-    {"name": "timer", "description": "Report elapsed time."},
-    {"name": "reset timer", "description": "Reset timer."},
-    {"name": "current date/time", "description": "Report date/time."},
-    {"name": "days since 2000", "description": "Report days since year 2000."},
-    {"name": "username", "description": "Report logged-in username."}
-  ],
-  "Operators": [
-    {"name": "add", "description": "Add two numbers."},
-    {"name": "subtract", "description": "Subtract one number."},
-    {"name": "multiply", "description": "Multiply numbers."},
-    {"name": "divide", "description": "Divide numbers."},
-    {"name": "pick random", "description": "Random number between two."},
-    {"name": "greater than", "description": "True if left > right."},
-    {"name": "less than", "description": "True if left < right."},
-    {"name": "equals", "description": "True if equal."},
-    {"name": "and", "description": "True if both conditions."},
-    {"name": "or", "description": "True if either condition."},
-    {"name": "not", "description": "True if condition false."},
-    {"name": "join text", "description": "Combine strings."},
-    {"name": "letter of text", "description": "Extract letter from string."},
-    {"name": "length of text", "description": "Count characters."},
-    {"name": "contains text", "description": "Check if string has text."},
-    {"name": "mod", "description": "Remainder after division."},
-    {"name": "round", "description": "Round number."},
-    {"name": "math functions", "description": "Square root, abs, etc."}
-  ],
-  "Variables": [
-    {"name": "set variable", "description": "Assign value to variable."},
-    {"name": "change variable", "description": "Increase/decrease variable."},
-    {"name": "show variable", "description": "Display variable on stage."},
-    {"name": "hide variable", "description": "Hide variable from stage."},
-    {"name": "make variable", "description": "Create new variable."}
-  ]
-}
+  "Motion": {
+    "coordinates": "x: 1, y: 93",
+    "blocks": [
+      {"name": "move steps", "description": "Move sprite forward by given steps."},
+      {"name": "turn clockwise", "description": "Rotate sprite clockwise."},
+      {"name": "turn counterclockwise", "description": "Rotate sprite counterclockwise."},
+      {"name": "go to position", "description": "Instantly move sprite to coordinates."},
+      {"name": "glide", "description": "Smoothly move sprite to a position."},
+      {"name": "point in direction", "description": "Face sprite in specific direction."},
+      {"name": "point towards", "description": "Turn sprite to face another object."},
+      {"name": "change x", "description": "Move horizontally by value."},
+      {"name": "set x", "description": "Place sprite at exact x."},
+      {"name": "change y", "description": "Move vertically by value."},
+      {"name": "set y", "description": "Place sprite at exact y."},
+      {"name": "go to random position", "description": "Move sprite to random location."},
+      {"name": "if on edge bounce", "description": "Bounce when sprite touches stage edge."},
+      {"name": "set rotation style", "description": "Change how sprite rotates."}
+    ]
+  },
+  "Looks": {
+    "coordinates": "x: 1, y: 139",
+    "blocks": [
+      {"name": "say message", "description": "Display a speech bubble."},
+      {"name": "think message", "description": "Display a thought bubble."},
+      {"name": "show", "description": "Make sprite visible."},
+      {"name": "hide", "description": "Make sprite invisible."},
+      {"name": "switch costume", "description": "Change sprite costume."},
+      {"name": "next costume", "description": "Move to next costume."},
+      {"name": "switch backdrop", "description": "Change stage background."},
+      {"name": "next backdrop", "description": "Move to next background."},
+      {"name": "change size", "description": "Increase/decrease sprite size."},
+      {"name": "set size", "description": "Set exact size."},
+      {"name": "change color effect", "description": "Adjust sprite’s color effect."},
+      {"name": "set color effect", "description": "Apply specific color effect."},
+      {"name": "clear graphic effects", "description": "Remove visual effects."}
+    ]
+  },
+  "Sound": {
+    "coordinates": "x: 1, y: 185",
+    "blocks": [
+      {"name": "play sound", "description": "Play chosen sound."},
+      {"name": "start sound", "description": "Play sound until finished."},
+      {"name": "stop all sounds", "description": "Stop every sound playing."},
+      {"name": "change pitch effect", "description": "Adjust sound pitch."},
+      {"name": "set pitch effect", "description": "Set specific sound pitch."},
+      {"name": "clear sound effects", "description": "Remove sound effects."},
+      {"name": "change volume", "description": "Raise/lower volume."},
+      {"name": "set volume", "description": "Fix volume level."},
+      {"name": "volume", "description": "Report current volume."}
+    ]
+  },
+  "Events": {
+    "coordinates": "x: 1, y: 231",
+    "blocks": [
+      {"name": "when green flag clicked", "description": "Trigger when project starts."},
+      {"name": "when key pressed", "description": "Trigger on key press."},
+      {"name": "when this sprite clicked", "description": "Trigger on sprite click."},
+      {"name": "when backdrop switches", "description": "Trigger when backdrop changes."},
+      {"name": "when loudness", "description": "Trigger when sound is loud."},
+      {"name": "broadcast message", "description": "Send message to all sprites."},
+      {"name": "broadcast and wait", "description": "Send message then wait."}
+    ]
+  },
+  "Control": {
+    "coordinates": "x: 1, y: 277",
+    "blocks": [
+      {"name": "wait seconds", "description": "Pause script."},
+      {"name": "repeat times", "description": "Repeat actions fixed number."},
+      {"name": "forever", "description": "Repeat actions infinitely."},
+      {"name": "if then", "description": "Run code only if true."},
+      {"name": "if then else", "description": "Run code for true/false."},
+      {"name": "wait until", "description": "Pause until condition true."},
+      {"name": "repeat until", "description": "Repeat until condition met."},
+      {"name": "stop", "description": "Stop script/project."},
+      {"name": "create clone", "description": "Duplicate sprite."},
+      {"name": "delete clone", "description": "Remove sprite clone."}
+    ]
+  },
+  "Sensing": {
+    "coordinates": "x: 1, y: 323",
+    "blocks": [
+      {"name": "touching object", "description": "Check collision with object."},
+      {"name": "touching color", "description": "Detect touching color."},
+      {"name": "color is touching", "description": "Check color overlap."},
+      {"name": "distance to", "description": "Report distance to object."},
+      {"name": "ask and wait", "description": "Ask user input."},
+      {"name": "answer", "description": "Report user answer."},
+      {"name": "key pressed", "description": "Detect key press."},
+      {"name": "mouse down", "description": "Detect mouse click."},
+      {"name": "mouse x", "description": "Report mouse x position."},
+      {"name": "mouse y", "description": "Report mouse y position."},
+      {"name": "loudness", "description": "Report microphone loudness."},
+      {"name": "timer", "description": "Report elapsed time."},
+      {"name": "reset timer", "description": "Reset timer."},
+      {"name": "current date/time", "description": "Report date/time."},
+      {"name": "days since 2000", "description": "Report days since year 2000."},
+      {"name": "username", "description": "Report logged-in username."}
+    ]
+  },
+  "Operators": {
+    "coordinates": "x: 1, y: 267",
+    "blocks": [
+      {"name": "add", "description": "Add two numbers."},
+      {"name": "subtract", "description": "Subtract one number."},
+      {"name": "multiply", "description": "Multiply numbers."},
+      {"name": "divide", "description": "Divide numbers."},
+      {"name": "pick random", "description": "Random number between two."},
+      {"name": "greater than", "description": "True if left > right."},
+      {"name": "less than", "description": "True if left < right."},
+      {"name": "equals", "description": "True if equal."},
+      {"name": "and", "description": "True if both conditions."},
+      {"name": "or", "description": "True if either condition."},
+      {"name": "not", "description": "True if condition false."},
+      {"name": "join text", "description": "Combine strings."},
+      {"name": "letter of text", "description": "Extract letter from string."},
+      {"name": "length of text", "description": "Count characters."},
+      {"name": "contains text", "description": "Check if string has text."},
+      {"name": "mod", "description": "Remainder after division."},
+      {"name": "round", "description": "Round number."},
+      {"name": "math functions", "description": "Square root, abs, etc."}
+    ]
+  },
+  "Variables": {
+    "coordinates": "x: 1, y: 415",
+    "blocks": [
+      {"name": "set variable", "description": "Assign value to variable."},
+      {"name": "change variable", "description": "Increase/decrease variable."},
+      {"name": "show variable", "description": "Display variable on stage."},
+      {"name": "hide variable", "description": "Hide variable from stage."},
+      {"name": "make variable", "description": "Create new variable."}
+    ]
+  }}
