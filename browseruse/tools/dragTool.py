@@ -36,7 +36,8 @@ class Toolbox:
         
         # Release mouse
         self.tab.Input.dispatchMouseEvent(type="mouseReleased", x=x_end, y=y_end, button="left", clickCount=1)
-        time.sleep(delay)
+        # time.sleep(delay)
+        return "Drag and drop operation completed."
 
 # Example usage:
 # toolbox = Toolbox()
