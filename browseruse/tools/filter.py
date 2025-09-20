@@ -2,6 +2,7 @@ import os
 import sys
 import json
 from dotenv import load_dotenv
+from pathlib import Path
 
 load_dotenv()
 
@@ -10,6 +11,10 @@ JSON_FILE = os.getenv("ELEMENT_FILE_PATH")
 DESCRIPTION_FILE = os.getenv("ELEMENTS_DESCRIPTION_JSON_PATH")
 
 def filter_json():
+    """
+    Filter JSON objects based on starting words from a text file.
+    Returns a list of web elements current context.
+    """
     # Step 1: Load words
     with open(WORDS_FILE, "r", encoding="utf-8") as f:
         words = [line.strip() for line in f if line.strip()]
@@ -38,6 +43,8 @@ def filter_json():
     filtered = sorted(filtered, key=lambda item: item["y"])
     return filtered
 
+# print("Filtered JSON:", filter_json())
+
 def find_used_blocks():
     find_used_blocks = []
     filtered = filter_json()
@@ -48,22 +55,26 @@ def find_used_blocks():
 
 
     # Step 4: Print result
-# print(filter_json())
+# print("Found used blocks:", find_used_blocks())
 
 def get_list_of_used_blocks():
+    '''
+    Get Scratch working space used blocks with coordinates. It's out put like 
+    List of used blocks:  Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+        1. turn Code block. Block Coordinates: (X: 367, Y: 215 )
+        2. turn Code block. Block Coordinates: (X: 367, Y: 247 )
+    '''
     used_blocks = find_used_blocks()
-    string = ""
+    string = " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n"
     count = 1
     for block in used_blocks:
         string = f"{string} {count}. {block['text_content']} Code block. Block Coordinates: (X: {block['x']}, Y: {block['y']} ) \n"
         count += 1
     return string
 
-# print(filter_json())
+# print("List of used blocks:", get_list_of_used_blocks())
 
-import json
-import os
-from pathlib import Path
+
 
 def get_category_coordinates(json_file_path=None):
     """
@@ -95,7 +106,7 @@ def get_category_coordinates(json_file_path=None):
     return result
 
 
-
+# print("Category coordinates:", get_category_coordinates())
 
 
 
@@ -131,6 +142,7 @@ def generate_category_summary(json_file_path=None):
     summary += "\nYou can interact with these categories by clicking on them to access their blocks."
     return summary
 
+# print("Category summary:", generate_category_summary())
 
 def generate_detailed_blocks_summary(json_file_path=None, include_all_blocks=False):
     """
@@ -179,9 +191,9 @@ def generate_detailed_blocks_summary(json_file_path=None, include_all_blocks=Fal
     summary += "then dragging blocks to the workspace to build programs."
     
     return summary
+# print("Detailed blocks summary:", generate_detailed_blocks_summary(include_all_blocks=True))
 
-
-if __name__ == "__main__":
-    # print(get_list_of_used_blocks())
-    print(generate_category_summary())
-    print(generate_detailed_blocks_summary(include_all_blocks=True))
+# if __name__ == "__main__":
+#     # print(get_list_of_used_blocks())
+#     print(generate_category_summary())
+#     print(generate_detailed_blocks_summary(include_all_blocks=True))
