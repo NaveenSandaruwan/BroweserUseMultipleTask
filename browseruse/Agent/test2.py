@@ -439,12 +439,7 @@ website_control_agent = create_react_agent(
     '''
 )
 
-# weather_future_agent = create_react_agent(
-#     model = model,
-#     tools = [predict_weather_for_date],
-#     name='weather_future_agent',
-#     prompt= "Get a 5-day weather forecast summary for a city in Sri Lanka. Input should be a city name and date in YYYY-MM-DD format. use this for get present data"
-# )
+
 
 # Define a function to load element descriptions
 def load_element_descriptions(txt_path=os.getenv("ELEMENTS_DESCRIPTION_PATH")):
@@ -464,6 +459,7 @@ def load_element_descriptions(txt_path=os.getenv("ELEMENTS_DESCRIPTION_PATH")):
 
 elements = load_and_extract_elements()
 element_descriptions = load_element_descriptions()
+
 
 
 work_flow = create_supervisor(
