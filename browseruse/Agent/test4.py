@@ -29,12 +29,24 @@ model = ChatGoogleGenerativeAI(
 
 
 web_application_coding_summary = generate_detailed_blocks_summary(include_all_blocks=True)
+working_space = get_list_of_used_blocks()
 
 general_coding_agent = create_react_agent(
     model=model,
     tools=[],
     name='coding_expert',
     prompt=f'''You are a world-class coding expert specializing in Scratch programming. 
+    Scratch is a visual block-based programming language mainly for beginners, especially kids, to learn coding concepts without typing code. Instead of writing text, you drag and snap together colorful blocks (like puzzle pieces) that represent commands. These blocks are grouped by categories (motion, looks, sound, events, control, sensing, operators, variables).
+
+You build programs (called projects) by combining blocks into scripts that control sprites (characters/objects on the stage). The stage is the background where sprites act. Sprites can move, talk, play sounds, sense inputs (like keyboard/mouse), and interact with each other.
+
+Scratch uses event-driven programming: actions start with triggers like “when green flag clicked,” “when key pressed,” or “when sprite clicked.” Programs run step-by-step from top to bottom but can run multiple scripts at once (parallel execution).
+
+It teaches core concepts: loops, conditionals, variables, functions (custom blocks), events, broadcasting messages, and even basic logic and math, all visually.
+
+Scratch projects can be shared online through the Scratch website, making it both a learning tool and a community platform.
+
+👉 In short: Scratch works by dragging puzzle-like blocks to control sprites on a stage, making coding visual, simple, and interactive.
 You have access to a comprehensive summary of all available Scratch blocks:
 
 {web_application_coding_summary}
@@ -51,6 +63,11 @@ Be concise, accurate, and supportive in your responses.
 )
 
 context = filter_json()
+
+
+
+# print(web_application_coding_summary)
+# print(working_space)
 
 context_agent = create_react_agent(
     model=model,
@@ -73,7 +90,42 @@ You are an expert in understanding and utilizing web page element coordinates.
 
 dragtool = Toolbox()
 
-working_space = get_list_of_used_blocks()
+
+
+debugging_agent = create_react_agent(
+    model=model,
+    tools=[],
+    name='debugging_expert',
+    prompt=f'''
+You are a debugging expert specializing in Scratch programming. Your role is to analyze the user's current workspace and identify potential issues or improvements in their Scratch program.
+
+Here is the summary of all available Scratch blocks:
+{web_application_coding_summary}
+
+Here is the current state of the user's workspace:
+{working_space}
+
+Your tasks include:
+1. Analyze the sequence of blocks in the workspace.
+   - Check if the blocks are logically connected based on their x and y coordinates.
+   - Ensure that the y-coordinates increase sequentially for stacked blocks.
+   - Identify any gaps, overlaps, or misplaced blocks.
+
+2. Provide feedback to the user:
+   - If there are issues, explain what might be wrong and why.
+   - Suggest corrections or improvements to fix the identified issues.
+   - If the workspace is correct, confirm that everything looks good.
+
+3. Be concise, clear, and supportive in your responses.
+4. Always reference the block names and their coordinates when explaining issues or suggestions.
+'''
+)
+
+
+
+
+
+
 drag_and_drop_agent = create_react_agent(
     model=model,
     tools=[dragtool.drag_and_drop],
@@ -145,13 +197,12 @@ Return a confirmation message after completing the drag-and-drop operation with 
 
 # )
 
-
 work_flow = create_supervisor(
-    [general_coding_agent,context_agent],  # Add other agents as needed
+    [general_coding_agent, context_agent, debugging_agent],  # Add other agents as needed
     model=model,
     prompt=(
         '''
-You are an expert supervisor overseeing a team of specialized agents which are coding_expert, context_expert, and drag_and_drop_expert. Your role is to:
+You are an expert supervisor overseeing a team of specialized agents which are coding_expert, context_expert, debugging_expert, and drag_and_drop_expert. Your role is to:
 - Give instruction only regarding Scratch programming.
 
 - Do not ask many questions from the user. Try to understand the user query and delegate it to the best agent.
@@ -164,17 +215,48 @@ You are an expert supervisor overseeing a team of specialized agents which are c
 Here are the agents you can delegate to:
        - coding_expert: Specializes in Scratch programming and can provide detailed explanations of Scratch blocks and their usage.
        - context_expert: Specializes in understanding and utilizing web page contexts element coordinates, particularly for Scratch programming interface.
-       
-work flow do not deviate form these steps please follow these,
-- first get answer by most suitable agent based on user quwery.
-- Before you give the final answer to the user, make sure to check if you have enough context about the Scratch programming interface. If not, use the coordinate_expert agent to get the necessary coordinates information and add those to the relevant Scratch blocks.
+       - debugging_expert: Specializes in analyzing the user's Scratch workspace to identify issues, provide feedback, and suggest improvements.
+
+work flow do not deviate from these steps, please follow these:
+- First, analyze the user query and determine the most suitable agent based on the query.
+- If the user query indicates they need help identifying issues or fixing their Scratch program (e.g., "Am I doing something wrong?", "Can you fix this?", "How to do this correctly?"), delegate the task to the debugging_expert.
+- Before you give the final answer to the user, make sure to check if you have enough context about the Scratch programming interface. If not, use the context_expert agent to get the necessary coordinates information and add those to the relevant Scratch blocks.
 
 - Finally get all agents answers and combine them as it is  into a single response to the user.
 - Finally get all agents answers and combine them as it is  into a single response to the user.
 '''
-       
     )
 )
+
+# work_flow = create_supervisor(
+#     [general_coding_agent,context_agent],  # Add other agents as needed
+#     model=model,
+#     prompt=(
+#         '''
+# You are an expert supervisor overseeing a team of specialized agents which are coding_expert, context_expert, and drag_and_drop_expert. Your role is to:
+# - Give instruction only regarding Scratch programming.
+
+# - Do not ask many questions from the user. Try to understand the user query and delegate it to the best agent.
+# - Analyze user queries and determine which agent is best suited to respond.
+# - Delegate tasks to the appropriate agent based on their expertise.
+# - Ensure that responses are accurate, relevant, and concise.
+# - If a query involves multiple topics, break it down and assign each part to the relevant agent.
+# - Maintain a coherent and user-friendly conversation flow.
+
+# Here are the agents you can delegate to:
+#        - coding_expert: Specializes in Scratch programming and can provide detailed explanations of Scratch blocks and their usage.
+#        - context_expert: Specializes in understanding and utilizing web page contexts element coordinates, particularly for Scratch programming interface.
+       
+# work flow do not deviate form these steps please follow these,
+# - first get answer by most suitable agent based on user quwery.
+# - Before you give the final answer to the user, make sure to check if you have enough context about the Scratch programming interface. If not, use the coordinate_expert agent to get the necessary coordinates information and add those to the relevant Scratch blocks.
+
+# - Finally get all agents answers and combine them as it is  into a single response to the user.
+# - Finally get all agents answers and combine them as it is  into a single response to the user.
+# '''
+       
+#     )
+# )
 
 
 # Chat loop
@@ -186,6 +268,7 @@ chat_app = work_flow.compile()
 while True:
     user_input = input("User: ")
     send_task("refresh")  
+    # print(working_space)
     if user_input.lower() in ["exit", "quit"]:
         break
 
@@ -200,3 +283,4 @@ while True:
     ai_messages = [m for m in result["messages"] if m.type == "ai"]
     if ai_messages:
         print("Bot:", ai_messages[-1].content)
+        # print(result)
