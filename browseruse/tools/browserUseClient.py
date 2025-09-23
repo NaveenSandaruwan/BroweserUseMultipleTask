@@ -17,7 +17,7 @@ def send_task(task: str):
 
 if __name__ == "__main__":
    
-    # send_task("Go to https://scratch.mit.edu/projects/editor/?tutorial=getStarted")
-    send_task("refresh")   # gracefully shut down worker
+    send_task("Go to https://scratch.mit.edu/projects/editor/?tutorial=getStarted")
+    #send_task("refresh")   # gracefully shut down worker
     # send_task("go to operators do not open new tab")
     # send_task("exit")   # gracefully shut down worker

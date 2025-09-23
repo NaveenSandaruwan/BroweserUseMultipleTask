@@ -1,66 +1,44 @@
-from typing import Optional
+# main.py
 from fastapi import FastAPI
-from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from agent import agent  # original agent
-from test2 import work_flow as enhanced_agent  # our new enhanced workflow
+from pydantic import BaseModel
+from dotenv import load_dotenv
+from test4 import call_LLM
 
-# app = FastAPI()
+load_dotenv()
 
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["*"],  # adjust for production
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
+BACKEND_PORT = 5000  # choose your port
 
-# Input model from frontend
-class UserMessage(BaseModel):
-    text: str
+app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+    allow_credentials=True,
+)
 
+class ChatRequest(BaseModel):
+    message: str
 
-def ask(msg, use_enhanced=True):
-    try:
-        # Initialize agent state with "question"
-        initial_state = {"question": msg.text}
+class ChatResponse(BaseModel):
+    reply: str
 
-        # Choose which agent to use
-        selected_agent = enhanced_agent if use_enhanced else agent
-        
-        # Invoke the selected agent
-        result_state = selected_agent.invoke(initial_state)
+# def run_llm(user_message: str) -> str:
+#     """Simple stub LLM reply"""
+#     print(f"[LLM] Received: {user_message}")
+#     reply = f"AI says: I heard '{user_message}'. This is my response."
+#     print(f"[LLM] Reply: {reply}")
+#     return reply
 
-        # Extract answer safely
-        answer = result_state.get("answer", "Sorry, something went wrong with the agent.")
+@app.post("/speak", response_model=ChatResponse)
+def speak(req: ChatRequest):
+    print(f"[API] Received from extension: {req.message}")
+    reply_text = call_LLM(req.message)
+    print(f"[API] Sending reply: {reply_text[1]}")
+    return ChatResponse(reply=reply_text[1])
 
-        # Ensure structured JSON command format
-        structured_command = {
-            "action": "explain",
-            "text": answer
-        }
-
-        # Optionally, include coordinates if your agent adds them
-        if "x" in result_state and "y" in result_state:
-            structured_command["x"] = result_state["x"]
-            structured_command["y"] = result_state["y"]
-        if "id" in result_state:
-            structured_command["id"] = result_state["id"]
-
-        return {"status": "ok", "command": structured_command}
-
-    except Exception as e:
-        # Return fallback structured command in case of error
-        return {
-            "status": "error",
-            "command": {"action": "explain", "text": "Sorry, something went wrong with the agent."},
-            "error": str(e)
-        }
-    
-
-# Test both agents for comparison
-print("Original agent response:")
-print(ask(UserMessage(text="What is move button?"), use_enhanced=False))
-
-print("\nEnhanced agent response:")
-print(ask(UserMessage(text="What is move button?"), use_enhanced=True))
+if __name__ == "__main__":
+    import uvicorn
+    print(f"[Server] Starting backend on port {BACKEND_PORT}...")
+    uvicorn.run("main:app", host="127.0.0.1", port=BACKEND_PORT, reload=True)
