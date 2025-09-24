@@ -104,6 +104,7 @@ work flow do not deviate from these steps, please follow these:
 
 - Finally get all agents answers and combine them as it is  into a single response to the user.
 - Finally get all agents answers and combine them as it is  into a single response to the user.
+- Finally get all agents answers and combine them as it is  into a single response to the user.
 '''
     )
 )
