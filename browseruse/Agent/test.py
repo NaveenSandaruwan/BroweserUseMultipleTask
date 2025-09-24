@@ -188,8 +188,8 @@ Important:
 Here are the agents you can delegate to:
        - coding_expert: Specializes in Scratch programming and can provide detailed explanations of Scratch blocks and their usage.
        - context_expert: Specializes in understanding and utilizing web page contexts element coordinates, particularly for Scratch programming interface.
-       - debugging_expert: Specializes in analyzing the user's Scratch workspace to identify issues, provide feedback, and suggest improvements.
-       - debugging_expert: Specializes in analyzing the user's Scratch workspace to identify issues, provide feedback, and suggest improvements.
+       - debugging_expert:Know the users workspace well. Specializes in analyzing the user's Scratch workspace to identify issues, provide feedback, and suggest improvements.
+
        
 work flow do not deviate from these steps, please follow these:
 - First, analyze the user query and determine the most suitable agent based on the query.
@@ -235,7 +235,7 @@ while True:
 
     chat_history.extend(result["messages"])
 
-    # ✅ extract only non-empty AI messages from format_agent
+    
     format_messages = [
         m for m in result["messages"]
         if m.type == "ai" and m.name == "format_agent" and m.content and m.content.strip()
@@ -246,5 +246,5 @@ while True:
         last_format_message = format_messages[-1]
         print("Bot:", last_format_message.content)
     else:
-        print("Bot: (no response from format agent)")
+        print("Bot: (no respons from format agent)")
 
