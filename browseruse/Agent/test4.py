@@ -216,7 +216,8 @@ Here are the agents you can delegate to:
        - coding_expert: Specializes in Scratch programming and can provide detailed explanations of Scratch blocks and their usage.
        - context_expert: Specializes in understanding and utilizing web page contexts element coordinates, particularly for Scratch programming interface.
        - debugging_expert: Specializes in analyzing the user's Scratch workspace to identify issues, provide feedback, and suggest improvements.
-
+       - debugging_expert: Specializes in analyzing the user's Scratch workspace to identify issues, provide feedback, and suggest improvements.
+       
 work flow do not deviate from these steps, please follow these:
 - First, analyze the user query and determine the most suitable agent based on the query.
 - If the user query indicates they need help identifying issues or fixing their Scratch program (e.g., "Am I doing something wrong?", "Can you fix this?", "How to do this correctly?"), delegate the task to the debugging_expert.

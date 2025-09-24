@@ -72,7 +72,7 @@ def get_list_of_used_blocks():
         count += 1
     return string
 
-print("List of used blocks:", get_list_of_used_blocks())
+# print("List of used blocks:", get_list_of_used_blocks())
 
 
 def get_category_coordinates(json_file_path=None):
