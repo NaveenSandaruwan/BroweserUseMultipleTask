@@ -65,28 +65,25 @@ Be concise, accurate, and supportive in your responses.
 context = filter_json()
 
 
-
-# print(web_application_coding_summary)
-# print(working_space)
-
 context_agent = create_react_agent(
     model=model,
     tools=[],
     name='coordinate_expert',
     prompt='''
-You are an expert in understanding and utilizing web page element coordinates.
- Your role is to help users interact with web pages effectively by leveraging the provided coordinate information.
- Here is the context you can use(each elment have this firmat 'tag_name': 'text', 'text_content': 'move', 'x': 74, 'y': 149 ):
-        if your provided text have "move" block add this context (X: 74, Y: 149 ) to the "move" block.
+    You are an expert in understanding and utilizing web page element coordinates.
+    Your role is to help users interact with web pages effectively by leveraging the provided coordinate information.
+    Here is the context you can use(each elment have this format 'tag_name': 'text', 'text_content': 'move', 'x': 74, 'y': 149 ):
+            if your provided text have "move" block add this context (X: 74, Y: 149 ) to the "move" block.
+            All content seen in the page:
+        {context}
+        Your tasks include: 
+        - Analyse other agent responses and add position context to related Scratch blocks if needed.
+        - Finally Add position context to related Scratch blocks.
+    '''
+    )
 
-        All content seen in the page:
-      {context}
-    Your tasks include: 
-     - Analyse other agent responses and add position context to related Scratch blocks if needed.
-     - Finally Add position context to related Scratch blocks.
 
-'''
-)
+
 
 dragtool = Toolbox()
 
@@ -121,6 +118,37 @@ Your tasks include:
 '''
 )
 
+
+guide_agent = create_react_agent(
+    model=model,
+    tools=[],
+    name='guide_expert',
+    prompt='''
+You are a guide expert specializing in Scratch programming. Your role is to provide step-by-step guidance to users who are learning or working on Scratch projects.
+
+Here is the summary of all available Scratch blocks:
+{web_application_coding_summary}
+
+Your tasks include:
+1. Understand the user's goal or question:
+   - If the user is learning, provide clear and simple explanations of Scratch concepts.
+   - If the user is working on a project, guide them through the steps to achieve their goal.
+
+2. Provide step-by-step instructions:
+   - Break down the solution into small, manageable steps.
+   - Reference relevant Scratch blocks and explain how to use them.
+
+3. Be supportive and encouraging:
+   - Use positive language to motivate the user.
+   - Offer tips or best practices for Scratch programming.
+
+4. Ensure clarity and accuracy:
+   - Avoid technical jargon unless necessary.
+   - Use examples or analogies to make concepts easier to understand.
+
+Always aim to make the learning process enjoyable and engaging for the user.
+'''
+)
 
 
 
@@ -216,8 +244,7 @@ Here are the agents you can delegate to:
        - coding_expert: Specializes in Scratch programming and can provide detailed explanations of Scratch blocks and their usage.
        - context_expert: Specializes in understanding and utilizing web page contexts element coordinates, particularly for Scratch programming interface.
        - debugging_expert: Specializes in analyzing the user's Scratch workspace to identify issues, provide feedback, and suggest improvements.
-       - debugging_expert: Specializes in analyzing the user's Scratch workspace to identify issues, provide feedback, and suggest improvements.
-       
+
 work flow do not deviate from these steps, please follow these:
 - First, analyze the user query and determine the most suitable agent based on the query.
 - If the user query indicates they need help identifying issues or fixing their Scratch program (e.g., "Am I doing something wrong?", "Can you fix this?", "How to do this correctly?"), delegate the task to the debugging_expert.
@@ -266,8 +293,12 @@ chat_history = []
 chat_app = work_flow.compile()
 
 
-def call_LLM(user_input):
+while True:
+    user_input = input("User: ")
     send_task("refresh")  
+    # print(working_space)
+    if user_input.lower() in ["exit", "quit"]:
+        break
 
     result = chat_app.invoke({
         "messages": chat_history + [{"role": "user", "content": user_input}]
@@ -279,6 +310,5 @@ def call_LLM(user_input):
     # Print only the last AI message
     ai_messages = [m for m in result["messages"] if m.type == "ai"]
     if ai_messages:
-        print(ai_messages)
-        return("Bot:", ai_messages[-1].content)
+        print("Bot:", ai_messages[-1].content)
         # print(result)
