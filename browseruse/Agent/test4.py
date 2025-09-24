@@ -160,45 +160,27 @@ Return a confirmation message after completing the drag-and-drop operation with 
 '''
 )
 
+format_agent = create_react_agent(
+    model=model,
+    tools=[],
+    name="format_agent",
+    prompt="""
+You are a friendly assistant whose task is to reformat technical Scratch programming instructions 
+so that they are simple, clear, and fun for children to understand. 
 
+- Use short sentences and simple words.
+- Keep explanations supportive and encouraging.
+- Keep all important instructions from the original message intact, but simplify any technical terms.
+- Present the steps in a way that kids can follow easily.
 
-# research_agent= create_react_agent(
-#     model = model,
-#     tools = [search_ddgo],
-#     name='search_expert',
-#     prompt= 'you are a world class researcher with access to web search. Do not do any math'
-# )
+Input: The message from the supervisor or other agents.
+Output: A child-friendly version of that message.
+"""
+)
 
-# weather_agent= create_react_agent(
-#     model = model,
-#     tools = [get_weather],
-#     name='weather_expert',
-#     prompt= '''You are a world-class weather researcher with access to real-time weather data through web services. Your job is to provide accurate, concise, and up-to-date weather reports for any location requested. Do not perform any calculations or estimates manually. Just retrieve and present verified information.
-
-# - Use plain language that is easy for anyone to understand.
-# - Always mention temperature, humidity, wind speed, and general weather conditions.
-# - If the city is not found or there’s an error, politely explain that the data is unavailable.
-# - Keep your response factual and avoid unnecessary elaboration.
-# '''
-# )
-
-# weather_future_agent = create_react_agent(
-#     model = model,
-#     tools = [predict_weather_for_date],
-#     name='weather_future_agent',
-#     prompt= "Get a 5-day weather forecast summary for a city in Sri Lanka. Input should be a city name and date in YYYY-MM-DD format. use this for get present data"
-# )
-
-# crop_expert = create_react_agent(
-#     model = model,
-#     tools = [get_suitable_crops_only],
-#     name='crop_expert', 
-#     prompt= 'you are a crop expert. Use this tool to get suitable crops for a given location. '
-
-# )
 
 work_flow = create_supervisor(
-    [general_coding_agent, context_agent, debugging_agent],  # Add other agents as needed
+    [general_coding_agent, context_agent, debugging_agent, format_agent],  # Add other agents as needed
     model=model,
     prompt=(
         '''
@@ -217,47 +199,19 @@ Here are the agents you can delegate to:
        - context_expert: Specializes in understanding and utilizing web page contexts element coordinates, particularly for Scratch programming interface.
        - debugging_expert: Specializes in analyzing the user's Scratch workspace to identify issues, provide feedback, and suggest improvements.
        - debugging_expert: Specializes in analyzing the user's Scratch workspace to identify issues, provide feedback, and suggest improvements.
-       
+       - format_agent: Specializes in reformatting technical Scratch programming instructions into simple, clear, and fun explanations suitable for children.
+
 work flow do not deviate from these steps, please follow these:
 - First, analyze the user query and determine the most suitable agent based on the query.
 - If the user query indicates they need help identifying issues or fixing their Scratch program (e.g., "Am I doing something wrong?", "Can you fix this?", "How to do this correctly?"), delegate the task to the debugging_expert.
 - Before you give the final answer to the user, make sure to check if you have enough context about the Scratch programming interface. If not, use the context_expert agent to get the necessary coordinates information and add those to the relevant Scratch blocks.
 
-- Finally get all agents answers and combine them as it is  into a single response to the user.
-- Finally get all agents answers and combine them as it is  into a single response to the user.
+Important:
+- Finally get all agents answers and combine them as it is  into a single response using format_agent to the user.
+- Finally get all agents answers and combine them as it is  into a single response using format_agent to the user.
 '''
     )
 )
-
-# work_flow = create_supervisor(
-#     [general_coding_agent,context_agent],  # Add other agents as needed
-#     model=model,
-#     prompt=(
-#         '''
-# You are an expert supervisor overseeing a team of specialized agents which are coding_expert, context_expert, and drag_and_drop_expert. Your role is to:
-# - Give instruction only regarding Scratch programming.
-
-# - Do not ask many questions from the user. Try to understand the user query and delegate it to the best agent.
-# - Analyze user queries and determine which agent is best suited to respond.
-# - Delegate tasks to the appropriate agent based on their expertise.
-# - Ensure that responses are accurate, relevant, and concise.
-# - If a query involves multiple topics, break it down and assign each part to the relevant agent.
-# - Maintain a coherent and user-friendly conversation flow.
-
-# Here are the agents you can delegate to:
-#        - coding_expert: Specializes in Scratch programming and can provide detailed explanations of Scratch blocks and their usage.
-#        - context_expert: Specializes in understanding and utilizing web page contexts element coordinates, particularly for Scratch programming interface.
-       
-# work flow do not deviate form these steps please follow these,
-# - first get answer by most suitable agent based on user quwery.
-# - Before you give the final answer to the user, make sure to check if you have enough context about the Scratch programming interface. If not, use the coordinate_expert agent to get the necessary coordinates information and add those to the relevant Scratch blocks.
-
-# - Finally get all agents answers and combine them as it is  into a single response to the user.
-# - Finally get all agents answers and combine them as it is  into a single response to the user.
-# '''
-       
-#     )
-# )
 
 
 # Chat loop
@@ -265,20 +219,25 @@ chat_history = []
 
 chat_app = work_flow.compile()
 
+if __name__ == "__main__":
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() in ["exit", "quit"]:
+            print("Exiting chat.")
+            break
 
-def call_LLM(user_input):
-    send_task("refresh")  
+        send_task("refresh")  
 
-    result = chat_app.invoke({
-        "messages": chat_history + [{"role": "user", "content": user_input}]
-    })
+        result = chat_app.invoke({
+            "messages": chat_history + [{"role": "user", "content": user_input}]
+        })
 
-    # Extend chat history with LangChain message objects
-    chat_history.extend(result["messages"])
+        # Extend chat history with LangChain message objects
+        chat_history.extend(result["messages"])
 
-    # Print only the last AI message
-    ai_messages = [m for m in result["messages"] if m.type == "ai"]
-    if ai_messages:
-        print(ai_messages)
-        return("Bot:", ai_messages[-1].content)
-        # print(result)
+        # Print only the last AI message
+        ai_messages = [m for m in result["messages"] if m.type == "ai"]
+        if ai_messages:
+            print("Bot:", ai_messages[-1].content)
+
+
