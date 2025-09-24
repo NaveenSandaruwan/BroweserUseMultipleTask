@@ -227,7 +227,6 @@ if __name__ == "__main__":
             break
 
         send_task("refresh")  
-
         result = chat_app.invoke({
             "messages": chat_history + [{"role": "user", "content": user_input}]
         })
@@ -239,5 +238,4 @@ if __name__ == "__main__":
         ai_messages = [m for m in result["messages"] if m.type == "ai"]
         if ai_messages:
             print("Bot:", ai_messages[-1].content)
-
 
