@@ -3,7 +3,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
-from test4 import call_LLM
+import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+  # Implement custom call_LLM logic directly here
+from tools.browserUseClient import send_task
+from test import graph
+
 
 load_dotenv()
 
@@ -30,13 +38,42 @@ class ChatResponse(BaseModel):
 #     reply = f"AI says: I heard '{user_message}'. This is my response."
 #     print(f"[LLM] Reply: {reply}")
 #     return reply
+chat_history = []
 
 @app.post("/speak", response_model=ChatResponse)
 def speak(req: ChatRequest):
     print(f"[API] Received from extension: {req.message}")
-    reply_text = call_LLM(req.message)
-    print(f"[API] Sending reply: {reply_text[1]}")
-    return ChatResponse(reply=reply_text[1])
+    
+  
+    
+    # Refresh browser state
+    send_task("refresh")
+    
+    # Process the user input
+    result = graph.invoke({
+        "messages": chat_history + [{"role": "user", "content": req.message}]
+    })
+    
+    # Update chat history
+    chat_history.extend(result["messages"])
+    
+    # Extract messages from the format agent
+    format_messages = [
+        m for m in result["messages"]
+        if m.type == "ai" and m.name == "format_agent" and m.content and m.content.strip()
+    ]
+    
+    # Get the reply text
+    if format_messages:
+        last_format_message = format_messages[-1]
+        reply_text = last_format_message.content
+        print(f"Bot: {reply_text}")
+    else:
+        reply_text = "I'm sorry, I couldn't process your request."
+        print("Bot: (no response from format agent)")
+    
+    print(f"[API] Sending reply: {reply_text}")
+    return ChatResponse(reply=reply_text)
 
 if __name__ == "__main__":
     import uvicorn
