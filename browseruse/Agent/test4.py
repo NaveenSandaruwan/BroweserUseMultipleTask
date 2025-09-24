@@ -266,12 +266,8 @@ chat_history = []
 chat_app = work_flow.compile()
 
 
-while True:
-    user_input = input("User: ")
+def call_LLM(user_input):
     send_task("refresh")  
-    # print(working_space)
-    if user_input.lower() in ["exit", "quit"]:
-        break
 
     result = chat_app.invoke({
         "messages": chat_history + [{"role": "user", "content": user_input}]
@@ -283,5 +279,6 @@ while True:
     # Print only the last AI message
     ai_messages = [m for m in result["messages"] if m.type == "ai"]
     if ai_messages:
-        print("Bot:", ai_messages[-1].content)
+        print(ai_messages)
+        return("Bot:", ai_messages[-1].content)
         # print(result)
