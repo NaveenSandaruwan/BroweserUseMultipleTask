@@ -278,5 +278,6 @@ def call_LLM(user_input):
     # Print only the last AI message
     ai_messages = [m for m in result["messages"] if m.type == "ai"]
     if ai_messages:
-        return ai_messages[-1].content
+        print(ai_messages)
+        return("Bot:", ai_messages[-1].content)
         # print(result)

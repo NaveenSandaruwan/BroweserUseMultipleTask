@@ -35,36 +35,39 @@ if (!SpeechRecognitionAPI) {
     micBtn.style.background = "#4285f4";
     statusEl.textContent = "";
   };
-
+  
+  // This is the part of your JavaScript code that runs after the user has finished speaking.
   recognition.onresult = async (event) => {
     const transcript = event.results[0][0].transcript.trim();
     console.log("Heard:", transcript);
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/speak", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: transcript }),
-      });
+        const response = await fetch("http://127.0.0.1:5000/speak", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: transcript }),
+        });
 
-      if (!response.ok) throw new Error("Network response not OK");
+        if (!response.ok) throw new Error("Network response not OK");
 
-      const data = await response.json();
-      console.log("Backend reply:", data);
+        // The backend's JSON response is parsed here.
+        const data = await response.json(); 
+        console.log("Backend reply:", data);
 
-      // Show reply under avatar
-      showSpeech(data.reply, 6000);
+        // The reply from the backend is passed to the showSpeech function.
+        showSpeech(data.reply, 6000); 
 
-      // Speak reply
-      speakText(data.reply);
+        // The same reply is also passed to the function that speaks the text.
+        speakText(data.reply);
 
     } catch (err) {
-      console.error("Error:", err);
-      const fallbackReply = `AI says: I heard '${transcript}'.`;
-      showSpeech(fallbackReply, 4000);
-      speakText(fallbackReply);
+        console.error("Error:", err);
+        const fallbackReply = `AI says: I heard '${transcript}'.`;
+        showSpeech(fallbackReply, 4000);
+        speakText(fallbackReply);
     }
   };
+
 }
 
 // =========================
