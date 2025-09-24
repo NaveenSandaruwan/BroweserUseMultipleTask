@@ -301,12 +301,12 @@ def call_LLM(user_input):
                 if m.type == "ai" and m.name == "format_agent" and m.content and m.content.strip()
             ]
 
-    if result:
-        # take the last non-empty message from format_agent
-        # last_format_message = result[-1]
-        print("Bot:", result)
-    else:
-        print("Bot: (no respons from format agent)")
+            if result:
+                # take the last non-empty message from format_agent
+                # last_format_message = result[-1]
+                print("Bot:", result)
+            else:
+                print("Bot: (no respons from format agent)")
 
 # def call_LLM(user_input):
 #             send_task("refresh")
