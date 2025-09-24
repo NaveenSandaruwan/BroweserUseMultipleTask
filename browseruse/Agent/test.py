@@ -301,12 +301,31 @@ def call_LLM(user_input):
                 if m.type == "ai" and m.name == "format_agent" and m.content and m.content.strip()
             ]
 
-            if format_messages:
-                last_format_message = format_messages[-1]
-                print("Bot:", last_format_message.content)
-                return last_format_message.content
-            else:
-                print("Bot: (no respons from format agent)")
-                return None
+    if result:
+        # take the last non-empty message from format_agent
+        # last_format_message = result[-1]
+        print("Bot:", result)
+    else:
+        print("Bot: (no respons from format agent)")
+
+# def call_LLM(user_input):
+#             send_task("refresh")
+#             result = graph.invoke({
+#                 "messages": chat_history + [{"role": "user", "content": user_input}]
+#             })
+#             chat_history.extend(result["messages"])
+
+#             format_messages = [
+#                 m for m in result["messages"]
+#                 if m.type == "ai" and m.name == "format_agent" and m.content and m.content.strip()
+#             ]
+
+#             if format_messages:
+#                 last_format_message = format_messages[-1]
+#                 print("Bot:", last_format_message.content)
+#                 return last_format_message.content
+#             else:
+#                 print("Bot: (no respons from format agent)")
+#                 return None
             
 # print("LLM is ready to use..."+"\n" ,call_LLM("Hello!"))
