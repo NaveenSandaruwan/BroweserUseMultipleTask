@@ -112,7 +112,24 @@ Your tasks include:
 """
 )
 
-# ...existing code...
+format_agent = create_react_agent(
+    model=model,
+    tools=[],
+    name="format_agent",
+    prompt="""
+You are a friendly assistant whose task is to reformat technical Scratch programming instructions 
+so that they are simple, clear, and fun for children to understand. 
+
+- Use short sentences and simple words.
+- Keep explanations supportive and encouraging.
+- Keep all important instructions from the original message intact, but simplify any technical terms.
+- Present the steps in a way that kids can follow easily.
+
+Input: The message from the supervisor or other agents.
+Output: A child-friendly version of that message.
+"""
+)
+
 # ...existing code...
 
 # Delegation tools (handoff)
@@ -158,6 +175,8 @@ supervisor_agent = create_react_agent(
     prompt="""
 You are an expert supervisor overseeing a team of specialized agents which are coding_expert, context_expert, debugging_expert, and drag_and_drop_expert. Your role is to:
 - Give instruction only regarding Scratch programming.
+Important:
+- Finally get all agents answers and combine them as it is  into a single response to the user.
 
 - Do not ask many questions from the user. Try to understand the user query and delegate it to the best agent.
 - Analyze user queries and determine which agent is best suited to respond.
@@ -177,6 +196,7 @@ work flow do not deviate from these steps, please follow these:
 - If the user query indicates they need help identifying issues or fixing their Scratch program (e.g., "Am I doing something wrong?", "Can you fix this?", "How to do this correctly?"), delegate the task to the debugging_expert.
 - Before you give the final answer to the user, make sure to check if you have enough context about the Scratch programming interface. If not, use the context_expert agent to get the necessary coordinates information and add those to the relevant Scratch blocks.
 
+Important:
 - Finally get all agents answers and combine them as it is  into a single response to the user.
 - Finally get all agents answers and combine them as it is  into a single response to the user.
 """
@@ -184,15 +204,20 @@ work flow do not deviate from these steps, please follow these:
 
 # --- Build Graph ---
 builder = StateGraph(MessagesState)
-builder = builder.add_node(supervisor_agent, destinations=("coding_expert", "context_expert", "debugging_expert", END))
+builder = builder.add_node(supervisor_agent, destinations=("coding_expert", "context_expert", "debugging_expert","format_agent", END))
 builder = builder.add_node(coding_agent)
 builder = builder.add_node(context_agent)
 builder = builder.add_node(debugging_agent)
+builder = builder.add_node(format_agent)
 
 builder = builder.add_edge(START, "supervisor")
 builder = builder.add_edge("coding_expert", "supervisor")
 builder = builder.add_edge("context_expert", "supervisor")
 builder = builder.add_edge("debugging_expert", "supervisor")
+
+builder = builder.add_edge("supervisor", "format_agent")
+builder = builder.add_edge("format_agent", END)
+
 
 graph = builder.compile()
 
@@ -204,9 +229,22 @@ while True:
     if user_input.lower() in ["exit", "quit"]:
         break
 
-    result = graph.invoke({"messages": chat_history + [{"role": "user", "content": user_input}]})
+    result = graph.invoke({
+        "messages": chat_history + [{"role": "user", "content": user_input}]
+    })
 
     chat_history.extend(result["messages"])
-    ai_messages = [m for m in result["messages"] if m.type == "ai"]
-    if ai_messages:
-        print("Bot:",result)
+
+    # ✅ extract only non-empty AI messages from format_agent
+    format_messages = [
+        m for m in result["messages"]
+        if m.type == "ai" and m.name == "format_agent" and m.content and m.content.strip()
+    ]
+
+    if format_messages:
+        # take the last non-empty message from format_agent
+        last_format_message = format_messages[-1]
+        print("Bot:", last_format_message.content)
+    else:
+        print("Bot: (no response from format agent)")
+
