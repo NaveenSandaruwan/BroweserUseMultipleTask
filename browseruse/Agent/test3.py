@@ -9,7 +9,6 @@ from typing import Dict, List, Any
 
 load_dotenv()
 
-# Import your existing functions
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
@@ -18,319 +17,235 @@ from tools.browserUseClient import send_task
 from tools.dragTool import Toolbox
 from tools.filter import filter_json, find_used_blocks, get_list_of_used_blocks, get_category_coordinates, generate_detailed_blocks_summary
 
-# Initialize model
-GEMINIAPI = os.getenv("GOOGLE_API_KEY")
-model = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash",
-    google_api_key=GEMINIAPI,
-    temperature=0.3  # Lower temperature for more consistent responses
-)
 
-# Initialize drag tool
-drag_tool = Toolbox()
+class ScratchChatApp:
+    def __init__(self):
+
+        self.send_task = send_task
+
+        GEMINIAPI = os.getenv("GOOGLE_API_KEY")
+        self.model = ChatGoogleGenerativeAI(
+            model="gemini-2.0-flash",
+            google_api_key=GEMINIAPI,
+            temperature=0.3
+        )
+
+        self.web_application_coding_summary = generate_detailed_blocks_summary(include_all_blocks=True)
+        self.working_space = get_list_of_used_blocks()
+        self.context = filter_json()
+
+        self.general_coding_agent = create_react_agent(
+            model=self.model,
+            tools=[],
+            name='coding_expert',
+            prompt=f'''You are a world-class coding expert specializing in Scratch programming. 
+Scratch is a visual block-based programming language mainly for beginners, especially kids, to learn coding concepts without typing code. Instead of writing text, you drag and snap together colorful blocks (like puzzle pieces) that represent commands. These blocks are grouped by categories (motion, looks, sound, events, control, sensing, operators, variables).
+
+You build programs (called projects) by combining blocks into scripts that control sprites (characters/objects on the stage). The stage is the background where sprites act. Sprites can move, talk, play sounds, sense inputs (like keyboard/mouse), and interact with each other.
+
+Scratch uses event-driven programming: actions start with triggers like “when green flag clicked,” “when key pressed,” or “when sprite clicked.” Programs run step-by-step from top to bottom but can run multiple scripts at once (parallel execution).
+
+It teaches core concepts: loops, conditionals, variables, functions (custom blocks), events, broadcasting messages, and even basic logic and math, all visually.
+
+Scratch projects can be shared online through the Scratch website, making it both a learning tool and a community platform.
+
+👉 In short: Scratch works by dragging puzzle-like blocks to control sprites on a stage, making coding visual, simple, and interactive.
+You have access to a comprehensive summary of all available Scratch blocks:
+
+{self.web_application_coding_summary}
+
+Your task is to assist users with their Scratch-related questions by providing clear, practical guidance based on the block summary above. 
+- Carefully analyze the user's query.
+- Reference relevant blocks and explain how they can be used to solve the problem.
+- Offer step-by-step instructions or suggestions when appropriate.
+- If the solution involves multiple blocks, describe how they work together.
+- In addition to code blocks descriptions, page element coordinates given to you. Use them if want.
+
+Be concise, accurate, and supportive in your responses.
+'''
+        )
+
+        self.context_agent = create_react_agent(
+            model=self.model,
+            tools=[],
+            name='coordinate_expert',
+            prompt=f'''
+You are an expert in understanding and utilizing web page element coordinates.
+ Your role is to help users interact with web pages effectively by leveraging the provided coordinate information.
+ Here is the context you can use(each elment have this firmat 'tag_name': 'text', 'text_content': 'move', 'x': 74, 'y': 149 ):
+        if your provided text have "move" block add this context (X: 74, Y: 149 ) to the "move" block.
+
+        All content seen in the page:
+      {self.context}
+    Your tasks include: 
+     - Analyse other agent responses and add position context to related Scratch blocks if needed.
+     - Finally Add position context to related Scratch blocks.
+
+'''
+        )
+
+        dragtool = Toolbox()
+
+        self.debugging_agent = create_react_agent(
+            model=self.model,
+            tools=[],
+            name='debugging_expert',
+            prompt=f'''
+You are a debugging expert specializing in Scratch programming. Your role is to analyze the user's current workspace and identify potential issues or improvements in their Scratch program.
+
+Here is the summary of all available Scratch blocks:
+{self.web_application_coding_summary}
+
+Here is the current state of the user's workspace:
+{self.working_space}
+
+Your tasks include:
+1. Analyze the sequence of blocks in the workspace.
+   - Check if the blocks are logically connected based on their x and y coordinates.
+   - Ensure that the y-coordinates increase sequentially for stacked blocks.
+   - Identify any gaps, overlaps, or misplaced blocks.
+
+2. Provide feedback to the user:
+   - If there are issues, explain what might be wrong and why.
+   - Suggest corrections or improvements to fix the identified issues.
+   - If the workspace is correct, confirm that everything looks good.
+
+3. Be concise, clear, and supportive in your responses.
+4. Always reference the block names and their coordinates when explaining issues or suggestions.
+'''
+        )
+
+        self.drag_and_drop_agent = create_react_agent(
+            model=self.model,
+            tools=[dragtool.drag_and_drop],
+            name='drag_and_drop_expert',
+            prompt=f'''
+You are a drag-and-drop expert for web applications, specializing in arranging Scratch code blocks using the drag_and_drop tool.
+
+When a user requests a drag-and-drop operation, follow these steps:
+
+1. Review the current workspace state: {self.working_space}
+   - This shows which blocks are already in the workspace and their coordinates.
+   - Identify the destination positions using these data.
+
+2. Review the available blocks: {self.context}
+   - This lists all blocks you can use, along with their names and positions on the page.
+   - Identify the source positions using these data. as a example you can see information in this format:
+    {{'tag_name': 'text', 'text_content': 'move', 'x': 74, 'y': 149 }}
+
+3. Understand the user's request:
+   - Identify which block(s) the user wants to move and where they should be placed.
+   - Use the available blocks and workspace information to determine the source and destination coordinates.
+
+4. Use the drag_and_drop tool to perform the operation:
+   - To add a block to the start of the workspace, use the workspace's starting coordinates.
+   - To insert a block after another block, use the coordinates of the target block as the destination.
+   - Example: drag_and_drop(source_x, source_y, dest_x, dest_y)
+
+5. Repeat as needed for multiple blocks or steps, updating your understanding of the workspace after each operation.
+
+Always ensure your actions match the user's intent and the current state of the workspace.
+Return a confirmation message after completing the drag-and-drop operation with coordinates which start from the source block and end at the destination block.
+'''
+        )
+
+        self.format_agent = create_react_agent(
+            model=self.model,
+            tools=[],
+            name="format_agent",
+            prompt="""
+You are a friendly assistant whose task is to reformat technical Scratch programming instructions 
+so that they are simple, clear, and fun for children to understand. 
+
+- Use short sentences and simple words.
+- Keep explanations supportive and encouraging.
+- Keep all important instructions from the original message intact, but simplify any technical terms.
+- Present the steps in a way that kids can follow easily.
+
+Input: The message from the supervisor or other agents.
+Output: A child-friendly version of that message.
+"""
+        )
+
+        self.work_flow = create_supervisor(
+            [self.general_coding_agent, self.context_agent, self.debugging_agent, self.format_agent],
+            model=self.model,
+            prompt=(
+                '''
+You are an expert supervisor overseeing a team of specialized agents which are coding_expert, context_expert, debugging_expert, and drag_and_drop_expert. Your role is to:
+- Give instruction only regarding Scratch programming.
+- Finally get all agents answers and combine them as it is  into a single response using format_agent to the user.
+- Do not ask many questions from the user. Try to understand the user query and delegate it to the best agent.
+- Analyze user queries and determine which agent is best suited to respond.
+- Delegate tasks to the appropriate agent based on their expertise.
+- If a query involves multiple topics, break it down and assign each part to the relevant agent.
 
 
-def get_workspace_blocks():
-    """
-    Get all blocks currently in the workspace with their positions.
-    Returns only blocks that are being used (x > 310).
-    """
-    try:
-        used_blocks = find_used_blocks()
-        if not used_blocks:
-            return {"workspace_blocks": [], "message": "No blocks in workspace yet"}
-        
-        formatted_blocks = []
-        for i, block in enumerate(used_blocks, 1):
-            formatted_blocks.append({
-                "number": i,
-                "name": block['text_content'],
-                "position": {"x": block['x'], "y": block['y']},
-                "description": f"Block #{i}: {block['text_content']} at ({block['x']}, {block['y']})"
-            })
-        
-        return {
-            "workspace_blocks": formatted_blocks,
-            "total_blocks": len(formatted_blocks),
-            "message": "These are the blocks currently in your workspace"
-        }
-    except Exception as e:
-        return {"error": str(e), "workspace_blocks": []}
+Here are the agents you can delegate to:
+       - coding_expert: Specializes in Scratch programming and can provide detailed explanations of Scratch blocks and their usage.
+       - context_expert: Specializes in understanding and utilizing web page contexts element coordinates, particularly for Scratch programming interface.
+       - debugging_expert: Specializes in analyzing the user's Scratch workspace to identify issues, provide feedback, and suggest improvements.
+       - debugging_expert: Specializes to see the user workspace and identify issues, provide feedback, and suggest improvements.
+       - format_agent: Specializes in reformatting technical Scratch programming instructions into simple, clear, and fun explanations suitable for children.
 
-def get_category_info(category_name: str = None):
-    """
-    Get information about Scratch categories and their blocks.
-    If category_name is provided, returns detailed info for that category.
-    """
-    try:
-        with open(os.getenv("ELEMENTS_DESCRIPTION_JSON_PATH"), 'r') as f:
-            data = json.load(f)
-        
-        if category_name:
-            # Find matching category (case-insensitive)
-            for cat, info in data.items():
-                if cat.lower() == category_name.lower():
-                    return {
-                        "category": cat,
-                        "position": info['coordinates'],
-                        "blocks": info.get('blocks', []),
-                        "block_count": len(info.get('blocks', [])),
-                        "message": f"{cat} category has {len(info.get('blocks', []))} blocks"
-                    }
-            return {"error": f"Category '{category_name}' not found"}
+work flow do not deviate from these steps, please follow these:
+- First, analyze the user query and determine the most suitable agent based on the query.
+- If the user query indicates they need help identifying issues or fixing their Scratch program (e.g., "Am I doing something wrong?", "Can you fix this?", "How to do this correctly?"), delegate the task to the debugging_expert.
+- Before you give the final answer to the user, make sure to check if you have enough context about the Scratch programming interface. If not, use the context_expert agent to get the necessary coordinates information and add those to the relevant Scratch blocks.
+
+Important:
+- Finally get all agents answers and combine them as it is  into a single response using format_agent to the user.
+- Finally get all agents answers and combine them as it is  into a single response using format_agent to the user.
+'''
+            )
+        )
+
+        self.chat_history = []
+
+    # Change the invoke method to correctly handle the user input
+    
+    def invoke(self, user_input):
+        self.send_task("refresh")
+        # Check if user_input is a string or dictionary
+        if isinstance(user_input, str):
+            messages = self.chat_history + [{"role": "user", "content": user_input}]
         else:
-            # Return summary of all categories
-            categories = {}
-            for cat, info in data.items():
-                categories[cat] = {
-                    "position": info['coordinates'],
-                    "block_count": len(info.get('blocks', []))
-                }
-            return {
-                "categories": categories,
-                "message": "Here are all the Scratch categories available"
-            }
-    except Exception as e:
-        return {"error": str(e)}
+            # We're already getting a properly formatted input
+            print("Warning: Expected string input. Using provided input structure.")
+            messages = user_input.get("messages", [])
+            
+        result = self.work_flow.compile().invoke({
+            "messages": messages
+        })
+        self.chat_history.extend(result["messages"])
+        return result
+# Create an instance of the class
+scratch_chat_app = ScratchChatApp()
 
-def get_block_position(block_name: str):
-    """
-    Find the exact position of a specific block by name.
-    Searches both in categories and workspace.
-    """
-    # First check workspace blocks
-    workspace = get_workspace_blocks()
-    if workspace.get('workspace_blocks'):
-        for block in workspace['workspace_blocks']:
-            if block_name.lower() in block['name'].lower():
-                return {
-                    "found": True,
-                    "location": "workspace",
-                    "block_name": block['name'],
-                    "position": block['position'],
-                    "message": f"Found '{block['name']}' in workspace at ({block['position']['x']}, {block['position']['y']})"
-                }
-    
-    # Check in category panels
-    filtered = filter_json()
-    for item in filtered:
-        if block_name.lower() in item['text_content'].lower():
-            return {
-                "found": True,
-                "location": "category_panel",
-                "block_name": item['text_content'],
-                "position": {"x": item['x'], "y": item['y']},
-                "message": f"Found '{item['text_content']}' in category panel at ({item['x']}, {item['y']})"
-            }
-    
-    return {
-        "found": False,
-        "message": f"Could not find block '{block_name}'"
-    }
+# chat_app = work_flow.compile()
 
-def format_child_response(content: str, position_data: Dict = None):
-    """
-    Format responses in a child-friendly way with position data if available.
-    """
-    # Child-friendly formatting
-    friendly_terms = {
-        "coordinate": "spot",
-        "position": "place", 
-        "execute": "do",
-        "implement": "make",
-        "utilize": "use",
-        "algorithm": "steps"
-    }
-    
-    formatted_content = content
-    for formal, friendly in friendly_terms.items():
-        formatted_content = formatted_content.replace(formal, friendly)
-    
-    # Add position information if available
-    if position_data:
-        position_info = f"\n\n📍 Position info: "
-        if isinstance(position_data, dict):
-            if 'x' in position_data and 'y' in position_data:
-                position_info += f"This is at spot ({position_data['x']}, {position_data['y']})"
-            elif 'position' in position_data:
-                pos = position_data['position']
-                position_info += f"This is at spot ({pos.get('x', '?')}, {pos.get('y', '?')})"
-        formatted_content += position_info
-    
-    return formatted_content
+# if __name__ == "__main__":
+#     while True:
+#         user_input = input("You: ")
+#         if user_input.lower() in ["exit", "quit"]:
+#             print("Exiting chat.")
+#             break
+
+#         scratch_chat_app.send_task("refresh")
+#         scratch_chat_app.working_space = get_list_of_used_blocks()
+#         scratch_chat_app.context = filter_json()
+#         print(scratch_chat_app.working_space)
+
+#         result = scratch_chat_app.invoke({
+#             "messages": scratch_chat_app.chat_history + [{"role": "user", "content": user_input}]
+#         })
+
+#         # Extend chat history with LangChain message objects
+#         scratch_chat_app.chat_history.extend(result["messages"])
+
+#         # Print only the last AI message
+#         ai_messages = [m for m in result["messages"] if m.type == "ai"]
+#         if ai_messages:
+#             print("Bot:", ai_messages[-1].content)
 
 
-
-# 1. Code Helper Agent - Answers questions about making code
-code_helper_agent = create_react_agent(
-    model=model,
-    tools=[get_category_info, get_block_position],
-    name='code_helper',
-    prompt='''You are a friendly Scratch coding helper for children. Your job is to help them understand how to make programs.
-
-    When a child asks about making code:
-    1. Use get_category_info to show them which categories have the blocks they need
-    2. Explain in simple, fun terms how to combine blocks
-    3. Always include the position of relevant categories
-    
-    Keep explanations short and use simple words. Be encouraging!
-    Example: "To make your sprite move, look at the Motion category at (x:1, y:93)! You can find the 'move steps' block there!"
-    
-    ALWAYS include positions when mentioning categories or blocks.'''
-)
-
-# 2. Code Checker Agent - Validates user's code
-code_checker_agent = create_react_agent(
-    model=model,
-    tools=[get_workspace_blocks, get_category_info],
-    name='code_checker',
-    prompt='''You are a friendly code checker for children using Scratch. 
-
-    When checking if code is correct:
-    1. Use get_workspace_blocks to see what blocks they've used
-    2. Check if the blocks make sense together
-    3. Give friendly suggestions if something could be better
-    
-    Be encouraging! Even if something is wrong, praise what they did right first.
-    Example: "Great job using the move block! It's at position (320, 150). To make it work better, try adding a 'when green flag clicked' block at the top!"
-    
-    ALWAYS mention block positions when discussing specific blocks.'''
-)
-
-# 3. Navigator Agent - Handles UI navigation
-navigator_agent = create_react_agent(
-    model=model,
-    tools=[send_task, get_block_position, get_category_info],
-    name='navigator',
-    prompt='''You are a navigation helper for the Scratch interface.
-
-    When the user wants to navigate or click something:
-    1. First identify what element they want using get_block_position or get_category_info
-    2. Get the exact position
-    3. Use send_task with clear instructions including coordinates
-    
-    Example task format for send_task:
-    - "Click on Motion category at position (1, 93)"
-    - "Click on the move block at (15, 120)"
-    
-    Always confirm the action after sending the task.'''
-)
-
-# 4. Drag Drop Agent - Handles drag and drop operations
-drag_drop_agent = create_react_agent(
-    model=model,
-    tools=[drag_tool.drag_and_drop, get_block_position],
-    name='drag_drop',
-    prompt='''You are the drag and drop specialist for Scratch blocks.
-
-    When asked to move blocks:
-    1. Use get_block_position to find the source block
-    2. Determine the target position (usually the workspace area)
-    3. Use drag_and_drop with exact coordinates
-    
-    Remember:
-    - Blocks in categories have x < 310
-    - Workspace blocks have x > 310
-    - Always verify positions before dragging'''
-)
-
-# 5. Response Formatter Agent - Makes everything child-friendly
-formatter_agent = create_react_agent(
-    model=model,
-    tools=[format_child_response],
-    name='formatter',
-    prompt='''You format all responses to be perfect for children aged 8-12.
-
-    Rules:
-    1. Use simple, fun language
-    2. Include emojis sparingly (🎮 ⭐ 👍 🚀)
-    3. Keep sentences short
-    4. Always include position information in a friendly way
-    5. Be encouraging and positive
-    
-    Example: "Awesome! 🌟 Your move block is at spot (320, 150). That's perfect for making your sprite dance!"'''
-)
-
-
-supervisor = create_supervisor(
-    [code_helper_agent, code_checker_agent, navigator_agent, drag_drop_agent, formatter_agent],
-    model=model,
-    prompt='''You are the head teacher managing Scratch coding helpers for children.
-
-    WORKFLOW RULES:
-    
-    1. For "how to make/create" questions → code_helper_agent
-       - Get category and block info
-       - Pass position data to formatter
-    
-    2. For "is my code correct" questions → code_checker_agent  
-       - Check workspace blocks
-       - Pass findings with positions to formatter
-    
-    3. For "click/go to/open" requests → navigator_agent
-       - Handle UI navigation
-       - No need for formatter unless explaining
-    
-    4. For "drag/move block" requests → drag_drop_agent
-       - Get positions from other agents if needed
-       - Execute drag operation
-    
-    5. ALWAYS end with formatter_agent for child-facing responses
-       - Exception: Simple navigation confirmations
-    
-    IMPORTANT:
-    - Keep agent chains short (max 3 agents)
-    - Pass position data between agents
-    - Don't ask unnecessary questions
-    - Be decisive - pick the right agent immediately
-    
-    Example flows:
-    - "How do I make my sprite jump?" → code_helper → formatter
-    - "Is my code right?" → code_checker → formatter  
-    - "Click on Motion" → navigator (done)
-    - "Drag move block to workspace" → drag_drop (done)'''
-)
-
-
-def create_scratch_assistant():
-    """Create and initialize the Scratch assistant."""
-    return supervisor.compile()
-
-def process_user_input(app, user_input: str, chat_history: List = None):
-    """Process user input and return response."""
-    if chat_history is None:
-        chat_history = []
-    
-    # Add context about current workspace state
-    workspace_state = get_workspace_blocks()
-    context = f"Current workspace: {workspace_state['message']}\n\nUser question: {user_input}"
-    
-    result = app.invoke({
-        "messages": chat_history + [{"role": "user", "content": context}]
-    })
-    
-    # Extract the assistant's response
-    for m in result["messages"]:
-        if m.type == "ai":
-            return m.content, result["messages"]
-    
-    return "I'm not sure how to help with that. Can you try asking in a different way?", result["messages"]
-
-
-if __name__ == "__main__":
-    # Initialize the assistant
-    app = create_scratch_assistant()
-    chat_history = []
-    
-    print("🎮 Scratch Coding Assistant Ready!")
-    print("Ask me anything about making cool programs in Scratch!\n")
-    
-    while True:
-        user_input = input("You: ")
-        
-        if user_input.lower() in ["exit", "quit", "bye"]:
-            print("👋 See you next time! Keep coding!")
-            break
-        
-        response, chat_history = process_user_input(app, user_input, chat_history)
-        print(f"Assistant: {response}\n")

@@ -227,7 +227,6 @@ if __name__ == "__main__":
             break
 
         send_task("refresh")  
-
         result = chat_app.invoke({
             "messages": chat_history + [{"role": "user", "content": user_input}]
         })

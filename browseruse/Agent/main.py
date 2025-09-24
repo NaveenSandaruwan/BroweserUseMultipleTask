@@ -10,8 +10,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
   # Implement custom call_LLM logic directly here
 from tools.browserUseClient import send_task
-from test import graph
-
+# from test4 import chat_app
+from test3 import ScratchChatApp
+from tools.filter import filter_json, find_used_blocks, get_list_of_used_blocks, get_category_coordinates, generate_detailed_blocks_summary
 
 load_dotenv()
 
@@ -43,39 +44,42 @@ chat_history = []
 @app.post("/speak", response_model=ChatResponse)
 def speak(req: ChatRequest):
     print(f"[API] Received from extension: {req.message}")
-    
-  
-    
+
+    # Import the required class and functions
+
+    # Initialize the chat app instance (or use a singleton/global if needed)
+    scratch_chat_app = ScratchChatApp()
+
     # Refresh browser state
-    send_task("refresh")
-    
+    scratch_chat_app.send_task("refresh")
+
+    # Update working space and context
+    scratch_chat_app.working_space = get_list_of_used_blocks()
+    scratch_chat_app.context = filter_json()
+    print(scratch_chat_app.working_space)
+
     # Process the user input
-    result = graph.invoke({
-        "messages": chat_history + [{"role": "user", "content": req.message}]
+    result = scratch_chat_app.invoke({
+        "messages": scratch_chat_app.chat_history + [{"role": "user", "content": req.message}]
     })
-    
-    # Update chat history
-    chat_history.extend(result["messages"])
-    
-    # Extract messages from the format agent
-    format_messages = [
-        m for m in result["messages"]
-        if m.type == "ai" and m.name == "format_agent" and m.content and m.content.strip()
-    ]
-    
-    # Get the reply text
-    if format_messages:
-        last_format_message = format_messages[-1]
-        reply_text = last_format_message.content
-        print(f"Bot: {reply_text}")
+
+    # Extend chat history with LangChain message objects
+    scratch_chat_app.chat_history.extend(result["messages"])
+
+    # Print only the last AI message
+    ai_messages = [m for m in result["messages"] if m.type == "ai"]
+    if ai_messages:
+        reply_text = ai_messages[-1].content
+        print("Bot:", reply_text)
     else:
         reply_text = "I'm sorry, I couldn't process your request."
-        print("Bot: (no response from format agent)")
-    
+        print("Bot: (no AI response)")
+
     print(f"[API] Sending reply: {reply_text}")
     return ChatResponse(reply=reply_text)
 
 if __name__ == "__main__":
     import uvicorn
+
     print(f"[Server] Starting backend on port {BACKEND_PORT}...")
     uvicorn.run("main:app", host="127.0.0.1", port=BACKEND_PORT, reload=True)
