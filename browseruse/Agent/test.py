@@ -1,468 +1,212 @@
-"""
-Browser Use React Agent Implementation with LangGraph Supervisor pattern
-"""
-
-from google import genai
-from langgraph.prebuilt import create_react_agent
-from langgraph_supervisor import create_supervisor
-import sys
-import os
-import json
-# Updated imports for Gemini
-from google import genai
-# We'll handle the LangChain imports in the model initialization
-# These will be needed after installing the packages
-from typing import List, Dict, Any, Optional, Callable
-from pydantic import BaseModel, Field
-
-# Add the parent directory to the path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
-
-# Import local utilities
-from utils.file_loader import load_and_extract_elements, load_element_descriptions
-from utils.prompt_rules import RULES
-from tools.dragTool import Toolbox
-from tools.browserUseClient import send_task
-
-# Import environment variables
+import os, sys, json
+from typing import Annotated
 from dotenv import load_dotenv
+
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langgraph.prebuilt import create_react_agent
+from langgraph.graph import StateGraph, START, END, MessagesState
+from langgraph.types import Command
+from langchain_core.tools import tool,  InjectedToolCallId
+from langgraph.prebuilt import InjectedState
+
+# --- Load environment ---
 load_dotenv()
 
-# Initialize Gemini client
-client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
-PATH = os.getenv("ELEMENT_FILE_PATH")
-
-# Initialize drag tool
-drag_tool = Toolbox()
-
-# Global memory for conversation persistence
-memory = {
-    "labeled_blocks": None,
-    "element_description": None,
-    "conversation_history": [],
-}
-
-# Define tool schemas
-class RefreshBrowserTool(BaseModel):
-    """Tool to refresh the browser and update element data"""
-    type: str = "refresh_browser"
-    description: str = "Refreshes the browser page and updates element data"
-
-class LoadFilesTool(BaseModel):
-    """Tool to load element files and descriptions"""
-    type: str = "load_files"
-    description: str = "Loads labeled blocks and element descriptions from files"
-
-class DragAndDropTool(BaseModel):
-    """Tool to perform drag and drop operations in the browser"""
-    start_x: int = Field(..., description="X coordinate of the starting position")
-    start_y: int = Field(..., description="Y coordinate of the starting position")
-    end_x: int = Field(..., description="X coordinate of the destination position")
-    end_y: int = Field(..., description="Y coordinate of the destination position")
-    description: str = "Performs a drag and drop operation from a starting position to an end position"
-
-class BrowserActionTool(BaseModel):
-    """Tool to perform actions in the browser (excluding drag and drop)"""
-    action: str = Field(..., description="Browser action to perform (e.g., click, navigate, input)")
-    description: str = "Performs a specified action in the browser"
-
-# Tool implementations
-def refresh_browser(args: dict) -> Dict[str, Any]:
-    """Executes browser refresh and updates element data"""
-    try:
-        send_task("refresh")
-        return {"status": "success", "message": "Browser refreshed and element data updated"}
-    except Exception as e:
-        return {"status": "error", "message": f"Failed to refresh browser: {str(e)}"}
-
-def load_files(args: dict) -> Dict[str, Any]:
-    """Loads labeled blocks and element descriptions from files"""
-    try:
-        # Load labeled blocks
-        labeled_blocks = load_and_extract_elements()
-        memory["labeled_blocks"] = labeled_blocks
-        
-        # Load element descriptions
-        element_description = load_element_descriptions()
-        memory["element_description"] = element_description
-        
-        return {
-            "status": "success",
-            "message": f"Loaded {len(labeled_blocks)} labeled blocks and element descriptions",
-            "labeled_blocks_count": len(labeled_blocks)
-        }
-    except Exception as e:
-        return {"status": "error", "message": f"Failed to load files: {str(e)}"}
-
-def drag_and_drop(args: dict) -> Dict[str, Any]:
-    """Executes drag and drop operation in the browser"""
-    try:
-        start_x = args.get("start_x")
-        start_y = args.get("start_y")
-        end_x = args.get("end_x")
-        end_y = args.get("end_y")
-        
-        if not all([start_x, start_y, end_x, end_y]):
-            return {
-                "status": "error", 
-                "message": "Missing coordinates for drag and drop operation"
-            }
-        
-        drag_tool.drag_and_drop(start_x, start_y, end_x, end_y)
-        
-        return {
-            "status": "success", 
-            "message": f"Drag and drop completed from ({start_x}, {start_y}) to ({end_x}, {end_y})"
-        }
-    except Exception as e:
-        return {"status": "error", "message": f"Failed to execute drag and drop: {str(e)}"}
-
-def browser_action(args: dict) -> Dict[str, Any]:
-    """Executes a browser action using the browser client"""
-    try:
-        action = args.get("action", "")
-        if not action:
-            return {"status": "error", "message": "No action provided"}
-        
-        send_task(action)
-        return {"status": "success", "message": f"Browser action executed: {action}"}
-    except Exception as e:
-        return {"status": "error", "message": f"Failed to execute browser action: {str(e)}"}
-
-def get_block_info(args: dict) -> Dict[str, Any]:
-    """Gets information about available blocks in the Scratch interface"""
-    labeled_blocks = memory.get("labeled_blocks")
-    if not labeled_blocks:
-        return {"status": "error", "message": "No blocks loaded. Please load files first."}
-    
-    # Return information about the first 10 blocks to avoid token limits
-    return {
-        "status": "success", 
-        "message": "Block information retrieved",
-        "blocks": labeled_blocks[:10]
-    }
-
-def explain_scratch_concept(args: dict) -> Dict[str, Any]:
-    """Explains a Scratch programming concept in a kid-friendly way"""
-    concept = args.get("concept")
-    if not concept:
-        return {"status": "error", "message": "No concept provided to explain"}
-    
-    # In a real implementation, this would call an LLM or use a knowledge base
-    # For now, we'll return a simple message
-    return {
-        "status": "success",
-        "message": f"Explanation for '{concept}' generated",
-        "explanation": f"Here's a kid-friendly explanation of {concept} in Scratch programming."
-    }
-
-# Define the tools available to agents
-file_tools = [
-    {
-        "type": "function",
-        "function": {
-            "name": "refresh_browser",
-            "description": "Refreshes the browser page and updates element data",
-            "parameters": {
-                "type": "object",
-                "properties": {},
-                "required": []
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "load_files",
-            "description": "Loads labeled blocks and element descriptions from files",
-            "parameters": {
-                "type": "object",
-                "properties": {},
-                "required": []
-            }
-        }
-    }
-]
-
-drag_drop_tools = [
-    {
-        "type": "function",
-        "function": {
-            "name": "drag_and_drop",
-            "description": "Performs a drag and drop operation from a starting position to an end position",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "start_x": {"type": "integer", "description": "X coordinate of the starting position"},
-                    "start_y": {"type": "integer", "description": "Y coordinate of the starting position"},
-                    "end_x": {"type": "integer", "description": "X coordinate of the destination position"},
-                    "end_y": {"type": "integer", "description": "Y coordinate of the destination position"}
-                },
-                "required": ["start_x", "start_y", "end_x", "end_y"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "get_block_info",
-            "description": "Gets information about available blocks in the Scratch interface",
-            "parameters": {
-                "type": "object",
-                "properties": {},
-                "required": []
-            }
-        }
-    }
-]
-
-browser_control_tools = [
-    {
-        "type": "function",
-        "function": {
-            "name": "browser_action",
-            "description": "Performs a specified action in the browser",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "action": {"type": "string", "description": "Browser action to perform (e.g., click, navigate, input)"}
-                },
-                "required": ["action"]
-            }
-        }
-    }
-]
-
-learning_tools = [
-    {
-        "type": "function",
-        "function": {
-            "name": "explain_scratch_concept",
-            "description": "Explains a Scratch programming concept in a kid-friendly way",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "concept": {"type": "string", "description": "The Scratch concept to explain"}
-                },
-                "required": ["concept"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "get_block_info",
-            "description": "Gets information about available blocks in the Scratch interface",
-            "parameters": {
-                "type": "object",
-                "properties": {},
-                "required": []
-            }
-        }
-    }
-]
-
-# Initialize the model for agents
-# Fix: Use the correct Google Gemini API structure
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.tools import StructuredTool
-
-# Create a langchain model instance
+# --- Model ---
+GEMINIAPI = os.getenv("GOOGLE_API_KEY")
 model = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash",
-    google_api_key=os.getenv("GOOGLE_API_KEY"),
-    temperature=0.7
+    google_api_key=GEMINIAPI,
+    temperature=0.3
 )
 
-# Convert functions to LangChain StructuredTools
-refresh_browser_tool = StructuredTool.from_function(
-    func=refresh_browser,
-    name="refresh_browser",
-    description="Refreshes the browser page and updates element data"
-)
+# --- Your imports ---
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from utils.file_loader import load_and_extract_elements, load_scratch_descriptions
+from tools.browserUseClient import send_task
+from tools.dragTool import Toolbox
+from tools.filter import filter_json, find_used_blocks, get_list_of_used_blocks, get_category_coordinates, generate_detailed_blocks_summary
 
-load_files_tool = StructuredTool.from_function(
-    func=load_files,
-    name="load_files", 
-    description="Loads labeled blocks and element descriptions from files"
-)
+# --- Context & summaries ---
+web_application_coding_summary = generate_detailed_blocks_summary(include_all_blocks=True)
+working_space = get_list_of_used_blocks()
+context = filter_json()
 
-# Create the specialized agents
-file_loader_agent = create_react_agent(
+# --- Agents ---
+coding_agent = create_react_agent(
     model=model,
-    tools=[refresh_browser_tool, load_files_tool],
-    name="file_loader",
-    prompt="""You are a file loader agent responsible for refreshing the browser and loading element files.
-    Your job is to ensure all necessary data is loaded before other agents can work.
-    Always check if files are loaded, and if not, load them.
-    Be efficient and only load files when necessary."""
+    tools=[],
+    name="coding_expert",
+    prompt=f"""You are a world-class coding expert specializing in Scratch programming. 
+    Scratch is a visual block-based programming language mainly for beginners, especially kids, to learn coding concepts without typing code. Instead of writing text, you drag and snap together colorful blocks (like puzzle pieces) that represent commands. These blocks are grouped by categories (motion, looks, sound, events, control, sensing, operators, variables).
+
+You build programs (called projects) by combining blocks into scripts that control sprites (characters/objects on the stage). The stage is the background where sprites act. Sprites can move, talk, play sounds, sense inputs (like keyboard/mouse), and interact with each other.
+
+Scratch uses event-driven programming: actions start with triggers like “when green flag clicked,” “when key pressed,” or “when sprite clicked.” Programs run step-by-step from top to bottom but can run multiple scripts at once (parallel execution).
+
+It teaches core concepts: loops, conditionals, variables, functions (custom blocks), events, broadcasting messages, and even basic logic and math, all visually.
+
+Scratch projects can be shared online through the Scratch website, making it both a learning tool and a community platform.
+
+👉 In short: Scratch works by dragging puzzle-like blocks to control sprites on a stage, making coding visual, simple, and interactive.
+You have access to a comprehensive summary of all available Scratch blocks:
+
+{web_application_coding_summary}
+
+Your task is to assist users with their Scratch-related questions by providing clear, practical guidance based on the block summary above. 
+- Carefully analyze the user's query.
+- Reference relevant blocks and explain how they can be used to solve the problem.
+- Offer step-by-step instructions or suggestions when appropriate.
+- If the solution involves multiple blocks, describe how they work together.
+- In addition to code blocks descriptions, page element coordinates given to you. Use them if want.
+
+Be concise, accurate, and supportive in your responses.
+"""
 )
 
-drag_drop_tool = StructuredTool.from_function(
-    func=drag_and_drop,
-    name="drag_and_drop",
-    description="Performs a drag and drop operation from a starting position to an end position"
-)
-
-get_block_info_tool = StructuredTool.from_function(
-    func=get_block_info,
-    name="get_block_info",
-    description="Gets information about available blocks in the Scratch interface"
-)
-
-browser_action_tool = StructuredTool.from_function(
-    func=browser_action,
-    name="browser_action",
-    description="Performs a specified action in the browser"
-)
-
-explain_scratch_concept_tool = StructuredTool.from_function(
-    func=explain_scratch_concept,
-    name="explain_scratch_concept",
-    description="Explains a Scratch programming concept in a kid-friendly way"
-)
-
-drag_drop_agent = create_react_agent(
+context_agent = create_react_agent(
     model=model,
-    tools=[drag_drop_tool, get_block_info_tool],
-    name="drag_drop_expert",
-    prompt="""You are a drag and drop expert for Scratch programming.
-    Your job is to help children move blocks around in the Scratch interface.
-    First, always get information about the available blocks.
-    Then, carefully identify which block the user wants to move and where.
-    Be precise with coordinates to ensure successful operations.
-    Confirm the action was completed successfully."""
+    tools=[],
+    name="context_expert",
+    prompt=f"""
+You are an expert in understanding and utilizing web page element coordinates.
+ Your role is to help users interact with web pages effectively by leveraging the provided coordinate information.
+ Here is the context you can use(each elment have this firmat 'tag_name': 'text', 'text_content': 'move', 'x': 74, 'y': 149 ):
+        if your provided text have "move" block add this context (X: 74, Y: 149 ) to the "move" block.
+
+        All content seen in the page:
+      {context}
+    Your tasks include: 
+     - Analyse other agent responses and add position context to related Scratch blocks if needed.
+     - Finally Add position context to related Scratch blocks.
+"""
 )
 
-browser_control_agent = create_react_agent(
+debugging_agent = create_react_agent(
     model=model,
-    tools=[browser_action_tool],
-    name="browser_controller",
-    prompt="""You are a browser control expert.
-    Your job is to help navigate and interact with the browser interface.
-    Be careful not to navigate away from the current site.
-    Use clear, specific instructions for the browser.
-    Always confirm actions were completed successfully.
-    NEVER try to go to external websites."""
+    tools=[],
+    name="debugging_expert",
+    prompt=f"""
+You are a debugging expert specializing in Scratch programming. Your role is to analyze the user's current workspace and identify potential issues or improvements in their Scratch program.
+
+Here is the summary of all available Scratch blocks:
+{web_application_coding_summary}
+
+Here is the current state of the user's workspace:
+{working_space}
+
+Your tasks include:
+1. Analyze the sequence of blocks in the workspace.
+   - Check if the blocks are logically connected based on their x and y coordinates.
+   - Ensure that the y-coordinates increase sequentially for stacked blocks.
+   - Identify any gaps, overlaps, or misplaced blocks.
+
+2. Provide feedback to the user:
+   - If there are issues, explain what might be wrong and why.
+   - Suggest corrections or improvements to fix the identified issues.
+   - If the workspace is correct, confirm that everything looks good.
+
+3. Be concise, clear, and supportive in your responses.
+4. Always reference the block names and their coordinates when explaining issues or suggestions.
+"""
 )
 
-learning_assistant_agent = create_react_agent(
+# ...existing code...
+# ...existing code...
+
+# Delegation tools (handoff)
+@tool
+def transfer_to_coding_expert(state: Annotated[MessagesState, InjectedState],
+                              tool_call_id: Annotated[str, InjectedToolCallId]) -> Command:
+    
+    ''' Tool to transfer control to the coding expert agent '''
+
+    tool_msg = {"role": "tool", "content": "handoff to coding_expert",
+                "name": "transfer_to_coding_expert", "tool_call_id": tool_call_id}
+    return Command(goto="coding_expert",
+                   update={**state, "messages": state["messages"] + [tool_msg]},
+                   graph=Command.PARENT)
+
+@tool
+def transfer_to_context_expert(state: Annotated[MessagesState, InjectedState],
+                               tool_call_id: Annotated[str, InjectedToolCallId]) -> Command:
+    ''' Tool to transfer control to the context expert agent '''
+
+    tool_msg = {"role": "tool", "content": "handoff to context_expert",
+                "name": "transfer_to_context_expert", "tool_call_id": tool_call_id}
+    return Command(goto="context_expert",
+                   update={**state, "messages": state["messages"] + [tool_msg]},
+                   graph=Command.PARENT)
+
+@tool
+def transfer_to_debugging_expert(state: Annotated[MessagesState, InjectedState],
+                                  tool_call_id: Annotated[str, InjectedToolCallId]) -> Command:
+    ''' Tool to transfer control to the debugging expert agent '''
+    tool_msg = {"role": "tool", "content": "handoff to debugging_expert",
+                "name": "transfer_to_debugging_expert", "tool_call_id": tool_call_id}
+    return Command(goto="debugging_expert",
+                   update={**state, "messages": state["messages"] + [tool_msg]},
+                   graph=Command.PARENT)
+
+
+# --- Supervisor Agent ---
+supervisor_agent = create_react_agent(
     model=model,
-    tools=[explain_scratch_concept_tool, get_block_info_tool],
-    name="learning_assistant",
-    prompt="""You are a friendly learning assistant for children using Scratch programming.
-    Your job is to explain programming concepts in a simple, kid-friendly way.
-    Use analogies and examples children can understand.
-    Be encouraging and positive in your explanations.
-    Always check what blocks are available before explaining concepts.
-    Focus on making programming fun and accessible."""
+    tools=[transfer_to_coding_expert, transfer_to_context_expert, transfer_to_debugging_expert],
+    name="supervisor",
+    prompt="""
+You are an expert supervisor overseeing a team of specialized agents which are coding_expert, context_expert, debugging_expert, and drag_and_drop_expert. Your role is to:
+- Give instruction only regarding Scratch programming.
+
+- Do not ask many questions from the user. Try to understand the user query and delegate it to the best agent.
+- Analyze user queries and determine which agent is best suited to respond.
+- Delegate tasks to the appropriate agent based on their expertise.
+- Ensure that responses are accurate, relevant, and concise.
+- If a query involves multiple topics, break it down and assign each part to the relevant agent.
+- Maintain a coherent and user-friendly conversation flow.
+
+Here are the agents you can delegate to:
+       - coding_expert: Specializes in Scratch programming and can provide detailed explanations of Scratch blocks and their usage.
+       - context_expert: Specializes in understanding and utilizing web page contexts element coordinates, particularly for Scratch programming interface.
+       - debugging_expert: Specializes in analyzing the user's Scratch workspace to identify issues, provide feedback, and suggest improvements.
+       - debugging_expert: Specializes in analyzing the user's Scratch workspace to identify issues, provide feedback, and suggest improvements.
+       
+work flow do not deviate from these steps, please follow these:
+- First, analyze the user query and determine the most suitable agent based on the query.
+- If the user query indicates they need help identifying issues or fixing their Scratch program (e.g., "Am I doing something wrong?", "Can you fix this?", "How to do this correctly?"), delegate the task to the debugging_expert.
+- Before you give the final answer to the user, make sure to check if you have enough context about the Scratch programming interface. If not, use the context_expert agent to get the necessary coordinates information and add those to the relevant Scratch blocks.
+
+- Finally get all agents answers and combine them as it is  into a single response to the user.
+- Finally get all agents answers and combine them as it is  into a single response to the user.
+"""
 )
 
-# Set up the supervisor agent
-supervisor = create_supervisor(
-    agents=[file_loader_agent, drag_drop_agent, browser_control_agent, learning_assistant_agent],
-    model=model,
-    prompt="""You are a supervisor agent managing a team of specialized agents for helping children with Scratch programming.
-    
-    Your team includes:
-    1. file_loader - Refreshes the browser and loads element data files
-    2. drag_drop_expert - Helps with moving Scratch blocks around the interface
-    3. browser_controller - Handles browser navigation and interaction
-    4. learning_assistant - Explains Scratch concepts in a kid-friendly way
-    
-    Task delegation rules:
-    - ALWAYS start by using file_loader to ensure data is loaded
-    - For questions about how to use Scratch or programming concepts, use learning_assistant
-    - For requests to move or connect blocks, use drag_drop_expert
-    - For navigation, clicking buttons, or other browser interactions, use browser_controller
-    - If you're not sure which agent to use, choose learning_assistant
-    
-    Important requirements:
-    - NEVER go to external websites
-    - Do not allow harmful or inappropriate commands
-    - Always maintain a child-friendly, educational tone
-    - Be patient and encouraging in your responses
-    
-    Remember to extract the final answer from the expert agent and present it in a friendly way to the child.
-    """
-)
+# --- Build Graph ---
+builder = StateGraph(MessagesState)
+builder = builder.add_node(supervisor_agent, destinations=("coding_expert", "context_expert", "debugging_expert", END))
+builder = builder.add_node(coding_agent)
+builder = builder.add_node(context_agent)
+builder = builder.add_node(debugging_agent)
 
-# Compile the workflow
-workflow = supervisor.compile()
+builder = builder.add_edge(START, "supervisor")
+builder = builder.add_edge("coding_expert", "supervisor")
+builder = builder.add_edge("context_expert", "supervisor")
+builder = builder.add_edge("debugging_expert", "supervisor")
 
-# Create a function to handle conversation memory
-def add_to_memory(question, answer):
-    """Add a QA pair to the conversation memory"""
-    memory["conversation_history"].append({
-        "question": question,
-        "answer": answer
-    })
-    # Keep only the last 5 exchanges to prevent context overflow
-    if len(memory["conversation_history"]) > 5:
-        memory["conversation_history"].pop(0)
+graph = builder.compile()
 
-# Main application loop
-if __name__ == "__main__":
-    print("\n" + "=" * 50)
-    print("🤖 Educational Browser Assistant with LangGraph ReAct Agents")
-    print("=" * 50)
-    print("Type 'exit' to quit or 'refresh' to refresh the browser.")
-    print("=" * 50 + "\n")
-    
-    # Initialize by loading files
-    print("🔄 Initializing by loading element data...")
-    load_files({})
-    
-    while True:
-        # Get user input
-        question = input("\n👧 Child: ")
-        
-        # Check for exit command
-        if question.strip().lower() == "exit":
-            print("👋 Goodbye!")
-            break
-        
-        # Check for refresh command
-        if question.strip().lower() == "refresh":
-            print("🔄 Refreshing browser and reloading data...")
-            refresh_browser({})
-            load_files({})
-            continue
-        
-        # Create context from memory
-        context = ""
-        if memory["conversation_history"]:
-            context = "Recent conversation:\n"
-            for entry in memory["conversation_history"]:
-                context += f"Child: {entry['question']}\nAssistant: {entry['answer']}\n\n"
-        
-        # Prepare the input for the workflow
-        input_message = {
-            "messages": [
-                {"role": "system", "content": "You are a helpful assistant for children using Scratch."},
-                {"role": "user", "content": f"{context}\n\nCurrent question: {question}"}
-            ]
-        }
-        
-        try:
-            # Run the supervisor workflow
-            print("🤔 Thinking...")
-            result = workflow.invoke(input_message)
-            
-            # Extract the final answer
-            if result and "messages" in result and result["messages"]:
-                # Get the last assistant message
-                for message in reversed(result["messages"]):
-                    if message["role"] == "assistant":
-                        answer = message["content"]
-                        print(f"🤖 Assistant: {answer}")
-                        
-                        # Add to memory
-                        add_to_memory(question, answer)
-                        break
-            else:
-                print("❌ No response generated. Please try again.")
-        except Exception as e:
-            print(f"❌ Error: {str(e)}")
-            print("Please try again with a different question.")
+# --- Chat loop ---
+chat_history = []
+while True:
+    user_input = input("User: ")
+    send_task("refresh")
+    if user_input.lower() in ["exit", "quit"]:
+        break
+
+    result = graph.invoke({"messages": chat_history + [{"role": "user", "content": user_input}]})
+
+    chat_history.extend(result["messages"])
+    ai_messages = [m for m in result["messages"] if m.type == "ai"]
+    if ai_messages:
+        print("Bot:",result)
