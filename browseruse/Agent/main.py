@@ -13,7 +13,7 @@ from tools.browserUseClient import send_task
 # from test4 import chat_app
 from test3 import ScratchChatApp
 from tools.filter import filter_json, find_used_blocks, get_list_of_used_blocks, get_category_coordinates, generate_detailed_blocks_summary
-
+from emotion import EmotionIdentifier
 load_dotenv()
 
 BACKEND_PORT = 5000  # choose your port
@@ -77,6 +77,29 @@ def speak(req: ChatRequest):
 
     print(f"[API] Sending reply: {reply_text}")
     return ChatResponse(reply=reply_text)
+
+class EmotionRequest(BaseModel):
+    text: str
+detector = EmotionIdentifier()
+
+@app.post("/emotion")
+async def emotion_endpoint(request: EmotionRequest):
+    # Format chat history if needed
+    history_text = ""
+    if request.include_history and chat_history:
+        # Use only the last 3 entries if history is longer than 3
+        history_to_use = chat_history[-3:] if len(chat_history) > 3 else chat_history
+        
+        # Convert chat history to a readable format
+        history_text = "\n".join([
+            f"{'User' if getattr(msg, 'type', None) == 'human' else 'Assistant'}: {getattr(msg, 'content', '')}"
+            for msg in history_to_use if hasattr(msg, 'content')
+        ])
+    
+    # Pass the formatted history to the emotion identifier
+    emotion = detector.identify_emotion(request.text, history=history_text)
+    return {"emotion": emotion}
+
 
 if __name__ == "__main__":
     import uvicorn
