@@ -52,7 +52,6 @@ OBO is built on a robust and modern technology stack to ensure a seamless and re
 | Component | Purpose |
 | :--- | :--- |
 | **Gemini (LLM)** | The powerful Large Language Model (LLM) that provides intelligent explanations and suggestions. |
-| **React** | Used for a dynamic and interactive user interface, providing smooth Scratch integration. |
 | **FastAPI** | Enables fast and efficient communication between the frontend and the AI backend. |
 | **Browser-use** | Technology used to precisely identify elements within the Scratch browser. |
 | **ElevenLabs** | Used for Text-to-Speech when answering the child's queries. |
