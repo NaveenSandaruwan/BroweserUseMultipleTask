@@ -33,6 +33,44 @@ web_application_coding_summary = generate_detailed_blocks_summary(include_all_bl
 working_space = get_list_of_used_blocks()
 context = filter_json()
 
+
+
+from langchain.schema import AIMessage
+
+def collect_all_agent_messages(state: MessagesState):
+    """
+    Collect the last AI message from each agent (supervisor + experts).
+    Excludes collector + format_agent itself.
+    Labels each agent with its name so the format_agent knows the source.
+    """
+    messages = state.get("messages", [])
+
+    # Filter relevant AI messages
+    agent_msgs = [
+        m for m in messages
+        if isinstance(m, AIMessage)
+        and getattr(m, "name", None) not in (None, "collector", "format_agent")
+        and m.content and str(m.content).strip()
+    ]
+
+    # Keep only the last message per agent
+    last_by_agent = {}
+    for m in agent_msgs:
+        agent_name = getattr(m, "name", "unknown_agent")
+        last_by_agent[agent_name] = m  # overwrite ensures "last seen" survives
+
+    # Wrap them with labels
+    labeled_msgs = []
+    for agent_name, m in last_by_agent.items():
+        labeled_text = f"[{agent_name}] {m.content}"
+        labeled_msgs.append(AIMessage(content=labeled_text, name="collector"))
+
+    # Debug
+    print("Collector gathered last outputs:", [(m.name, m.content) for m in labeled_msgs])
+
+    return {"messages": labeled_msgs}
+
+
 # --- Agents ---
 coding_agent = create_react_agent(
     model=model,
@@ -201,54 +239,74 @@ Important:
 - Finally get all agents answers and combine them as it is  into a single response to the user.
 """
 )
-
-# --- Build Graph ---
 builder = StateGraph(MessagesState)
-# builder = builder.add_node(supervisor_agent, destinations=("coding_expert", "context_expert", "debugging_expert","format_agent", END))
-builder = builder.add_node(supervisor_agent, destinations=("coding_expert", "context_expert", "debugging_expert", END))
-builder = builder.add_node(coding_agent)
-builder = builder.add_node(context_agent)
-builder = builder.add_node(debugging_agent)
-# builder = builder.add_node(format_agent)
 
+# Add nodes
+builder = builder.add_node("supervisor", supervisor_agent)
+builder = builder.add_node("coding_expert", coding_agent)
+builder = builder.add_node("context_expert", context_agent)
+builder = builder.add_node("debugging_expert", debugging_agent)
+builder = builder.add_node("collector", collect_all_agent_messages)  # 👈 collector
+# builder = builder.add_node("format_agent", format_agent)
+
+# Flow
 builder = builder.add_edge(START, "supervisor")
 builder = builder.add_edge("coding_expert", "supervisor")
 builder = builder.add_edge("context_expert", "supervisor")
 builder = builder.add_edge("debugging_expert", "supervisor")
 
-builder = builder.add_edge("supervisor", END)
-# builder = builder.add_edge("supervisor", "format_agent")
-# builder = builder.add_edge("format_agent", END)
-
+# Supervisor → Collector → Format Agent → END
+builder = builder.add_edge("supervisor", "collector")
+builder = builder.add_edge("collector", "format_agent")
+builder = builder.add_edge("format_agent", END)
 
 graph = builder.compile()
 
-# --- Chat loop ---
 chat_history = []
-while True:
-    user_input = input("User: ")
-    send_task("refresh")
-    if user_input.lower() in ["exit", "quit"]:
-        break
+# while True:
+#     user_input = input("User: ")
+#     send_task("refresh")
+#     if user_input.lower() in ["exit", "quit"]:
+#         break
+#     if len(chat_history) > 5:
+#         chat_history = chat_history[-5:]  # keep only last 5 messages
+#     result = graph.invoke({
+#         "messages": chat_history + [{"role": "user", "content": user_input}]
+#     })
 
-    result = graph.invoke({
-        "messages": chat_history + [{"role": "user", "content": user_input}]
-    })
-
-    chat_history.extend(result["messages"])
+#     chat_history.extend(result["messages"])
 
     
-    format_messages = [
-        m for m in result["messages"]
-        if m.type == "ai" and m.name == "format_agent" and m.content and m.content.strip()
-    ]
+#     format_messages = [
+#         m for m in result["messages"]
+#         if m.type == "ai" and m.name == "format_agent" and m.content and m.content.strip()
+#     ]
 
-    if result:
-        # take the last non-empty message from format_agent
-        # last_format_message = result[-1]
-        print("Bot:", result)
-    else:
-        print("Bot: (no respons from format agent)")
+#     if format_messages:
+#         # take the last non-empty message from format_agent
+#         last_format_message = format_messages[-1]
+#         print("Bot:", last_format_message.content)
+#     else:
+#         print("Bot: (no respons from format agent)")
+
+def call_LLM(user_input):
+            send_task("refresh")
+            result = graph.invoke({
+                "messages": chat_history + [{"role": "user", "content": user_input}]
+            })
+            chat_history.extend(result["messages"])
+
+            format_messages = [
+                m for m in result["messages"]
+                if m.type == "ai" and m.name == "format_agent" and m.content and m.content.strip()
+            ]
+
+            if result:
+                # take the last non-empty message from format_agent
+                # last_format_message = result[-1]
+                print("Bot:", result)
+            else:
+                print("Bot: (no respons from format agent)")
 
 # def call_LLM(user_input):
 #             send_task("refresh")
