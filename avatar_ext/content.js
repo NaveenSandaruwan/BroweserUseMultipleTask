@@ -34,17 +34,17 @@ function createAvatarUI() {
     return getUIElements();
   }
 
-  // --- Main Container (Position: Top Left) ---
+  // --- Main Container (Position: Top Right) ---
   const container = document.createElement("div");
   container.id = "avatar-extension-container";
   container.style.cssText = `
         position: fixed;
-        top: 20px;   /* Top-Left Positioning */
-        left: 20px;  /* Top-Left Positioning */
+        top: 20px;   /* Top positioning */
+        right: 20px; /* Right positioning */
         z-index: 10000;
         display: flex;
         flex-direction: column;
-        align-items: flex-start; /* Align avatar/mic button to the left */
+        align-items: flex-end; /* Align avatar/mic button to the right */
     `;
 
   // --- Avatar Graphic Element ---
@@ -93,19 +93,19 @@ function createAvatarUI() {
         background: white;
         border: 2px solid #333;
         border-radius: 10px;
-        padding: 8px 12px;
-        max-width: 300px; 
+        padding: 10px 15px;
+        max-width: 400px; /* Increased width from 300px */
+        min-width: 300px; /* Add minimum width */
         max-height: 250px; 
         overflow-y: auto; /* Enable vertical scrolling */
         opacity: 0; 
         transition: opacity 0.3s ease;
-        /* SCROLL FIX: Removed pointer-events: none; */
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         
-        /* Positioning next to the avatar */
+        /* Positioning to the left of the avatar (since we're on right side of window) */
         position: absolute;
         top: 0;
-        left: 100px; 
+        right: 90px; /* Position to the left of the avatar */
         font-size: 14px;
         line-height: 1.4;
         cursor: default; /* Indicates scrollability */
@@ -364,8 +364,9 @@ function showSpeech(text) {
             background: white;
             border: 2px solid #333;
             border-radius: 10px;
-            padding: 8px 12px;
-            max-width: 300px;
+            padding: 10px 15px;
+            max-width: 400px;
+            min-width: 300px;
             max-height: 250px;
             overflow-y: auto;
             opacity: 0;
@@ -373,7 +374,7 @@ function showSpeech(text) {
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             position: absolute;
             top: 0;
-            left: 100px;
+            right: 90px;
             font-size: 14px;
             line-height: 1.4;
             cursor: default;
