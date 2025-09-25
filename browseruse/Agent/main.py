@@ -13,7 +13,11 @@ from tools.browserUseClient import send_task
 # from test4 import chat_app
 from test3 import ScratchChatApp
 from tools.filter import filter_json, find_used_blocks, get_list_of_used_blocks, get_category_coordinates, generate_detailed_blocks_summary
+
+import time
+
 from emotion import EmotionIdentifier
+
 load_dotenv()
 
 BACKEND_PORT = 5000  # choose your port
@@ -52,7 +56,7 @@ def speak(req: ChatRequest):
 
     # Refresh browser state
     scratch_chat_app.send_task("refresh")
-
+    time.sleep(2)  # wait for the page to load
     # Update working space and context
     scratch_chat_app.working_space = get_list_of_used_blocks()
     scratch_chat_app.context = filter_json()
@@ -67,13 +71,40 @@ def speak(req: ChatRequest):
     scratch_chat_app.chat_history.extend(result["messages"])
 
     # Print only the last AI message
-    ai_messages = [m for m in result["messages"] if m.type == "ai"]
-    if ai_messages:
-        reply_text = ai_messages[-1].content
+    responses = {
+            "supervisor": None,
+            "format_agent": None,
+            "coordinate_expert": None,
+            "debugging_expert": None,
+            "coding_expert": None
+        }
+
+    for message in result["messages"]:
+        # AI/Tool messages will have .name
+        if hasattr(message, "name") and message.name in responses:
+            responses[message.name] = message.content
+
+    # Check if format agent has a result
+    if responses["format_agent"] and len(responses["format_agent"]) > 200:
+        reply_text = responses["format_agent"]
         print("Bot:", reply_text)
     else:
-        reply_text = "I'm sorry, I couldn't process your request."
-        print("Bot: (no AI response)")
+        # Pick the longest response among other agents
+        longest_response = max(
+            (resp for role, resp in responses.items() if role != "format_agent" and resp),
+            key=len,
+            default=None
+        )
+        if longest_response:
+            reply_text = longest_response
+            print("Bot:", reply_text)
+        else:
+            ai_messages = [m for m in result["messages"] if m.type == "ai"]
+            if ai_messages:
+                reply_text = ai_messages[-1].content
+                print("Bot:", reply_text)
+            else:
+                print("Bot: (No response found)")
 
     print(f"[API] Sending reply: {reply_text}")
     return ChatResponse(reply=reply_text)
