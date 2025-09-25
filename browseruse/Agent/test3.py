@@ -81,6 +81,14 @@ You are an expert in understanding and utilizing web page element coordinates.
      - Analyse other agent responses and add position context to related Scratch blocks if needed.
      - Finally Add position context to related Scratch blocks.
 
+You are an expert in understanding and utilizing web page element coordinates.
+what user is doing in the scratch web application: {self.working_space}
+
+and you must also be aware of coordinates, beacuse from x=312 to x=972 is the working space.
+so by the x coordinate you can understand where the block is.
+
+and the blocks are arranged sequentially is given by 1,2,3.... from the working space file.     
+
 '''
         )
 
@@ -98,6 +106,13 @@ Here is the summary of all available Scratch blocks:
 
 Here is the current state of the user's workspace:
 {self.working_space}
+
+You are an expert in debugging Scratch programs.
+Your role is to help users identify and fix issues in their Scratch projects.{self.working_space}
+You can provide step-by-step guidance on how to troubleshoot common problems,
+
+use context agent to get the context of the working space and help user to debug their Scratch programs.
+and use gemini to get things users commonly doing mistakes in scratch programming and help user to fix those mistakes.
 
 Your tasks include:
 1. Analyze the sequence of blocks in the workspace.
@@ -201,9 +216,6 @@ Important:
         )
 
         self.chat_history = []
-
-    # Change the invoke method to correctly handle the user input
-    
     def invoke(self, user_input):
         self.send_task("refresh")
         # Check if user_input is a string or dictionary
@@ -218,34 +230,58 @@ Important:
             "messages": messages
         })
         self.chat_history.extend(result["messages"])
+
         return result
+
+
 # Create an instance of the class
 scratch_chat_app = ScratchChatApp()
 
-# chat_app = work_flow.compile()
+if __name__ == "__main__":
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() in ["exit", "quit"]:
+            print("Exiting chat.")
+            break
 
-# if __name__ == "__main__":
-#     while True:
-#         user_input = input("You: ")
-#         if user_input.lower() in ["exit", "quit"]:
-#             print("Exiting chat.")
-#             break
+        scratch_chat_app.send_task("refresh")
+        scratch_chat_app.working_space = get_list_of_used_blocks()
+        scratch_chat_app.context = filter_json()
+        print(scratch_chat_app.working_space)
 
-#         scratch_chat_app.send_task("refresh")
-#         scratch_chat_app.working_space = get_list_of_used_blocks()
-#         scratch_chat_app.context = filter_json()
-#         print(scratch_chat_app.working_space)
+        result = scratch_chat_app.invoke({
+            "messages": scratch_chat_app.chat_history + [{"role": "user", "content": user_input}]
+        })
 
-#         result = scratch_chat_app.invoke({
-#             "messages": scratch_chat_app.chat_history + [{"role": "user", "content": user_input}]
-#         })
+        # Store responses by agent name
+        responses = {
+            "supervisor": None,
+            "format_agent": None,
+            "coordinate_expert": None,
+            "debugging_expert": None,
+            "coding_expert": None
+        }
 
-#         # Extend chat history with LangChain message objects
-#         scratch_chat_app.chat_history.extend(result["messages"])
+        for message in result["messages"]:
+            # AI/Tool messages will have .name
+            if hasattr(message, "name") and message.name in responses:
+                responses[message.name] = message.content
 
-#         # Print only the last AI message
-#         ai_messages = [m for m in result["messages"] if m.type == "ai"]
-#         if ai_messages:
-#             print("Bot:", ai_messages[-1].content)
-
-
+        # Check if format agent has a result
+        if responses["format_agent"] and len(responses["format_agent"]) > 200:
+            print("Bot:", responses["format_agent"])
+        else:
+            # Pick the longest response among other agents
+            longest_response = max(
+                (resp for role, resp in responses.items() if role != "format_agent" and resp),
+                key=len,
+                default=None
+            )
+            if longest_response:
+                print("Bot:", longest_response)
+            else:
+                ai_messages = [m for m in result["messages"] if m.type == "ai"]
+                if ai_messages:
+                    print("Bot:", ai_messages[-1].content)
+                else:
+                    print("Bot: (No response found)")
