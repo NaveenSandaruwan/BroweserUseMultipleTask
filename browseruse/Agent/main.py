@@ -117,7 +117,7 @@ detector = EmotionIdentifier()
 async def emotion_endpoint(request: EmotionRequest):
     # Format chat history if needed
     history_text = ""
-    if request.include_history and chat_history:
+    if  chat_history:
         # Use only the last 3 entries if history is longer than 3
         history_to_use = chat_history[-3:] if len(chat_history) > 3 else chat_history
         
@@ -126,7 +126,7 @@ async def emotion_endpoint(request: EmotionRequest):
             f"{'User' if getattr(msg, 'type', None) == 'human' else 'Assistant'}: {getattr(msg, 'content', '')}"
             for msg in history_to_use if hasattr(msg, 'content')
         ])
-    
+        print(f"Formatted history for emotion detection:\n{history_text}")
     # Pass the formatted history to the emotion identifier
     emotion = detector.identify_emotion(request.text, history=history_text)
     return {"emotion": emotion}

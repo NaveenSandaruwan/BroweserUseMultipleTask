@@ -24,7 +24,7 @@ class EmotionIdentifier:
         """
         prompt = (
             "Identify the primary emotion expressed in the following text. "
-            "Respond with only one word (e.g., happy, sad, angry, surprised, fearful, disgusted, neutral).\n\n"
+            "Respond with only one word by most suitable emotion from here happy, sad, angry, surprised, fearful, disgusted, neutral.\n\n"
             "Imagine you are a learning assistant for children. "
             "You have to identify the reaction emotion of the user from their text.\n"
         )
