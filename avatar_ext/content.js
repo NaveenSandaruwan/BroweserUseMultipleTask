@@ -25,9 +25,7 @@ function simpleMarkdownToHtml(markdownText) {
   return html;
 }
 
-// =========================
-// Create and Insert UI Elements
-// =================================
+
 function createAvatarUI() {
   // Check if UI already exists
   if (document.getElementById("avatar-extension-container")) {
@@ -255,9 +253,7 @@ chrome.runtime.onMessage.addListener((message) => {
   }
 });
 
-// =========================
-// Speech Recognition
-// =========================
+
 const SpeechRecognitionAPI =
   window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -349,9 +345,7 @@ if (!SpeechRecognitionAPI) {
   };
 }
 
-// =========================
-// Avatar Bubble Functions
-// =========================
+
 function showSpeech(text) {
   let speechBubble = document.getElementById("python-avatar-speech");
   const avatarContainer = document.getElementById("avatar-extension-container");
@@ -395,9 +389,7 @@ function showSpeech(text) {
   speechBubble.scrollTop = 0;
 }
 
-// =========================
-// Emotion Detection & Avatar Updates
-// =========================
+
 
 // Function to detect emotion from text
 async function detectEmotion(text) {
@@ -510,9 +502,7 @@ function updateAvatarEmotion(emotion) {
   }, 300);
 }
 
-// =========================
-// Browser TTS (Speech Synthesis)
-// =========================
+
 function speakText(text) {
   if (!text || text.trim() === "") {
     console.log("Empty text provided to speakText, ignoring");
@@ -556,10 +546,7 @@ function speakText(text) {
   }
 }
 
-// =========================
-// Initialization
-// =========================
-// Add SVG animation styles
+
 const avatarStyles = document.createElement("style");
 avatarStyles.textContent = `
   #avatar-mouth, #left-eyebrow, #right-eyebrow, #left-pupil, #right-pupil {
