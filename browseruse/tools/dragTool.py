@@ -1,3 +1,14 @@
+import sys
+import os
+_file_ = os.path.abspath(__file__)
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), '../..')))
+
+from tools.browserUseClient import send_task
+from tools.filter import filter_json
+
+from browseruse.tools.filter import filter_json
 import pychrome
 import time
 
@@ -38,6 +49,36 @@ class Toolbox:
         self.tab.Input.dispatchMouseEvent(type="mouseReleased", x=x_end, y=y_end, button="left", clickCount=1)
         # time.sleep(delay)
         return "Drag and drop operation completed."
+    
+    def click(self, x, y, button="left", click_count=1, delay=0.05):
+        """
+        Simulates a mouse click at the specified coordinates.
+        
+        Args:
+            x (int or float): The x-coordinate to click.
+            y (int or float): The y-coordinate to click.
+            button (str, optional): The mouse button to click ("left", "right", or "middle"). Defaults to "left".
+            click_count (int, optional): Number of clicks (1 for single-click, 2 for double-click). Defaults to 1.
+            delay (float, optional): The delay in seconds between mouse events. Defaults to 0.05.
+            
+        Returns:
+            str: Confirmation message.
+        """
+        # Move to the position
+        self.tab.Input.dispatchMouseEvent(type="mouseMoved", x=x, y=y)
+        # time.sleep(delay)
+        
+        # Press mouse down
+        self.tab.Input.dispatchMouseEvent(type="mousePressed", x=x, y=y, button=button, clickCount=click_count)
+        # time.sleep(delay)
+        
+        # Release mouse up
+        self.tab.Input.dispatchMouseEvent(type="mouseReleased", x=x, y=y, button=button, clickCount=click_count)
+        # time.sleep(delay)
+        # send_task('refresh')
+        new_context = filter_json()
+
+        return f"Click operation completed at coordinates ({x}, {y}). New context: {new_context}"
 
 # Example usage:
 # toolbox = Toolbox()
