@@ -26,91 +26,8 @@ model = ChatGoogleGenerativeAI(
     temperature=0.6
 )
 
-def find_closest_block(category: str, block_query: str) -> dict:
-    """
-    Find the closest matching block in description.json using fuzzy matching
-    """
-    description_path = os.getenv("ELEMENTS_DESCRIPTION_JSON_PATH")
-    try:
-        with open(description_path, 'r') as f:
-            descriptions = json.load(f)
-        
-        if category in descriptions:
-            best_match = None
-            highest_ratio = 0
-            
-            # Search through all blocks in the category
-            for block in descriptions[category]["blocks"]:
-                # Calculate similarity ratio
-                ratio = SequenceMatcher(None, 
-                                      block["name"].lower(), 
-                                      block_query.lower()).ratio()
-                
-                # Update if this is the best match so far
-                if ratio > highest_ratio and ratio > 0.6:  # 0.6 threshold for minimum match
-                    highest_ratio = ratio
-                    best_match = block
-            
-            if best_match:
-                # Parse coordinates
-                coords = best_match["coordinates"]
-                x = float(coords.split("x: ")[1].split(",")[0])
-                y = float(coords.split("y: ")[1])
-                
-                return {
-                    "name": best_match["name"],
-                    "description": best_match["description"],
-                    "coordinates": {"x": x, "y": y},
-                    "match_confidence": highest_ratio
-                }
-                
-    except Exception as e:
-        print(f"Error finding block: {e}")
-    return None
-# Define custom functions to use as tools for our agents
-
 # drag_tool = Toolbox()
 executor = Executor()
-
-# Text Content Overview Agent - provides a comprehensive view of all text on the page
-
-
-# Answer generation agent that creates responses based on retrieved content
-answer_generation_agent = create_react_agent(
-    model = model,
-    tools = [],  # No tools needed as it works with the content from the retrieval agent
-    name = 'answer_generator',
-    prompt = '''You are an expert in explaining web content and Scratch programming concepts,
-    with special emphasis on element positions.
-    
-    When generating answers about elements, ALWAYS follow this exact structure:
-    
-    1. ELEMENT POSITION DATA:
-       - Coordinates: (x,y) values for the element
-       - Dimensions: Width and height if available
-       - Center Point: Calculated center coordinates
-       - Position Description: What these coordinates represent
-    
-    2. ELEMENT DETAILS:
-       - Text Content: What text the element displays
-       - Element Type: The HTML tag type
-       - Element ID: Identifier from elements.json
-       
-    3. RELATED INFORMATION:
-       - Description: What the element does (from descriptions)
-       - Context: How this element relates to other elements
-       
-    CRITICAL REQUIREMENTS:
-    - Position data MUST appear first in your answers
-    - NEVER omit position details - they are the most important information
-    - Format coordinates as (x,y) for easy reading
-    - Present all information in a highly structured, table-like format
-    - For drag operations, clearly highlight the exact coordinates to use
-    
-    Your answers should be precise, structured, and focused primarily on position data.
-    All information should come directly from the element data provided by the agents.
-    '''
-)
 
 
 
@@ -233,52 +150,12 @@ work_flow = create_supervisor(
 )
 
 
-# Test the new functions directly
-def run_function_tests():
-    print("\n=== TESTING ELEMENT TEXT EXTRACTION ===")
-    text_result = extract_all_element_text()
-    print(f"Found {text_result['total_text_elements']} text elements")
-    print(f"Scratch blocks: {text_result['scratch_block_count']}")
-    print(f"UI elements: {text_result['ui_element_count']}")
-    print(f"Navigation: {text_result['navigation_count']}")
-    print(f"Other text: {text_result['other_text_count']}")
-    print("First 5 text elements:")
-    for i, item in enumerate(text_result['all_text_elements'][:5]):
-        print(f"  {i+1}. '{item['text']}' (Element ID: {item['element_id']})")
-    
-    print("\n=== TESTING POSITION ACCESS BY TEXT ===")
-    test_queries = ["move", "turn", "Sprite"]
-    for query in test_queries:
-        print(f"\nSearching for position data for text: '{query}'")
-        position_result = get_element_by_text_content(query)
-        print(f"Found {position_result['total_matches']} matching elements")
-        for i, elem in enumerate(position_result['matched_elements'][:3]):
-            print(f"  Element {i+1}:")
-            print(f"    Text: {elem['text_content']}")
-            print(f"    Tag: {elem['tag_name']}")
-            print(f"    Position: ({elem['position']['x']}, {elem['position']['y']})")
-            if elem['position']['width']:
-                print(f"    Dimensions: {elem['position']['width']} x {elem['position']['height']}")
-            print(f"    Center: ({elem['center_point']['x']}, {elem['center_point']['y']})")
-    
-    print("\n=== TESTING CONTENT RETRIEVAL ===")
-    for query in test_queries:
-        print(f"\nGetting content for: '{query}'")
-        content_result = get_relevant_content(query)
-        print(f"Found {content_result['total_elements_found']} elements and {content_result['total_descriptions_found']} descriptions")
-        print(f"Source: {content_result['source']}")
-
-# Uncomment to run the function tests
-# run_function_tests()
-
 # Chat loop
 chat_history = []
 
 chat_app = work_flow.compile()
 
-# Automatically run text overview when starting
 
-# Store the initial context
 
 while True:
     user_input = input("User: ")
