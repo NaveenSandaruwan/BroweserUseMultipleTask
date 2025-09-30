@@ -27,7 +27,7 @@ drag_tool = Toolbox()
 ELEMENTS = os.getenv("ELEMENTS_DESCRIPTION_JSON_PATH")
 
 
-with open("/Users/bishmajayasundara/Documents/sem 5/BroweserUseMultipleTask-1/element_data/description.json", 'r') as f:
+with open(ELEMENTS, 'r') as f:
     category_data = json.load(f)
 
 class Executor:
