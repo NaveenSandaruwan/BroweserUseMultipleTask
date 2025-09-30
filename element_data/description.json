@@ -84,7 +84,7 @@
       {"name": "if then else", "description": "Run code for true/false.", "coordinates": "x: 74.5, y: 340"},
       {"name": "wait until", "description": "Pause until condition true.", "coordinates": "x: 74.5, y: 388"},
       {"name": "repeat until", "description": "Repeat until condition met.", "coordinates": "x: 74.5, y: 436"},
-      {"name": "stop", "description": "Stop script/project.", "coordinates": "x: 74.5, y: 484"},
+      {"name": "stop", "description": "Stop script/project.", "coordinates": "x: 74.5, y: 740"},
       {"name": "when I start as a clone", "description": "Trigger when clone created.", "coordinates": "x: 74.5, y: 532"},
       {"name": "create clone of", "description": "Duplicate sprite.", "coordinates": "x: 74.5, y: 580"},
       {"name": "delete this clone", "description": "Remove sprite clone.", "coordinates": "x: 74.5, y: 628"}
