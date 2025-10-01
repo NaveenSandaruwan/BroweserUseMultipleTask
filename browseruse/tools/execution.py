@@ -120,28 +120,37 @@ class Executor:
         
         steps = plan.get("steps", [])
         print(f"Executing {len(steps)} steps...")
-        
+        scroll = False
+        blockno = 1
         for step in steps:
             print(f"\nProcessing step: {step}")
             step_num = step["step"]
             category = step["category"]
             block = step["block"]
 
+
+
             # print(f"\nExecuting Step {step_num}: {category} → {block}")
 
             # 1. Find block in description.json
             match = Executor.find_closest_block(category, block)
             if not match:
-                print(f"❌ Could not find block '{block}' in category '{category}'")
+                print(f"❌ Could not find block '{block}' in category '{category}'")           
                 continue
             
             start = match["coordinates"]
             x_start, y_start = start["x"], start["y"]
+            
+
+            # scroll to the block position if needed
+       
+                
+
 
             # 2. Compute end position
             x_end = 350
-            y_end = 140 + 40 * (step_num - 1)
-
+            y_end = 140 + 33 * (blockno - 1)
+            blockno += 1
             print(f"  Start position: ({x_start}, {y_start})")
             print(f"  End position:   ({x_end}, {y_end})")
 
@@ -151,6 +160,17 @@ class Executor:
             drag_tool.click(category_x, category_y + 5)
 
             time.sleep(delay)
+            if y_start > 700:
+                scroll = True
+                drag_tool.scroll( delta_y=405)
+                
+                y_start -= 405
+            
+            if y_end > 700:
+                scroll = True
+                drag_tool.scroll( x=574, delta_y=405)
+                
+                y_end -= 405
 
             # 4. Drag and drop the block
             drag_tool.drag_and_drop(
@@ -159,6 +179,9 @@ class Executor:
                 x_end=x_end, 
                 y_end=y_end
             )
+            if scroll:
+                time.sleep(1)
+            scroll = False
         return "✅ Execution completed."
 
 
@@ -169,13 +192,13 @@ class Executor:
 #   "steps": [
 #     {
 #       "step": 1,
-#       "category": "Control",
-#       "block": "repeat"
+#       "category": "Looks",
+#       "block": "Hide"
 #     },
 #     {
 #       "step": 2,
-#       "category": "Motion",
-#       "block": "move 10 steps"
+#       "category": "Looks",
+#       "block": "show"
 #     },
 #     {
 #       "step": 3,

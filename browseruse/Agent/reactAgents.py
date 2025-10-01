@@ -41,6 +41,11 @@ model2 = ChatGoogleGenerativeAI(
     temperature=0.1  # Lower temperature for more consistent responses
 )
 
+model3 = ChatGoogleGenerativeAI(
+    model="gemini-2.0-flash",
+    google_api_key=GEMINIAPI,
+    temperature=0.5  # Lower temperature for more consistent responses
+)
 
 command_agent = create_react_agent(
     model=model,
@@ -100,7 +105,7 @@ You MUST NOT deviate from this format under any circumstances.
   # Placeholder for command agent if needed
 
 general_coding_agent = create_react_agent(
-            model=model,
+            model=model3,
             tools=[],
             name='coding_expert',
             prompt=f'''You are a world-class coding expert specializing in Scratch programming. 
@@ -133,7 +138,7 @@ Be concise, accurate, and supportive in your responses.
         )
 
 explaining_agent = create_react_agent(
-    model=model,
+    model=model3,
     tools=[],
     name='explain_agent',
     prompt=f'''
@@ -194,7 +199,7 @@ so that they are simple, clear, and fun for children to understand.
 - Present the steps in a way that kids can follow easily.
 
 Input: The message from the supervisor or other agents.
-Output: A child-friendly version of that message.
+Output: A child-friendly version of that message not more than 200 words.
 """
         )
 

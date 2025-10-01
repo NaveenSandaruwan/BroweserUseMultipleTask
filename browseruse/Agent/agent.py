@@ -68,6 +68,7 @@ graph.add_edge("format_response", END)
 
 # Compile
 chat = graph.compile()
+
 chat_history = []
 
 if __name__ == "__main__":

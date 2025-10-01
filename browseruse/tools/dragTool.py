@@ -79,7 +79,22 @@ class Toolbox:
         new_context = filter_json()
 
         return f"Click operation completed at coordinates ({x}, {y}). New context: {new_context}"
-
-# Example usage:
+    def scroll(self, x=290, y=297, delta_x=0, delta_y=0):
+        """
+        Simulates a mouse wheel scroll at the specified coordinates.
+        
+        Args:
+            x (int or float): The x-coordinate where the scroll occurs.
+            y (int or float): The y-coordinate where the scroll occurs.
+            delta_x (int, optional): The horizontal scroll amount. Defaults to 0.
+            delta_y (int, optional): The vertical scroll amount. Defaults to -100 (scroll up).
+            
+        Returns:
+            str: Confirmation message.
+        """
+        self.tab.Input.dispatchMouseEvent(type="mouseWheel", x=x, y=y, deltaX=delta_x, deltaY=delta_y)
+        time.sleep(0.1)  # Small delay to ensure the scroll is registered
+        return f"Scroll operation completed at coordinates ({x}, {y}) with delta ({delta_x}, {delta_y})."
+# # Example usage:
 # toolbox = Toolbox()
-# toolbox.drag_and_drop(74, 149, 400, 179)
+# toolbox.scroll(delta_y=405)
