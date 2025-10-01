@@ -8,13 +8,8 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-  # Implement custom call_LLM logic directly here
-from tools.browserUseClient import send_task
-# from test4 import chat_app
-from test3 import ScratchChatApp
-from tools.filter import filter_json, find_used_blocks, get_list_of_used_blocks, get_category_coordinates, generate_detailed_blocks_summary
+
 from agent import chat
-import time
 
 from emotion import EmotionIdentifier
 
@@ -37,12 +32,7 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     reply: str
 
-# def run_llm(user_message: str) -> str:
-#     """Simple stub LLM reply"""
-#     print(f"[LLM] Received: {user_message}")
-#     reply = f"AI says: I heard '{user_message}'. This is my response."
-#     print(f"[LLM] Reply: {reply}")
-#     return reply
+
 chat_history = []
 
 @app.post("/speak", response_model=ChatResponse)
