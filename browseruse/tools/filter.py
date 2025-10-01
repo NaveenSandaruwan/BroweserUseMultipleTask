@@ -70,6 +70,8 @@ def get_list_of_used_blocks():
     for block in used_blocks:
         string = f"{string} {count}. {block['text_content']} Code block. Block Coordinates: (X: {block['x']}, Y: {block['y']} ) \n"
         count += 1
+    
+    print("List of used blocks:", string)
     return string
 
 # print("List of used blocks:", get_list_of_used_blocks())

@@ -1,3 +1,4 @@
+import time
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.prebuilt import create_react_agent
 import os
@@ -33,6 +34,12 @@ model = ChatGoogleGenerativeAI(
     temperature=0.3  # Lower temperature for more consistent responses
 )
 
+model2 = ChatGoogleGenerativeAI(
+    model="gemini-2.0-flash",
+    google_api_key=GEMINIAPI,
+    temperature=0.1  # Lower temperature for more consistent responses
+)
+
 executor = Executor()
 
 
@@ -43,39 +50,60 @@ working_space = get_list_of_used_blocks()
 
 
 command_agent = create_react_agent(
-            model=model,
-            tools=[executor.executor_tool],
-            name="Command_agent",
-            prompt='''
-    You are a Command Agent for Scratch programming. Your job is to receive instructions from the supervisor and ALWAYS convert them into a JSON object with this format and execute them using the provided tool:
+    model=model,
+    tools=[],
+    name="Command_agent",
+    prompt='''
+You are a Command Agent for Scratch programming. Your job is to receive instructions from the supervisor and ALWAYS convert them into a JSON object with this format:
 
-    {
-      "steps": [
-        {"step": 1, "category": "CategoryName", "block": "BlockName"},
-        {"step": 2, "category": "CategoryName", "block": "BlockName"},
-        ...
-      ]
-    }
+{
+  "steps": [
+    {"step": 1, "category": "CategoryName", "block": "BlockName"},
+    {"step": 2, "category": "CategoryName", "block": "BlockName"},
+    ...
+  ]
+}
 
-    Instructions may look like:
-    - "Move the sprite 10 steps, repeat 10 times, then go to a random position."
-    - "Play 'meow' sound, wait 1 second, move 20 steps, repeat 8 times."
-    - "Say 'Hello!' for 2 seconds, then turn 15 degrees right."
-    - "When green flag clicked, go to x:0 y:0, say 'Ready!', move 50 steps."
-    - "Move 15 steps, turn 90 degrees, repeat 4 times."
+Instructions may look like:
+- "Move the sprite 10 steps, repeat 10 times, then go to a random position."
+- "Play 'meow' sound, wait 1 second, move 20 steps, repeat 8 times."
+- "Say 'Hello!' for 2 seconds, then turn 15 degrees right."
+- "When green flag clicked, go to x:0 y:0, say 'Ready!', move 50 steps."
+- "Move 15 steps, turn 90 degrees, repeat 4 times."
 
-    For EVERY instruction:
-    1. Break it down into discrete steps using Scratch blocks.
-    2. For each step, specify the `category` (Motion, Looks, Sound, Events, Control, Sensing, Operators, Variables) and the `block` name.
-    3. Output ONLY a JSON object as shown above.
-    4. After generating commands, you MUST call the tool to execute them immediately.
-    5. Do not output anything except the command JSON and tool call.
+For EVERY instruction:
+1. Break it down into discrete steps using Scratch blocks.
+2. For each step, specify the `category` (Motion, Looks, Sound, Events, Control, Sensing, Operators, Variables) and the `block` name.
+3. Output ONLY a JSON object as shown above.
 
-    You must always follow this format, regardless of the instruction.
-    You MUST always call the tool after generating the commands.
-    You MUST NOT deviate from this format under any circumstances.
-    '''
-        )
+You must always follow this format, regardless of the instruction.
+You MUST NOT deviate from this format under any circumstances.
+'''
+)
+
+command_executor = create_react_agent(
+    model=model,
+    tools=[executor.executor_tool],
+    name="Command_executor",
+    prompt='''
+
+you will receive a json object from command agent and you have to execute the json object using the tool.
+
+ the format of the json object is like this:
+
+ {
+  "steps": [
+    {"step": 1, "category": "CategoryName", "block": "BlockName"},
+    {"step": 2, "category": "CategoryName", "block": "BlockName"},
+    ...
+  ]
+}
+
+use the tool to execute the json object formatted commands.
+
+''')
+
+
   # Placeholder for command agent if needed
 
 general_coding_agent = create_react_agent(
@@ -94,12 +122,14 @@ It teaches core concepts: loops, conditionals, variables, functions (custom bloc
 Scratch projects can be shared online through the Scratch website, making it both a learning tool and a community platform.
 
 👉 In short: Scratch works by dragging puzzle-like blocks to control sprites on a stage, making coding visual, simple, and interactive.
-You have access to a comprehensive summary of all available Scratch blocks:
 
-{web_application_coding_summary}
+You are given  a comprehensive summary of all available Scratch blocks with their functionalities with user queries.
+
 
 Your task is to assist users with their Scratch-related questions by providing clear, practical guidance based on the block summary above. 
 - Carefully analyze the user's query.
+- Understand the summary of Scratch blocks and their functionalities.
+- Familiarize yourself with the user's current workspace and the blocks they have used.
 - Reference relevant blocks and explain how they can be used to solve the problem.
 - Offer step-by-step instructions or suggestions when appropriate.
 - If the solution involves multiple blocks, describe how they work together.
@@ -115,10 +145,8 @@ explaining_agent = create_react_agent(
     name='explain_agent',
     prompt=f'''
 You are a Scratch programming expert. You know everything about Scratch programming blocks, their categories, the user's workspace, and how blocks should be used to create programs.
-You have access to a comprehensive summary of all available Scratch blocks:
-{web_application_coding_summary}
-You also have access to the user's current workspace, which contains the blocks they have used and their coordinates:
-{working_space}
+You are given a comprehensive summary of all available Scratch blocks with their functionalities with user queries.
+You also have access to the user's current workspace, which contains the blocks they have used and their coordinates.
 Your task is to explain the user's current workspace in detail.
 
 '''
@@ -132,14 +160,12 @@ debugging_agent = create_react_agent(
             prompt=f'''
 You are a debugging expert specializing in Scratch programming. Your role is to analyze the user's current workspace and identify potential issues or improvements in their Scratch program.
 
-Here is the summary of all available Scratch blocks:
-{web_application_coding_summary}
+You are given a summary of all available Scratch blocks with their functionalities with user queries.
 
-Here is the current state of the user's workspace:
-{working_space}
+You are also given the current state of the user's workspace with user queries.
 
 You are an expert in debugging Scratch programs.
-Your role is to help users identify and fix issues in their Scratch projects.{working_space}
+Your role is to help users identify and fix issues in their Scratch projects.
 You can provide step-by-step guidance on how to troubleshoot common problems,
 
 use context agent to get the context of the working space and help user to debug their Scratch programs.
@@ -239,7 +265,7 @@ class State(dict):
 
 def llm_router(state: State) -> Literal["code_explain", "code_debugging", "give_instructions","make_blocks"]:
     query = state["query"]
-    response = model.invoke(
+    response = model2.invoke(
         f"""
 You are a router agent that decides which expert agent should handle the user's request based on its content.
 Given the user's query below, choose the most appropriate agent to handle it:
@@ -247,9 +273,11 @@ User Query: "{query}"
   - code_explain -> Explain working space (user's code) of the user.
   - code_debugging -> Help user debug their Scratch programs.
   - give_instructions -> Provide step-by-step instructions for using Scratch and How to code using Scratch. If user ask to give instuctions to do certain task, choose this.
-  - make_blocks -> Create Scratch blocks based on user input. If user want some help to create blocks, choose this. If user want to see how to do something, choose make_blocks.
+  - make_blocks -> Create Scratch blocks based on user input. If user want some help to create blocks, choose this. If user want to See how to do something, choose make_blocks.
+  - make_blocks -> Specially key words like "Create blocks", "Make blocks", "Show me how to do this in blocks", "How to do this in blocks", "Help me create blocks", "Help me make blocks", "I want to see the blocks for this", "I want to see how to do this in blocks", "Show me the blocks for this", "Show me how to do this in blocks", "Can you create the blocks for this?", "Can you make the blocks for this?", "Can you show me the blocks for this?", "Can you show me how to do this in blocks?", "I need help creating blocks", "I need help making blocks", "I need help with the blocks for this", "I need help with how to do this in blocks", "Please create the blocks for this", "Please make the blocks for this", "Please show me the blocks for this", "Please show me how to do this in blocks". If user say any of these or similar, choose make_blocks.
   - general_agent -> For all other queries that do not fit the above categories if it is a just not code related, provide a general response. If use say "Hi", "Hello", "Thank you", "Thanks", "What is your name?", "Who are you?" or any other general question like this, choose this.
 
+  specially identify if the user is asking for instructions on how to do something in Scratch, or if they want you to create blocks for them. In these cases, you must choose "give_instructions" or "make_blocks" respectively.
   always choose one of these options: code_explain, code_debugging, give_instructions, make_blocks, default. According to the definitions given above.
   .
 """
@@ -261,29 +289,62 @@ User Query: "{query}"
     return choice
     
 def code_explain_node(state: State) -> State:
-    result = explaining_agent.invoke({"messages": [HumanMessage(content=state["query"])]})
+    send_task("refresh")
+    time.sleep(2)  # wait for 2 seconds to ensure the workspace is updated
+    # Always refresh coding summary and working space before explaining
+    web_application_coding_summary = generate_detailed_blocks_summary(include_all_blocks=True)
+    working_space = get_list_of_used_blocks()
+
+    # Compose a message that includes the query, coding summary, and working space
+    message = (
+        f"User Query: {state['query']}\n\n"
+        f"Scratch Block Summary and functionalities of blocks in each category:\n{web_application_coding_summary}\n\n"
+        f"Current Workspace ( you can see what user have done):\n{working_space}"
+    )
+
+    result = explaining_agent.invoke({"messages": [HumanMessage(content=message)]})
     return {"result": {"explanation": result["messages"][-1].content}}
 
 def code_debugging_node(state: State) -> State:
-    result = debugging_agent.invoke({"messages": [HumanMessage(content=state["query"])]})
+
+    send_task("refresh")
+    time.sleep(2)  # wait for 2 seconds to ensure the workspace is updated
+    web_application_coding_summary = generate_detailed_blocks_summary(include_all_blocks=True)
+    working_space = get_list_of_used_blocks()
+
+    # Compose a message that includes the query, coding summary, and working space
+    message = (
+        f"User Query: {state['query']}\n\n"
+        f"Scratch Block Summary and functionalities of blocks in each category:\n{web_application_coding_summary}\n\n"
+        f"Current Workspace ( you can see what user have done):\n{working_space}"
+    )
+
+    result = debugging_agent.invoke({"messages": [HumanMessage(content=message)]})
     return {"result": {"debugging_advice": result["messages"][-1].content}}
 
 def give_instructions_node(state: State) -> State:
-    result = general_coding_agent.invoke({"messages": [HumanMessage(content=state["query"])]})
+    web_application_coding_summary = generate_detailed_blocks_summary(include_all_blocks=True)
+    message = (
+        f"User Query: {state['query']}\n\n"
+        f"Scratch Block Summary and functionalities of blocks in each category:\n{web_application_coding_summary}\n\n"
+        
+        )
+    result = general_coding_agent.invoke({"messages": [HumanMessage(content=message)]})
     return {"result": {"instructions": result["messages"][-1].content}}
 
 def make_blocks_node(state: State) -> State:
     result = command_agent.invoke({"messages": [state['result']['instructions']]})
     return {"result": {"make_blocks": result["messages"][-1].content}}
 
+def execute_blocks_node(state: State) -> State:
+    result = command_executor.invoke({"messages": [state['result']['make_blocks']]})
+    return {"result": {"execute_blocks": result["messages"][-1].content}}
+
 def general_agent_node(state: State) -> State:
     result = general_agent.invoke({"messages": [HumanMessage(content=state["query"])]})
     return {"result": {"general_response": result["messages"][-1].content}}
 
 
-# def format_response(state: State) -> State:
-#     result = format_agent.invoke({"messages": [HumanMessage(content=state["result"])]})
-#     return {"result": {"formatted_response": result["messages"][-1].content}}
 def format_response(state: State) -> State:
     # Extract the actual text content from the result dictionary
     if "result" in state:
@@ -304,6 +365,7 @@ graph.add_node("give_instructions_2", give_instructions_node)
 graph.add_node("code_debugging", code_debugging_node)
 graph.add_node("give_instructions", give_instructions_node)
 graph.add_node("make_blocks", make_blocks_node)
+graph.add_node("execute_blocks", execute_blocks_node)
 graph.add_node("format_response", format_response)
 graph.add_node("general_agent", general_agent_node)
 
@@ -327,9 +389,10 @@ graph.add_conditional_edges(
 graph.add_edge("code_explain", "format_response")
 graph.add_edge("code_debugging", "format_response")
 graph.add_edge("give_instructions", "format_response")
-graph.add_edge("make_blocks", "format_response")
+graph.add_edge("execute_blocks", "format_response")
 graph.add_edge("general_agent", "format_response")
 graph.add_edge("give_instructions_2", "make_blocks")
+graph.add_edge("make_blocks", "execute_blocks")
 # Sequential both path
 
 graph.add_edge("format_response", END)

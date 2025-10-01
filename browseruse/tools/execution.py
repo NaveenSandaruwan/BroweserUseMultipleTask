@@ -116,9 +116,10 @@ class Executor:
             plan = json.loads(json_plan)
         except json.JSONDecodeError as e:
             print("Invalid JSON plan:", e)
-            return
+            return "❌ Invalid JSON plan."
         
         steps = plan.get("steps", [])
+        print(f"Executing {len(steps)} steps...")
         
         for step in steps:
             step_num = step.get("step")
@@ -157,31 +158,32 @@ class Executor:
                 x_end=x_end, 
                 y_end=y_end
             )
+            return "✅ Execution completed."
 
 
 
-# if __name__ == "__main__":
-#     # Example JSON plan
-#     test_json_plan = json.dumps({
-#   "steps": [
-#     {
-#       "step": 1,
-#       "category": "Control",
-#       "block": "repeat"
-#     },
-#     {
-#       "step": 2,
-#       "category": "Motion",
-#       "block": "move 10 steps"
-#     },
-#     {
-#       "step": 3,
-#       "category": "Motion",
-#       "block": "go to random position"
-#     }
-#   ]
-# })
+if __name__ == "__main__":
+    # Example JSON plan
+    test_json_plan = json.dumps({
+  "steps": [
+    {
+      "step": 1,
+      "category": "Control",
+      "block": "repeat"
+    },
+    {
+      "step": 2,
+      "category": "Motion",
+      "block": "move 10 steps"
+    },
+    {
+      "step": 3,
+      "category": "Motion",
+      "block": "go to random position"
+    }
+  ]
+})
 
-#     # Call the executor_tool function with the test JSON plan
-# Executor.executor_tool(test_json_plan)
+    # Call the executor_tool function with the test JSON plan
+Executor.executor_tool(test_json_plan)
 
