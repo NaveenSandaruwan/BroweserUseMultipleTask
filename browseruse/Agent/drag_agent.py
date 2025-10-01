@@ -21,9 +21,9 @@ GEMINIAPI = os.getenv("GOOGLE_API_KEY")
 # print(GEMINIAPI)
 # print("GEMINI_API:", GEMINIAPI)  # Debugging line to check if the API key is loaded correctly
 model = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
+    model="gemini-2.0-flash",
     google_api_key=GEMINIAPI,
-    temperature=0.6
+    temperature=0.3
 )
 
 # drag_tool = Toolbox()

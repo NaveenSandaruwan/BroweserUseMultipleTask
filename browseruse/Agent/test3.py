@@ -12,6 +12,7 @@ load_dotenv()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
+from tools.execution import Executor
 from utils.file_loader import load_and_extract_elements, load_scratch_descriptions
 from tools.browserUseClient import send_task
 from tools.dragTool import Toolbox
@@ -19,7 +20,7 @@ from tools.filter import filter_json, find_used_blocks, get_list_of_used_blocks,
 
 
 class ScratchChatApp:
-    def __init__(self):
+    def __init__(self, executor: Executor = None):
 
         self.send_task = send_task
 
@@ -27,12 +28,50 @@ class ScratchChatApp:
         self.model = ChatGoogleGenerativeAI(
             model="gemini-2.0-flash",
             google_api_key=GEMINIAPI,
-            temperature=0.3
+            temperature=0.2
         )
 
         self.web_application_coding_summary = generate_detailed_blocks_summary(include_all_blocks=True)
         self.working_space = get_list_of_used_blocks()
         self.context = filter_json()
+        self.executor = executor 
+        self.toolname = getattr(self.executor.executor_tool, "name", "executor_tool")
+
+        self.command_agent = create_react_agent(
+            model=self.model,
+            tools=[self.executor.executor_tool],
+            name="Command_agent",
+            prompt='''
+    You are a Command Agent for Scratch programming. Your job is to receive instructions from the supervisor and ALWAYS convert them into a JSON object with this format and execute them using the provided tool:
+
+    {
+      "steps": [
+        {"step": 1, "category": "CategoryName", "block": "BlockName"},
+        {"step": 2, "category": "CategoryName", "block": "BlockName"},
+        ...
+      ]
+    }
+
+    Instructions may look like:
+    - "Move the sprite 10 steps, repeat 10 times, then go to a random position."
+    - "Play 'meow' sound, wait 1 second, move 20 steps, repeat 8 times."
+    - "Say 'Hello!' for 2 seconds, then turn 15 degrees right."
+    - "When green flag clicked, go to x:0 y:0, say 'Ready!', move 50 steps."
+    - "Move 15 steps, turn 90 degrees, repeat 4 times."
+
+    For EVERY instruction:
+    1. Break it down into discrete steps using Scratch blocks.
+    2. For each step, specify the `category` (Motion, Looks, Sound, Events, Control, Sensing, Operators, Variables) and the `block` name.
+    3. Output ONLY a JSON object as shown above.
+    4. After generating commands, you MUST call the tool to execute them immediately.
+    5. Do not output anything except the command JSON and tool call.
+
+    You must always follow this format, regardless of the instruction.
+    You MUST always call the tool after generating the commands.
+    You MUST NOT deviate from this format under any circumstances.
+    '''
+        )
+  # Placeholder for command agent if needed
 
         self.general_coding_agent = create_react_agent(
             model=self.model,
@@ -65,34 +104,34 @@ Be concise, accurate, and supportive in your responses.
 '''
         )
 
-        self.context_agent = create_react_agent(
-            model=self.model,
-            tools=[],
-            name='coordinate_expert',
-            prompt=f'''
-You are an expert in understanding and utilizing web page element coordinates.
- Your role is to help users interact with web pages effectively by leveraging the provided coordinate information.
- Here is the context you can use(each elment have this firmat 'tag_name': 'text', 'text_content': 'move', 'x': 74, 'y': 149 ):
-        if your provided text have "move" block add this context (X: 74, Y: 149 ) to the "move" block.
+#         self.context_agent = create_react_agent(
+#             model=self.model,
+#             tools=[],
+#             name='context_expert',
+#             prompt=f'''
+# You are an expert in understanding and utilizing web page element coordinates.
+#  Your role is to help users interact with web pages effectively by leveraging the provided coordinate information.
+#  Here is the context you can use(each elment have this firmat 'tag_name': 'text', 'text_content': 'move', 'x': 74, 'y': 149 ):
+#         if your provided text have "move" block add this context (X: 74, Y: 149 ) to the "move" block.
 
-        All content seen in the page:
-      {self.context}
-    Your tasks include: 
-     - Analyse other agent responses and add position context to related Scratch blocks if needed.
-     - Finally Add position context to related Scratch blocks.
+#         All content seen in the page:
+#       {self.context}
+#     Your tasks include: 
+#      - Analyse other agent responses and add position context to related Scratch blocks if needed.
+#      - Finally Add position context to related Scratch blocks.
 
-You are an expert in understanding and utilizing web page element coordinates.
-what user is doing in the scratch web application: {self.working_space}
+# You are an expert in understanding and utilizing web page element coordinates.
+# what user is doing in the scratch web application: {self.working_space}
 
-and you must also be aware of coordinates, beacuse from x=312 to x=972 is the working space.
-so by the x coordinate you can understand where the block is.
+# and you must also be aware of coordinates, beacuse from x=312 to x=972 is the working space.
+# so by the x coordinate you can understand where the block is.
 
-and the blocks are arranged sequentially is given by 1,2,3.... from the working space file.     
+# and the blocks are arranged sequentially is given by 1,2,3.... from the working space file.     
 
-'''
-        )
+# '''
+#         )
 
-        dragtool = Toolbox()
+   
 
         self.debugging_agent = create_react_agent(
             model=self.model,
@@ -130,39 +169,6 @@ Your tasks include:
 '''
         )
 
-        self.drag_and_drop_agent = create_react_agent(
-            model=self.model,
-            tools=[dragtool.drag_and_drop],
-            name='drag_and_drop_expert',
-            prompt=f'''
-You are a drag-and-drop expert for web applications, specializing in arranging Scratch code blocks using the drag_and_drop tool.
-
-When a user requests a drag-and-drop operation, follow these steps:
-
-1. Review the current workspace state: {self.working_space}
-   - This shows which blocks are already in the workspace and their coordinates.
-   - Identify the destination positions using these data.
-
-2. Review the available blocks: {self.context}
-   - This lists all blocks you can use, along with their names and positions on the page.
-   - Identify the source positions using these data. as a example you can see information in this format:
-    {{'tag_name': 'text', 'text_content': 'move', 'x': 74, 'y': 149 }}
-
-3. Understand the user's request:
-   - Identify which block(s) the user wants to move and where they should be placed.
-   - Use the available blocks and workspace information to determine the source and destination coordinates.
-
-4. Use the drag_and_drop tool to perform the operation:
-   - To add a block to the start of the workspace, use the workspace's starting coordinates.
-   - To insert a block after another block, use the coordinates of the target block as the destination.
-   - Example: drag_and_drop(source_x, source_y, dest_x, dest_y)
-
-5. Repeat as needed for multiple blocks or steps, updating your understanding of the workspace after each operation.
-
-Always ensure your actions match the user's intent and the current state of the workspace.
-Return a confirmation message after completing the drag-and-drop operation with coordinates which start from the source block and end at the destination block.
-'''
-        )
 
         self.format_agent = create_react_agent(
             model=self.model,
@@ -183,7 +189,12 @@ Output: A child-friendly version of that message.
         )
 
         self.work_flow = create_supervisor(
-            [self.general_coding_agent, self.context_agent, self.debugging_agent, self.format_agent],
+            [self.general_coding_agent,
+          
+             self.debugging_agent, 
+             self.format_agent,
+            self.command_agent],
+            
             model=self.model,
             prompt=(
                 '''
@@ -198,16 +209,17 @@ You are an expert supervisor overseeing a team of specialized agents which are c
 
 Here are the agents you can delegate to:
        - coding_expert: Specializes in Scratch programming and can provide detailed explanations of Scratch blocks and their usage.
-       - context_expert: Specializes in understanding and utilizing web page contexts element coordinates, particularly for Scratch programming interface.
+
        - debugging_expert: Specializes in analyzing the user's Scratch workspace to identify issues, provide feedback, and suggest improvements.
        - debugging_expert: Specializes to see the user workspace and identify issues, provide feedback, and suggest improvements.
        - format_agent: Specializes in reformatting technical Scratch programming instructions into simple, clear, and fun explanations suitable for children.
+       - Command_agent: Specializes in executing Scratch programming tasks by breaking down user instructions into discrete steps using Scratch blocks and the Scratch programming interface.
 
 work flow do not deviate from these steps, please follow these:
 - First, analyze the user query and determine the most suitable agent based on the query.
 - If the user query indicates they need help identifying issues or fixing their Scratch program (e.g., "Am I doing something wrong?", "Can you fix this?", "How to do this correctly?"), delegate the task to the debugging_expert.
 - Before you give the final answer to the user, make sure to check if you have enough context about the Scratch programming interface. If not, use the context_expert agent to get the necessary coordinates information and add those to the relevant Scratch blocks.
-
+- If the user wants any help to create a scratch program on working space or ask to show how to do something, First get instructions from coding_expert and then use the Command_agent to break down the instructions into discrete steps using Scratch blocks.
 Important:
 - Finally get all agents answers and combine them as it is  into a single response using format_agent to the user.
 - Finally get all agents answers and combine them as it is  into a single response using format_agent to the user.
@@ -233,9 +245,9 @@ Important:
 
         return result
 
-
+executor = Executor()
 # Create an instance of the class
-scratch_chat_app = ScratchChatApp()
+scratch_chat_app = ScratchChatApp(executor=executor)
 
 if __name__ == "__main__":
     while True:
@@ -247,7 +259,7 @@ if __name__ == "__main__":
         scratch_chat_app.send_task("refresh")
         scratch_chat_app.working_space = get_list_of_used_blocks()
         scratch_chat_app.context = filter_json()
-        print(scratch_chat_app.working_space)
+        # print(scratch_chat_app.working_space)
 
         result = scratch_chat_app.invoke({
             "messages": scratch_chat_app.chat_history + [{"role": "user", "content": user_input}]
@@ -257,7 +269,7 @@ if __name__ == "__main__":
         responses = {
             "supervisor": None,
             "format_agent": None,
-            "coordinate_expert": None,
+           
             "debugging_expert": None,
             "coding_expert": None
         }
@@ -285,3 +297,32 @@ if __name__ == "__main__":
                     print("Bot:", ai_messages[-1].content)
                 else:
                     print("Bot: (No response found)")
+
+
+# command_json = ''' {
+#   "steps": [
+#     {
+#       "step": 1,
+#       "category": "Events",
+#       "block": "when key pressed"
+#     },
+#     {
+#       "step": 2,
+#       "category": "Motion",
+#       "block": "turn clockwise 15 degrees"
+#     },
+#     {
+#       "step": 3,
+#       "category": "Events",
+#       "block": "when key pressed"
+#     },
+#     {
+#       "step": 4,
+#       "category": "Motion",
+#       "block": "turn counterclockwise 15 degrees"
+#     }
+#   ]
+# }'''
+
+
+# scratch_chat_app.executor.executor_tool(command_json)
