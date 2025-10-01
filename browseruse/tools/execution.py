@@ -116,16 +116,18 @@ class Executor:
             plan = json.loads(json_plan)
         except json.JSONDecodeError as e:
             print("Invalid JSON plan:", e)
-            return
+            return "❌ Invalid JSON plan."
         
         steps = plan.get("steps", [])
+        print(f"Executing {len(steps)} steps...")
         
         for step in steps:
-            step_num = step.get("step")
-            category = step.get("category")
-            block = step.get("block")
+            print(f"\nProcessing step: {step}")
+            step_num = step["step"]
+            category = step["category"]
+            block = step["block"]
 
-            print(f"\nExecuting Step {step_num}: {category} → {block}")
+            # print(f"\nExecuting Step {step_num}: {category} → {block}")
 
             # 1. Find block in description.json
             match = Executor.find_closest_block(category, block)
@@ -157,6 +159,7 @@ class Executor:
                 x_end=x_end, 
                 y_end=y_end
             )
+        return "✅ Execution completed."
 
 
 
