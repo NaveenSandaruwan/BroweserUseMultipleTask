@@ -122,11 +122,12 @@ class Executor:
         print(f"Executing {len(steps)} steps...")
         
         for step in steps:
-            step_num = step.get("step")
-            category = step.get("category")
-            block = step.get("block")
+            print(f"\nProcessing step: {step}")
+            step_num = step["step"]
+            category = step["category"]
+            block = step["block"]
 
-            print(f"\nExecuting Step {step_num}: {category} → {block}")
+            # print(f"\nExecuting Step {step_num}: {category} → {block}")
 
             # 1. Find block in description.json
             match = Executor.find_closest_block(category, block)
@@ -158,32 +159,32 @@ class Executor:
                 x_end=x_end, 
                 y_end=y_end
             )
-            return "✅ Execution completed."
+        return "✅ Execution completed."
 
 
 
-if __name__ == "__main__":
-    # Example JSON plan
-    test_json_plan = json.dumps({
-  "steps": [
-    {
-      "step": 1,
-      "category": "Control",
-      "block": "repeat"
-    },
-    {
-      "step": 2,
-      "category": "Motion",
-      "block": "move 10 steps"
-    },
-    {
-      "step": 3,
-      "category": "Motion",
-      "block": "go to random position"
-    }
-  ]
-})
+# if __name__ == "__main__":
+#     # Example JSON plan
+#     test_json_plan = json.dumps({
+#   "steps": [
+#     {
+#       "step": 1,
+#       "category": "Control",
+#       "block": "repeat"
+#     },
+#     {
+#       "step": 2,
+#       "category": "Motion",
+#       "block": "move 10 steps"
+#     },
+#     {
+#       "step": 3,
+#       "category": "Motion",
+#       "block": "go to random position"
+#     }
+#   ]
+# })
 
-    # Call the executor_tool function with the test JSON plan
-Executor.executor_tool(test_json_plan)
+#     # Call the executor_tool function with the test JSON plan
+# Executor.executor_tool(test_json_plan)
 

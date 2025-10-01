@@ -82,6 +82,9 @@ def make_blocks(json_string: str) -> str:
         The function locates each block by fuzzy matching, clicks the category tab,
         and performs drag-and-drop actions to build the desired program structure.
         """
+    if len(json_string.strip()) == 0:
+        print("Empty JSON string provided.")
+        return "false"
     try:
         executor.executor_tool(json_string)
         return "true"
@@ -179,7 +182,7 @@ def make_blocks_node(state: State) -> State:
 def execute_blocks_node(state: State) -> State:
     # take state['result']['make_blocks'] and extract json object from it
     json_object = extract_and_format_first_json(state['result']['make_blocks'])
-    print("Extracted JSON:", json_object)
+    # print("Extracted JSON:", json_object)
     try:
         result = make_blocks(json_object)
         # time.sleep(10)  # wait for 2 seconds to ensure the workspace is updated
@@ -258,27 +261,18 @@ graph.add_edge("make_blocks", "execute_blocks")
 graph.add_edge("format_response", END)
 
 # Compile
-app = graph.compile()
-chat_history = []
+chat = graph.compile()
+# chat_history = []
 
-if __name__ == "__main__":
-    while True:
-        user_input = input("You: ")
-        if user_input.lower() in ["exit", "quit"]:
-            print("Exiting chat.")
-            break
+# if __name__ == "__main__":
+#     while True:
+#         user_input = input("You: ")
+#         if user_input.lower() in ["exit", "quit"]:
+#             print("Exiting chat.")
+#             break
 
-        # scratch_chat_app.send_task("refresh")
-        # scratch_chat_app.working_space = get_list_of_used_blocks()
-        # scratch_chat_app.context = filter_json()
-        # # print(scratch_chat_app.working_space)
-
-        result = app.invoke({
-            "query": chat_history + [{"role": "user", "content": user_input}]
-        })
-        print(result['result']['formatted_response'])
-        # for m in result:
-        #     if m.type == "ai":  # equivalent to role == "assistant"
-        #         pprint.pprint({"Bot": m.content})
-
-
+#         result = chat.invoke({
+#             "query": chat_history + [{"role": "user", "content": user_input}]
+#         })
+#         print(result['result']['formatted_response'])
+       
