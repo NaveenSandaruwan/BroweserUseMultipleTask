@@ -24,7 +24,7 @@ def get_base_path():
         return Path(__file__).parent.parent.parent
     
 BASE_DIR = get_base_path()
-WORDS_FILE = BASE_DIR / "element_data" / "allElement.txt"
+WORDS_FILE = BASE_DIR / "element_data" / "browser_block.txt"
 JSON_FILE = BASE_DIR / "element_data" / "elements.json"
 DESCRIPTION_FILE = BASE_DIR / "element_data" / "description.json"
 
@@ -49,7 +49,7 @@ def filter_json():
         if text is None or not obj.get("tag_name") == "text":
             continue
         # print(f"Words to match: {words}")
-        print(obj)
+        # print(obj)
         if any(text.startswith(w) for w in words):
             
             filtered.append({
