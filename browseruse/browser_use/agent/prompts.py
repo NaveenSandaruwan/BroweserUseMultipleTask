@@ -1,5 +1,7 @@
 import importlib.resources
 from datetime import datetime
+import os
+import sys
 from typing import TYPE_CHECKING, Literal, Optional
 
 from browser_use.llm.messages import ContentPartImageParam, ContentPartTextParam, ImageURL, SystemMessage, UserMessage
@@ -38,22 +40,30 @@ class SystemPrompt:
 
 		self.system_message = SystemMessage(content=prompt, cache=True)
 
-	def _load_prompt_template(self) -> None:
-		"""Load the prompt template from the markdown file."""
-		try:
-			# Choose the appropriate template based on flash_mode and use_thinking settings
-			if self.flash_mode:
-				template_filename = 'system_prompt_flash.md'
-			elif self.use_thinking:
-				template_filename = 'system_prompt.md'
-			else:
-				template_filename = 'system_prompt_no_thinking.md'
 
-			# This works both in development and when installed as a package
-			with importlib.resources.files('browser_use.agent').joinpath(template_filename).open('r', encoding='utf-8') as f:
-				self.prompt_template = f.read()
-		except Exception as e:
-			raise RuntimeError(f'Failed to load system prompt template: {e}')
+
+	@staticmethod
+	def resource_path(relative_path):
+		
+		if getattr(sys, "frozen", False):
+			base_path = os.path.dirname(sys.executable)
+		else:
+			base_path = os.path.dirname(__file__)
+		return os.path.join(base_path, relative_path)
+
+	def _load_prompt_template(self):
+		if self.flash_mode:
+			template_filename = "system_prompt_flash.md"
+		elif self.use_thinking:
+			template_filename = "system_prompt.md"
+		else:
+			template_filename = "system_prompt_no_thinking.md"
+
+		# Look for the file next to the executable
+		path = SystemPrompt.resource_path(os.path.join("element_data", template_filename))
+
+		with open(path, "r", encoding="utf-8") as f:
+			self.prompt_template = f.read()
 
 	def get_system_message(self) -> SystemMessage:
 		"""

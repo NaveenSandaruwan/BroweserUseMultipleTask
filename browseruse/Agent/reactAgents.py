@@ -23,7 +23,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')
 
 
 # Initialize model
-GEMINIAPI = os.getenv("GOOGLE_API_KEY")
+GEMINIAPI = 'AIzaSyBRYRYAjFStLg_xFoNFTaSsaphNuNkmd_I'
 model = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash",
     google_api_key=GEMINIAPI,

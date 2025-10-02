@@ -12,7 +12,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')
 from browseruse.Agent.agent import chat
 from browseruse.tools.browserUseClient import send_task
 
-from emotion import EmotionIdentifier
+from browseruse.Agent.emotion import EmotionIdentifier
 
 load_dotenv()
 

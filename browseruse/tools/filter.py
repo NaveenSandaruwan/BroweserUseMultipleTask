@@ -4,15 +4,29 @@ import json
 from dotenv import load_dotenv
 from pathlib import Path
 
-load_dotenv()
+# load_dotenv()
 
-# Base directory - root of your project
-BASE_DIR = Path(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+# # Base directory - root of your project
+# BASE_DIR = Path(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
-# Get paths from environment variables and make them absolute by joining with BASE_DIR
-WORDS_FILE = BASE_DIR / os.getenv("ALL_BLOCKS_PATH")
-JSON_FILE = BASE_DIR / os.getenv("ELEMENT_FILE_PATH")
-DESCRIPTION_FILE = BASE_DIR / os.getenv("ELEMENTS_DESCRIPTION_JSON_PATH")
+# # Get paths from environment variables and make them absolute by joining with BASE_DIR
+# WORDS_FILE = BASE_DIR / os.getenv("ALL_BLOCKS_PATH")
+# JSON_FILE = BASE_DIR / os.getenv("ELEMENT_FILE_PATH")
+# DESCRIPTION_FILE = BASE_DIR / os.getenv("ELEMENTS_DESCRIPTION_JSON_PATH")
+
+def get_base_path():
+    """Return folder where exe/script is located (for reading/writing files)."""
+    if getattr(sys, "frozen", False):
+        # Running as PyInstaller exe
+        return Path(sys.executable).parent
+    else:
+        # Running as Python script
+        return Path(__file__).parent.parent.parent
+    
+BASE_DIR = get_base_path()
+WORDS_FILE = BASE_DIR / "element_data" / "allElement.txt"
+JSON_FILE = BASE_DIR / "element_data" / "elements.json"
+DESCRIPTION_FILE = BASE_DIR / "element_data" / "description.json"
 
 def filter_json():
     """

@@ -1,11 +1,12 @@
 import json
 import os
 from pathlib import Path
+import sys
 
 class ElementPositionService:
     def __init__(self, base_directory: Path):
         self.base_directory = base_directory
-        self.elements_dir = base_directory /"BrowserUse"/ "element_data"
+        self.elements_dir = base_directory / "element_data"
         os.makedirs(self.elements_dir, exist_ok=True)
         
     def _get_text_content(self, element) -> str | None:
@@ -73,3 +74,14 @@ class ElementPositionService:
             json.dump(element_data, f, indent=2)
             print(f"✅ Element positions saved to {file_path}")
         return file_path
+    
+    def get_base_path():
+        """Return folder where exe/script is located (for reading/writing files)."""
+        if getattr(sys, "frozen", False):
+            # Running as PyInstaller exe
+            return Path(sys.executable).parent
+        else:
+            # Running as Python script
+            return Path(__file__).parent.parent.parent
+    
+

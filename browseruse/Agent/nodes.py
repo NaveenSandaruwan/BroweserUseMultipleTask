@@ -30,7 +30,7 @@ from browseruse.Agent.reactAgents import command_agent,explaining_agent,debuggin
 from browseruse.Agent.utils.state import State
 from browseruse.Agent.utils.tool import make_blocks
 
-GEMINIAPI = os.getenv("GOOGLE_API_KEY")
+GEMINIAPI = 'AIzaSyBRYRYAjFStLg_xFoNFTaSsaphNuNkmd_I'
 model = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash",
     google_api_key=GEMINIAPI,

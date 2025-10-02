@@ -133,7 +133,8 @@ class OldConfig:
 
 	@property
 	def GOOGLE_API_KEY(self) -> str:
-		return os.getenv('GOOGLE_API_KEY', '')
+		# return os.getenv('GOOGLE_API_KEY', '')
+		return 'AIzaSyBRYRYAjFStLg_xFoNFTaSsaphNuNkmd_I'
 
 	@property
 	def DEEPSEEK_API_KEY(self) -> str:

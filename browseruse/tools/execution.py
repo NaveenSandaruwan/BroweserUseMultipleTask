@@ -23,11 +23,18 @@ load_dotenv()
 # Instantiate your drag tool
 drag_tool = Toolbox()
 
-BASE_DIR = Path(os.path.abspath(os.path.join(os.path.dirname(_file_), '../../')))
+def get_base_path():
+    """Return folder where exe/script is located (for reading/writing files)."""
+    if getattr(sys, "frozen", False):
+        # Running as PyInstaller exe
+        return Path(sys.executable).parent
+    else:
+        # Running as Python script
+        return Path(__file__).parent.parent.parent
+    
+BASE_DIR = get_base_path()
 
-# Get paths with BASE_DIR prefix
-ELEMENTS = BASE_DIR / os.getenv("ELEMENTS_DESCRIPTION_JSON_PATH")
-
+ELEMENTS = BASE_DIR / "element_data" / "description.json"
 
 with open(ELEMENTS, 'r') as f:
     category_data = json.load(f)

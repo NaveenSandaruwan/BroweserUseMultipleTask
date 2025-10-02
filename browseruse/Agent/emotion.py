@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 load_dotenv()
 
-GEMINIAPI = os.getenv("GOOGLE_API_KEY")
+GEMINIAPI = 'AIzaSyBRYRYAjFStLg_xFoNFTaSsaphNuNkmd_I'
 
 class EmotionIdentifier:
     def __init__(self):

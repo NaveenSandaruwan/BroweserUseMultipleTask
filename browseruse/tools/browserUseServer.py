@@ -7,9 +7,10 @@ import threading
 from dotenv import load_dotenv
 
 load_dotenv()
-USER_DATA_DIR = os.getenv("USER_DATA_DIR")
-CHROME_EXECUTABLE_PATH = os.getenv("CHROME_EXECUTABLE_PATH")
-BROWSER_USE_PATH = os.getenv("BROWSER_USE_PATH")
+USER_DATA_DIR="E:\\VS CODE\\Agentic AI\\profile"
+CHROME_EXECUTABLE_PATH="C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+BROWSER_USE_PATH = "E:\\VS CODE\\Agentic AI\\BrowserUse\\browseruse"
+
 # print("BROWSER_USE_PATH:", BROWSER_USE_PATH)
 sys.path.append(BROWSER_USE_PATH)
 from browser_use import ChatGoogle
