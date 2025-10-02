@@ -11,7 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')
   # Implement custom call_LLM logic directly here
 from tools.browserUseClient import send_task
 # from test4 import chat_app
-from test3 import ScratchChatApp
+# from test3 import ScratchChatApp
 from tools.filter import filter_json, find_used_blocks, get_list_of_used_blocks, get_category_coordinates, generate_detailed_blocks_summary
 from agent import chat
 import time
