@@ -5,11 +5,12 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
 import sys
-
+import uvicorn
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-from agent import chat
+from browseruse.Agent.agent import chat
+from browseruse.tools.browserUseClient import send_task
 
 from emotion import EmotionIdentifier
 
@@ -37,6 +38,7 @@ chat_history = []
 
 @app.post("/speak", response_model=ChatResponse)
 def speak(req: ChatRequest):
+    send_task("refresh")
     result = chat.invoke({
             "query": chat_history + [{"role": "user", "content": req.message}]
         })
@@ -65,9 +67,9 @@ async def emotion_endpoint(request: EmotionRequest):
     emotion = detector.identify_emotion(request.text, history=history_text)
     return {"emotion": emotion}
 
-
-if __name__ == "__main__":
-    import uvicorn
-
+def start_agent_server():
     print(f"[Server] Starting backend on port {BACKEND_PORT}...")
-    uvicorn.run("main:app", host="127.0.0.1", port=BACKEND_PORT, reload=True)
+    uvicorn.run("browseruse.Agent.main:app", host="127.0.0.1", port=BACKEND_PORT, reload=True)
+
+# if __name__ == "__main__":
+#     start_agent_server()

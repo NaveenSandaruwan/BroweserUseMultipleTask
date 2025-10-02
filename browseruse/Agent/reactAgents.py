@@ -21,11 +21,6 @@ load_dotenv()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-from utils.jsonextract import extract_first_steps_json,extract_and_format_first_json
-from tools.browserUseClient import send_task
-from tools.dragTool import Toolbox
-from tools.filter import filter_json, find_used_blocks, get_list_of_used_blocks, get_category_coordinates, generate_detailed_blocks_summary
-from tools.execution import Executor
 
 # Initialize model
 GEMINIAPI = os.getenv("GOOGLE_API_KEY")
@@ -44,7 +39,7 @@ model2 = ChatGoogleGenerativeAI(
 model3 = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash",
     google_api_key=GEMINIAPI,
-    temperature=0.5  # Lower temperature for more consistent responses
+    temperature=0.3  # Lower temperature for more consistent responses
 )
 
 command_agent = create_react_agent(

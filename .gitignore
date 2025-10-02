@@ -17,3 +17,4 @@ dist/
 *.log
 *brvenv/
 element_data/elements.json
+*/**/elements.json

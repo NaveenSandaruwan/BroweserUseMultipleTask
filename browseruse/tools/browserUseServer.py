@@ -119,6 +119,7 @@ async def main():
     if hasattr(agent, "browser_session") and agent.browser_session:
         await agent.browser_session.kill()
 
-
-if __name__ == "__main__":
+def start_server():
     asyncio.run(main())
+# if __name__ == "__main__":
+#     start_server()

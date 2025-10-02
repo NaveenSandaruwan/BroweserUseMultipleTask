@@ -5,8 +5,8 @@ _file_ = os.path.abspath(__file__)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), '../..')))
 
-from tools.browserUseClient import send_task
-from tools.filter import filter_json
+from browseruse.tools.browserUseClient import send_task
+from browseruse.tools.filter import filter_json
 
 from browseruse.tools.filter import filter_json
 import pychrome

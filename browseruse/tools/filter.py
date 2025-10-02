@@ -6,9 +6,13 @@ from pathlib import Path
 
 load_dotenv()
 
-WORDS_FILE = os.getenv("ALL_BLOCKS_PATH")
-JSON_FILE = os.getenv("ELEMENT_FILE_PATH")
-DESCRIPTION_FILE = os.getenv("ELEMENTS_DESCRIPTION_JSON_PATH")
+# Base directory - root of your project
+BASE_DIR = Path(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+
+# Get paths from environment variables and make them absolute by joining with BASE_DIR
+WORDS_FILE = BASE_DIR / os.getenv("ALL_BLOCKS_PATH")
+JSON_FILE = BASE_DIR / os.getenv("ELEMENT_FILE_PATH")
+DESCRIPTION_FILE = BASE_DIR / os.getenv("ELEMENTS_DESCRIPTION_JSON_PATH")
 
 def filter_json():
     """
@@ -64,6 +68,7 @@ def get_list_of_used_blocks():
         1. turn Code block. Block Coordinates: (X: 367, Y: 215 )
         2. turn Code block. Block Coordinates: (X: 367, Y: 247 )
     '''
+
     used_blocks = find_used_blocks()
     string = " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n"
     count = 1
@@ -158,7 +163,7 @@ def generate_detailed_blocks_summary(json_file_path=None, include_all_blocks=Fal
     # Use default path if none provided
     if json_file_path is None:
         json_file_path = Path(DESCRIPTION_FILE)
-    
+    print("Using JSON file path:", json_file_path)
     # Read and parse the JSON file
     try:
         with open(json_file_path, 'r', encoding='utf-8') as f:

@@ -14,8 +14,8 @@ load_dotenv()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-from utils.state import State
-from nodes import llm_router,code_explain_node,give_instructions_node,code_debugging_node,make_blocks_node,execute_blocks_node,format_response,general_agent_node,handle_execution_error
+from browseruse.Agent.utils.state import State
+from browseruse.Agent.nodes import llm_router,code_explain_node,give_instructions_node,code_debugging_node,make_blocks_node,execute_blocks_node,format_response,general_agent_node,handle_execution_error
 
 
 graph = StateGraph(State)

@@ -13,18 +13,20 @@ _file_ = os.path.abspath(__file__)
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), '../..')))
-from tools.dragTool import Toolbox 
+from browseruse.tools.dragTool import Toolbox 
 from dotenv import load_dotenv
-
+from pathlib import Path
 load_dotenv()
-from tools.browserUseClient import send_task
 
 # assuming your dragTool.py defines a class
 
 # Instantiate your drag tool
 drag_tool = Toolbox()
 
-ELEMENTS = os.getenv("ELEMENTS_DESCRIPTION_JSON_PATH")
+BASE_DIR = Path(os.path.abspath(os.path.join(os.path.dirname(_file_), '../../')))
+
+# Get paths with BASE_DIR prefix
+ELEMENTS = BASE_DIR / os.getenv("ELEMENTS_DESCRIPTION_JSON_PATH")
 
 
 with open(ELEMENTS, 'r') as f:
@@ -44,7 +46,7 @@ class Executor:
         """
         Find the closest matching block in description.json using fuzzy matching
         """
-        description_path = os.getenv("ELEMENTS_DESCRIPTION_JSON_PATH")
+        description_path = ELEMENTS
         try:
             with open(description_path, 'r') as f:
                 descriptions = json.load(f)

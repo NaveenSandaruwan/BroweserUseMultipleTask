@@ -5,7 +5,7 @@ from pathlib import Path
 class ElementPositionService:
     def __init__(self, base_directory: Path):
         self.base_directory = base_directory
-        self.elements_dir = base_directory / "element_data"
+        self.elements_dir = base_directory /"BrowserUse"/ "element_data"
         os.makedirs(self.elements_dir, exist_ok=True)
         
     def _get_text_content(self, element) -> str | None:
@@ -71,4 +71,5 @@ class ElementPositionService:
                 }
         with open(file_path, 'w') as f:
             json.dump(element_data, f, indent=2)
+            print(f"✅ Element positions saved to {file_path}")
         return file_path

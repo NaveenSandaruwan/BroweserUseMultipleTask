@@ -21,14 +21,14 @@ load_dotenv()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-from utils.jsonextract import extract_first_steps_json,extract_and_format_first_json
-from tools.browserUseClient import send_task
-from tools.dragTool import Toolbox
-from tools.filter import filter_json, find_used_blocks, get_list_of_used_blocks, get_category_coordinates, generate_detailed_blocks_summary
-from tools.execution import Executor
-from reactAgents import command_agent,explaining_agent,debugging_agent,general_coding_agent,format_agent,general_agent
-from utils.state import State
-from utils.tool import make_blocks
+from browseruse.Agent.utils.jsonextract import extract_first_steps_json,extract_and_format_first_json
+from browseruse.tools.browserUseClient import send_task
+from browseruse.tools.dragTool import Toolbox
+from browseruse.tools.filter import filter_json, find_used_blocks, get_list_of_used_blocks, get_category_coordinates, generate_detailed_blocks_summary
+from browseruse.tools.execution import Executor
+from browseruse.Agent.reactAgents import command_agent,explaining_agent,debugging_agent,general_coding_agent,format_agent,general_agent
+from browseruse.Agent.utils.state import State
+from browseruse.Agent.utils.tool import make_blocks
 
 GEMINIAPI = os.getenv("GOOGLE_API_KEY")
 model = ChatGoogleGenerativeAI(
@@ -84,6 +84,7 @@ def code_explain_node(state: State) -> State:
     time.sleep(2) 
     web_application_coding_summary = generate_detailed_blocks_summary(include_all_blocks=True)
     working_space = get_list_of_used_blocks()
+    # print("Working space:", working_space)
 
     # Compose a message that includes the query, coding summary, and working space
     message = (
@@ -98,6 +99,7 @@ def code_explain_node(state: State) -> State:
 def code_debugging_node(state: State) -> State:
 
     send_task("refresh")
+    print("Refreshing workspace for debugging...")
     time.sleep(2)  # wait for 2 seconds to ensure the workspace is updated
     web_application_coding_summary = generate_detailed_blocks_summary(include_all_blocks=True)
     working_space = get_list_of_used_blocks()
@@ -114,6 +116,7 @@ def code_debugging_node(state: State) -> State:
 
 def give_instructions_node(state: State) -> State:
     web_application_coding_summary = generate_detailed_blocks_summary(include_all_blocks=True)
+    # print("Web application coding summary:", web_application_coding_summary)
     message = (
         f"User Query: {state['query']}\n\n"
         f"Scratch Block Summary and functionalities of blocks in each category:\n{web_application_coding_summary}\n\n"
@@ -123,6 +126,8 @@ def give_instructions_node(state: State) -> State:
     return {"result": {"instructions": result["messages"][-1].content}}
 
 def make_blocks_node(state: State) -> State:
+    send_task("refresh")
+    time.sleep(1)  # wait for 2 seconds to ensure the workspace is updated
     result = command_agent.invoke({"messages": [state['result']['instructions']]})
     return {"result": {"make_blocks": result["messages"][-1].content}}
 

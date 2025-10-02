@@ -1,46 +1,32 @@
-from browser_use import Agent, ChatGoogle, BrowserProfile, BrowserSession ,browser
-from dotenv import load_dotenv
+import os
+import sys
+import time
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-# Read GOOGLE_API_KEY into env
-load_dotenv()
-
-# Create a browser profile
-
-
-# Start a browser session using the browser_profile argument
-
-
-# Initialize the model
-llm = ChatGoogle(model='gemini-2.0-flash')
-
-# Create agent with the model
+from browseruse.tools.browserUseClient import send_task
+from browseruse.tools.browserUseServer import start_server
+import threading
+import multiprocessing
 
 
-import asyncio
-
-load_dotenv()
-
-
-async def main():
-    profile = BrowserProfile(
-    
-    user_data_dir='C:\\Users\\MSI20\\AppData\\Local\\Google\\Chrome\\User Data',
-    profile_directory='Default',
-        )
-    browser = BrowserSession(
-    browser_profile=profile
-     )
-    agent = Agent(
-    task="Go to geeks for geeks data structures and algorithms",
-    llm=llm,
-    browser=browser
-            )
-    await agent.run()
 
 if __name__ == "__main__":
-    asyncio.run(main())
 
-
-
-
-
+        
+        browseruse_server_process = multiprocessing.Process(target=start_server)
+        browseruse_server_process.start()
+        while True:
+                a= send_task("Go to https://scratch.mit.edu/projects/editor/?tutorial=getStarted")
+                if a:
+                        
+                        from browseruse.Agent.main import start_agent_server
+                        agent_server_process = multiprocessing.Process(target=start_agent_server)
+                        agent_server_process.start()
+                        break
+                        
+                time.sleep(2)
+        time.sleep(2)  # Ensure the browseruse server starts before the agent server
+        
+        agent_server_process.join()
+        # start_server()
