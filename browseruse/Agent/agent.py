@@ -69,17 +69,17 @@ graph.add_edge("format_response", END)
 # Compile
 chat = graph.compile()
 
-chat_history = []
+# chat_history = []
 
-if __name__ == "__main__":
-    while True:
-        user_input = input("You: ")
-        if user_input.lower() in ["exit", "quit"]:
-            print("Exiting chat.")
-            break
+# if __name__ == "__main__":
+#     while True:
+#         user_input = input("You: ")
+#         if user_input.lower() in ["exit", "quit"]:
+#             print("Exiting chat.")
+#             break
 
-        result = chat.invoke({
-            "query": chat_history + [{"role": "user", "content": user_input}]
-        })
-        print(result['result']['formatted_response'])
+#         result = chat.invoke({
+#             "query": chat_history + [{"role": "user", "content": user_input}]
+#         })
+#         print(result['result']['formatted_response'])
        
