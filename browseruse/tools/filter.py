@@ -48,7 +48,10 @@ def filter_json():
         text = obj.get("text_content","")
         if text is None or not obj.get("tag_name") == "text":
             continue
+        # print(f"Words to match: {words}")
+        print(obj)
         if any(text.startswith(w) for w in words):
+            
             filtered.append({
                 "tag_name": obj["tag_name"],
                 "text_content": obj["text_content"],
@@ -59,6 +62,8 @@ def filter_json():
     # Step 4: Print result
     #print(json.dumps(filtered, indent=2, ensure_ascii=False))
     filtered = sorted(filtered, key=lambda item: item["y"])
+    # print(f"Filtered: {data}")
+    # print(f" Path: {JSON_FILE}")
     return filtered
 
 # print("Filtered JSON:", filter_json())
@@ -91,6 +96,7 @@ def get_list_of_used_blocks():
         count += 1
     
     print("List of used blocks:", string)
+    print(f"Found used blocks: {used_blocks}")
     return string
 
 # print("List of used blocks:", get_list_of_used_blocks())
