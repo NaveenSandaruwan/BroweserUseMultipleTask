@@ -149,7 +149,7 @@ class Executor:
 
             # 2. Compute end position
             x_end = 350
-            y_end = 140 + 33 * (blockno - 1)
+            y_end = 140 + 37 * (blockno - 1)
             blockno += 1
             print(f"  Start position: ({x_start}, {y_start})")
             print(f"  End position:   ({x_end}, {y_end})")

@@ -1,0 +1,336 @@
+{
+  "session_id": "20251003_131619",
+  "total_tests": 10,
+  "test_results": [
+    {
+      "test_id": "test_001",
+      "description": "Basic event and control flow",
+      "input": {
+        "steps": [
+          {
+            "step": 1,
+            "category": "Events",
+            "block": "when green flag clicked"
+          },
+          {
+            "step": 2,
+            "category": "Control",
+            "block": "forever"
+          },
+          {
+            "step": 3,
+            "category": "Looks",
+            "block": "say message"
+          }
+        ]
+      },
+      "execution_status": "✅ Execution completed.",
+      "workspace_state": " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) \n 2. forever Code block. Block Coordinates: (X: 350, Y: 175 ) \n 3. say Code block. Block Coordinates: (X: 361, Y: 208 ) \n",
+      "screenshot_path": "test_results/screenshots/test_001_20251003_131619.png",
+      "execution_time_seconds": 7.55,
+      "timestamp": "2025-10-03T13:16:30.550655",
+      "steps_count": 3
+    },
+    {
+      "test_id": "test_002",
+      "description": "Motion blocks sequence",
+      "input": {
+        "steps": [
+          {
+            "step": 1,
+            "category": "Events",
+            "block": "when green flag clicked"
+          },
+          {
+            "step": 2,
+            "category": "Motion",
+            "block": "move steps"
+          },
+          {
+            "step": 3,
+            "category": "Motion",
+            "block": "turn right"
+          }
+        ]
+      },
+      "execution_status": "✅ Execution completed.",
+      "workspace_state": " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) \n 2. move Code block. Block Coordinates: (X: 350, Y: 175 ) \n 3. turn Code block. Block Coordinates: (X: 350, Y: 208 ) \n",
+      "screenshot_path": "test_results/screenshots/test_002_20251003_131619.png",
+      "execution_time_seconds": 7.57,
+      "timestamp": "2025-10-03T13:16:41.128956",
+      "steps_count": 3
+    },
+    {
+      "test_id": "test_003",
+      "description": "Looks blocks with speech",
+      "input": {
+        "steps": [
+          {
+            "step": 1,
+            "category": "Events",
+            "block": "when green flag clicked"
+          },
+          {
+            "step": 2,
+            "category": "Looks",
+            "block": "say message for seconds"
+          },
+          {
+            "step": 3,
+            "category": "Looks",
+            "block": "hide"
+          },
+          {
+            "step": 4,
+            "category": "Looks",
+            "block": "show"
+          }
+        ]
+      },
+      "execution_status": "✅ Execution completed.",
+      "workspace_state": " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) \n 2. move Code block. Block Coordinates: (X: 350, Y: 175 ) \n 3. turn Code block. Block Coordinates: (X: 350, Y: 208 ) \n",
+      "screenshot_path": "test_results/screenshots/test_003_20251003_131619.png",
+      "execution_time_seconds": 11.24,
+      "timestamp": "2025-10-03T13:16:55.381894",
+      "steps_count": 4
+    },
+    {
+      "test_id": "test_004",
+      "description": "Control structures with repeat",
+      "input": {
+        "steps": [
+          {
+            "step": 1,
+            "category": "Events",
+            "block": "when green flag clicked"
+          },
+          {
+            "step": 2,
+            "category": "Control",
+            "block": "repeat times"
+          },
+          {
+            "step": 3,
+            "category": "Motion",
+            "block": "move steps"
+          }
+        ]
+      },
+      "execution_status": "✅ Execution completed.",
+      "workspace_state": " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) \n 2. repeat Code block. Block Coordinates: (X: 350, Y: 175 ) \n 3. move Code block. Block Coordinates: (X: 361, Y: 208 ) \n",
+      "screenshot_path": "test_results/screenshots/test_004_20251003_131619.png",
+      "execution_time_seconds": 7.53,
+      "timestamp": "2025-10-03T13:17:05.921468",
+      "steps_count": 3
+    },
+    {
+      "test_id": "test_005",
+      "description": "Timer operations",
+      "input": {
+        "steps": [
+          {
+            "step": 1,
+            "category": "Events",
+            "block": "when green flag clicked"
+          },
+          {
+            "step": 2,
+            "category": "Sensing",
+            "block": "reset timer"
+          },
+          {
+            "step": 3,
+            "category": "Control",
+            "block": "repeat "
+          },
+          {
+            "step": 4,
+            "category": "Sound",
+            "block": "start sound"
+          }
+        ]
+      },
+      "execution_status": "✅ Execution completed.",
+      "workspace_state": " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) \n 2. repeat Code block. Block Coordinates: (X: 350, Y: 208 ) \n",
+      "screenshot_path": "test_results/screenshots/test_005_20251003_131619.png",
+      "execution_time_seconds": 9.93,
+      "timestamp": "2025-10-03T13:17:18.859247",
+      "steps_count": 4
+    },
+    {
+      "test_id": "test_006",
+      "description": "Mouse following behavior",
+      "input": {
+        "steps": [
+          {
+            "step": 1,
+            "category": "Events",
+            "block": "when green flag clicked"
+          },
+          {
+            "step": 2,
+            "category": "Control",
+            "block": "forever"
+          },
+          {
+            "step": 3,
+            "category": "Motion",
+            "block": "point towards"
+          },
+          {
+            "step": 4,
+            "category": "Motion",
+            "block": "move steps"
+          }
+        ]
+      },
+      "execution_status": "✅ Execution completed.",
+      "workspace_state": " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) \n 2. forever Code block. Block Coordinates: (X: 350, Y: 175 ) \n 3. move Code block. Block Coordinates: (X: 361, Y: 240 ) \n",
+      "screenshot_path": "test_results/screenshots/test_006_20251003_131619.png",
+      "execution_time_seconds": 8.84,
+      "timestamp": "2025-10-03T13:17:30.707487",
+      "steps_count": 4
+    },
+    {
+      "test_id": "test_007",
+      "description": "Complex animation loop",
+      "input": {
+        "steps": [
+          {
+            "step": 1,
+            "category": "Events",
+            "block": "when green flag clicked"
+          },
+          {
+            "step": 2,
+            "category": "Control",
+            "block": "forever"
+          },
+          {
+            "step": 3,
+            "category": "Motion",
+            "block": "go to random position"
+          },
+          {
+            "step": 4,
+            "category": "Looks",
+            "block": "change graphic effect"
+          },
+          {
+            "step": 5,
+            "category": "Control",
+            "block": "wait seconds"
+          }
+        ]
+      },
+      "execution_status": "✅ Execution completed.",
+      "workspace_state": " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) \n 2. forever Code block. Block Coordinates: (X: 350, Y: 175 ) \n 3. go to Code block. Block Coordinates: (X: 361, Y: 208 ) \n 4. change Code block. Block Coordinates: (X: 361, Y: 240 ) \n 5. wait Code block. Block Coordinates: (X: 361, Y: 272 ) \n",
+      "screenshot_path": "test_results/screenshots/test_007_20251003_131619.png",
+      "execution_time_seconds": 10.11,
+      "timestamp": "2025-10-03T13:17:43.827858",
+      "steps_count": 5
+    },
+    {
+      "test_id": "test_008",
+      "description": "Sprite positioning sequence",
+      "input": {
+        "steps": [
+          {
+            "step": 1,
+            "category": "Events",
+            "block": "when green flag clicked"
+          },
+          {
+            "step": 2,
+            "category": "Motion",
+            "block": "go to position"
+          },
+          {
+            "step": 3,
+            "category": "Motion",
+            "block": "point in direction"
+          },
+          {
+            "step": 4,
+            "category": "Motion",
+            "block": "glide"
+          }
+        ]
+      },
+      "execution_status": "✅ Execution completed.",
+      "workspace_state": " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) \n 2. go to x: Code block. Block Coordinates: (X: 350, Y: 175 ) \n 3. glide Code block. Block Coordinates: (X: 350, Y: 240 ) \n 4. secs to x: Code block. Block Coordinates: (X: 413, Y: 240 ) \n",
+      "screenshot_path": "test_results/screenshots/test_008_20251003_131619.png",
+      "execution_time_seconds": 8.82,
+      "timestamp": "2025-10-03T13:17:55.660773",
+      "steps_count": 4
+    },
+    {
+      "test_id": "test_009",
+      "description": "Backdrop switching",
+      "input": {
+        "steps": [
+          {
+            "step": 1,
+            "category": "Events",
+            "block": "when green flag clicked"
+          },
+          {
+            "step": 2,
+            "category": "Looks",
+            "block": "switch backdrop"
+          },
+          {
+            "step": 3,
+            "category": "Control",
+            "block": "wait seconds"
+          },
+          {
+            "step": 4,
+            "category": "Looks",
+            "block": "next backdrop"
+          }
+        ]
+      },
+      "execution_status": "✅ Execution completed.",
+      "workspace_state": " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) \n 2. wait Code block. Block Coordinates: (X: 350, Y: 175 ) \n",
+      "screenshot_path": "test_results/screenshots/test_009_20251003_131619.png",
+      "execution_time_seconds": 7.55,
+      "timestamp": "2025-10-03T13:18:06.218481",
+      "steps_count": 4
+    },
+    {
+      "test_id": "test_010",
+      "description": "Edge detection and bounce",
+      "input": {
+        "steps": [
+          {
+            "step": 1,
+            "category": "Events",
+            "block": "when green flag clicked"
+          },
+          {
+            "step": 2,
+            "category": "Control",
+            "block": "forever"
+          },
+          {
+            "step": 3,
+            "category": "Motion",
+            "block": "move steps"
+          },
+          {
+            "step": 4,
+            "category": "Motion",
+            "block": "if on edge bounce"
+          }
+        ]
+      },
+      "execution_status": "✅ Execution completed.",
+      "workspace_state": " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) \n 2. forever Code block. Block Coordinates: (X: 350, Y: 175 ) \n 3. move Code block. Block Coordinates: (X: 361, Y: 208 ) \n",
+      "screenshot_path": "test_results/screenshots/test_010_20251003_131619.png",
+      "execution_time_seconds": 9.99,
+      "timestamp": "2025-10-03T13:18:19.218504",
+      "steps_count": 4
+    }
+  ]
+}

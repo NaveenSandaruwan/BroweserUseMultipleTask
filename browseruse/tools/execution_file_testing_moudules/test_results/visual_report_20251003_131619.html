@@ -1,0 +1,457 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scratch Block Test Report - 20251003_131619</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .summary {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .test-case {
+            border: 1px solid #ddd;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 5px;
+            background: #fafafa;
+            page-break-inside: avoid;
+        }
+        .test-header {
+            background: #2196F3;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: -20px -20px 15px -20px;
+        }
+        .test-steps {
+            background: white;
+            padding: 10px;
+            border-left: 3px solid #FF9800;
+            margin: 10px 0;
+        }
+        .screenshot {
+            max-width: 100%;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .workspace-state {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 12px;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .status-success {
+            background: #4CAF50;
+            color: white;
+        }
+        .metadata {
+            color: #666;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Scratch Block Execution Test Report</h1>
+        
+        <div class="summary">
+            <h2>Test Summary</h2>
+            <p><strong>Session ID:</strong> 20251003_131619</p>
+            <p><strong>Total Tests:</strong> 10</p>
+            <p><strong>Total Execution Time:</strong> 89.13s</p>
+            <p><strong>Average Time per Test:</strong> 8.91s</p>
+            <p><strong>Generated:</strong> 2025-10-03 13:18:19</p>
+        </div>
+
+        <div class="test-case">
+            <div class="test-header">
+                <h3>Test 1: test_001</h3>
+            </div>
+            
+            <p><strong>Description:</strong> Basic event and control flow</p>
+            
+            <div class="metadata">
+                <span class="status status-success">✅ Execution completed.</span>
+                <span>⏱️ 7.55s</span>
+                <span>📦 3 steps</span>
+            </div>
+            
+            <div class="test-steps">
+                <h4>📝 Input Steps:</h4>
+                <ol>
+                    <li><strong>Events</strong> → when green flag clicked</li>
+                    <li><strong>Control</strong> → forever</li>
+                    <li><strong>Looks</strong> → say message</li>
+
+                </ol>
+            </div>
+            
+            <h4>📸 Visual Result:</h4>
+            <img src="screenshots/test_001_20251003_131619.png" alt="Test test_001 Screenshot" class="screenshot">
+            
+            <h4>📊 Workspace State:</h4>
+            <div class="workspace-state"> Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. forever Code block. Block Coordinates: (X: 350, Y: 175 ) 
+ 3. say Code block. Block Coordinates: (X: 361, Y: 208 ) 
+</div>
+        </div>
+
+        <div class="test-case">
+            <div class="test-header">
+                <h3>Test 2: test_002</h3>
+            </div>
+            
+            <p><strong>Description:</strong> Motion blocks sequence</p>
+            
+            <div class="metadata">
+                <span class="status status-success">✅ Execution completed.</span>
+                <span>⏱️ 7.57s</span>
+                <span>📦 3 steps</span>
+            </div>
+            
+            <div class="test-steps">
+                <h4>📝 Input Steps:</h4>
+                <ol>
+                    <li><strong>Events</strong> → when green flag clicked</li>
+                    <li><strong>Motion</strong> → move steps</li>
+                    <li><strong>Motion</strong> → turn right</li>
+
+                </ol>
+            </div>
+            
+            <h4>📸 Visual Result:</h4>
+            <img src="screenshots/test_002_20251003_131619.png" alt="Test test_002 Screenshot" class="screenshot">
+            
+            <h4>📊 Workspace State:</h4>
+            <div class="workspace-state"> Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. move Code block. Block Coordinates: (X: 350, Y: 175 ) 
+ 3. turn Code block. Block Coordinates: (X: 350, Y: 208 ) 
+</div>
+        </div>
+
+        <div class="test-case">
+            <div class="test-header">
+                <h3>Test 3: test_003</h3>
+            </div>
+            
+            <p><strong>Description:</strong> Looks blocks with speech</p>
+            
+            <div class="metadata">
+                <span class="status status-success">✅ Execution completed.</span>
+                <span>⏱️ 11.24s</span>
+                <span>📦 4 steps</span>
+            </div>
+            
+            <div class="test-steps">
+                <h4>📝 Input Steps:</h4>
+                <ol>
+                    <li><strong>Events</strong> → when green flag clicked</li>
+                    <li><strong>Looks</strong> → say message for seconds</li>
+                    <li><strong>Looks</strong> → hide</li>
+                    <li><strong>Looks</strong> → show</li>
+
+                </ol>
+            </div>
+            
+            <h4>📸 Visual Result:</h4>
+            <img src="screenshots/test_003_20251003_131619.png" alt="Test test_003 Screenshot" class="screenshot">
+            
+            <h4>📊 Workspace State:</h4>
+            <div class="workspace-state"> Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 142 ) 
+ 2. say Code block. Block Coordinates: (X: 350, Y: 174 ) 
+ 3. hide Code block. Block Coordinates: (X: 350, Y: 207 ) 
+ 4. show Code block. Block Coordinates: (X: 350, Y: 239 )  
+</div>
+        </div>
+
+        <div class="test-case">
+            <div class="test-header">
+                <h3>Test 4: test_004</h3>
+            </div>
+            
+            <p><strong>Description:</strong> Control structures with repeat</p>
+            
+            <div class="metadata">
+                <span class="status status-success">✅ Execution completed.</span>
+                <span>⏱️ 7.53s</span>
+                <span>📦 3 steps</span>
+            </div>
+            
+            <div class="test-steps">
+                <h4>📝 Input Steps:</h4>
+                <ol>
+                    <li><strong>Events</strong> → when green flag clicked</li>
+                    <li><strong>Control</strong> → repeat times</li>
+                    <li><strong>Motion</strong> → move steps</li>
+
+                </ol>
+            </div>
+            
+            <h4>📸 Visual Result:</h4>
+            <img src="screenshots/test_004_20251003_131619.png" alt="Test test_004 Screenshot" class="screenshot">
+            
+            <h4>📊 Workspace State:</h4>
+            <div class="workspace-state"> Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 142 )
+ 2. repeat Code block. Block Coordinates: (X: 350, Y: 174 )
+ 3. move Code block. Block Coordinates: (X: 350, Y: 207 )
+
+</div>
+        </div>
+
+        <div class="test-case">
+            <div class="test-header">
+                <h3>Test 5: test_005</h3>
+            </div>
+            
+            <p><strong>Description:</strong> Timer operations</p>
+            
+            <div class="metadata">
+                <span class="status status-success">✅ Execution completed.</span>
+                <span>⏱️ 9.93s</span>
+                <span>📦 4 steps</span>
+            </div>
+            
+            <div class="test-steps">
+                <h4>📝 Input Steps:</h4>
+                <ol>
+                    <li><strong>Events</strong> → when green flag clicked</li>
+                    <li><strong>Sensing</strong> → reset timer</li>
+                    <li><strong>Control</strong> → repeat </li>
+                    <li><strong>Sound</strong> → start sound</li>
+
+                </ol>
+            </div>
+            
+            <h4>📸 Visual Result:</h4>
+            <img src="screenshots/test_005_20251003_131619.png" alt="Test test_005 Screenshot" class="screenshot">
+            
+            <h4>📊 Workspace State:</h4>
+            <div class="workspace-state"> Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. reset Code block. Block Coordinates: (X: 350, Y: 175 )
+ 3. repeat Code block. Block Coordinates: (X: 350, Y: 208 ) 
+ 4. start Code block. Block Coordinates: (X: 361, Y: 240 )
+</div>
+        </div>
+
+        <div class="test-case">
+            <div class="test-header">
+                <h3>Test 6: test_006</h3>
+            </div>
+            
+            <p><strong>Description:</strong> Mouse following behavior</p>
+            
+            <div class="metadata">
+                <span class="status status-success">✅ Execution completed.</span>
+                <span>⏱️ 8.84s</span>
+                <span>📦 4 steps</span>
+            </div>
+            
+            <div class="test-steps">
+                <h4>📝 Input Steps:</h4>
+                <ol>
+                    <li><strong>Events</strong> → when green flag clicked</li>
+                    <li><strong>Control</strong> → forever</li>
+                    <li><strong>Motion</strong> → point towards</li>
+                    <li><strong>Motion</strong> → move steps</li>
+
+                </ol>
+            </div>
+            
+            <h4>📸 Visual Result:</h4>
+            <img src="screenshots/test_006_20251003_131619.png" alt="Test test_006 Screenshot" class="screenshot">
+            
+            <h4>📊 Workspace State:</h4>
+            <div class="workspace-state"> Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. forever Code block. Block Coordinates: (X: 350, Y: 175 ) 
+ 3. point Code block. Block Coordinates: (X: 361, Y: 208 )
+ 4. move Code block. Block Coordinates: (X: 361, Y: 240 ) 
+</div>
+        </div>
+
+        <div class="test-case">
+            <div class="test-header">
+                <h3>Test 7: test_007</h3>
+            </div>
+            
+            <p><strong>Description:</strong> Complex animation loop</p>
+            
+            <div class="metadata">
+                <span class="status status-success">✅ Execution completed.</span>
+                <span>⏱️ 10.11s</span>
+                <span>📦 5 steps</span>
+            </div>
+            
+            <div class="test-steps">
+                <h4>📝 Input Steps:</h4>
+                <ol>
+                    <li><strong>Events</strong> → when green flag clicked</li>
+                    <li><strong>Control</strong> → forever</li>
+                    <li><strong>Motion</strong> → go to random position</li>
+                    <li><strong>Looks</strong> → change graphic effect</li>
+                    <li><strong>Control</strong> → wait seconds</li>
+
+                </ol>
+            </div>
+            
+            <h4>📸 Visual Result:</h4>
+            <img src="screenshots/test_007_20251003_131619.png" alt="Test test_007 Screenshot" class="screenshot">
+            
+            <h4>📊 Workspace State:</h4>
+            <div class="workspace-state"> Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. forever Code block. Block Coordinates: (X: 350, Y: 175 ) 
+ 3. go to Code block. Block Coordinates: (X: 361, Y: 208 ) 
+ 4. change Code block. Block Coordinates: (X: 361, Y: 240 ) 
+ 5. wait Code block. Block Coordinates: (X: 361, Y: 272 ) 
+</div>
+        </div>
+
+        <div class="test-case">
+            <div class="test-header">
+                <h3>Test 8: test_008</h3>
+            </div>
+            
+            <p><strong>Description:</strong> Sprite positioning sequence</p>
+            
+            <div class="metadata">
+                <span class="status status-success">✅ Execution completed.</span>
+                <span>⏱️ 8.82s</span>
+                <span>📦 4 steps</span>
+            </div>
+            
+            <div class="test-steps">
+                <h4>📝 Input Steps:</h4>
+                <ol>
+                    <li><strong>Events</strong> → when green flag clicked</li>
+                    <li><strong>Motion</strong> → go to position</li>
+                    <li><strong>Motion</strong> → point in direction</li>
+                    <li><strong>Motion</strong> → glide</li>
+
+                </ol>
+            </div>
+            
+            <h4>📸 Visual Result:</h4>
+            <img src="screenshots/test_008_20251003_131619.png" alt="Test test_008 Screenshot" class="screenshot">
+            
+            <h4>📊 Workspace State:</h4>
+            <div class="workspace-state"> Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. go to x: Code block. Block Coordinates: (X: 350, Y: 175 ) 
+ 3. point in direction Code block. Block Coordinates: (X: 350, Y: 208 )
+ 4. glide Code block. Block Coordinates: (X: 350, Y: 240 )
+</div>
+        </div>
+
+        <div class="test-case">
+            <div class="test-header">
+                <h3>Test 9: test_009</h3>
+            </div>
+            
+            <p><strong>Description:</strong> Backdrop switching</p>
+            
+            <div class="metadata">
+                <span class="status status-success">✅ Execution completed.</span>
+                <span>⏱️ 7.55s</span>
+                <span>📦 4 steps</span>
+            </div>
+            
+            <div class="test-steps">
+                <h4>📝 Input Steps:</h4>
+                <ol>
+                    <li><strong>Events</strong> → when green flag clicked</li>
+                    <li><strong>Looks</strong> → switch backdrop</li>
+                    <li><strong>Control</strong> → wait seconds</li>
+                    <li><strong>Looks</strong> → next backdrop</li>
+
+                </ol>
+            </div>
+            
+            <h4>📸 Visual Result:</h4>
+            <img src="screenshots/test_009_20251003_131619.png" alt="Test test_009 Screenshot" class="screenshot">
+            
+            <h4>📊 Workspace State:</h4>
+            <div class="workspace-state"> Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. wait Code block. Block Coordinates: (X: 350, Y: 175 ) 
+ 3. next backdrop Code block. Block Coordinates: (X: 350, Y: 208 )
+</div>
+        </div>
+
+        <div class="test-case">
+            <div class="test-header">
+                <h3>Test 10: test_010</h3>
+            </div>
+            
+            <p><strong>Description:</strong> Edge detection and bounce</p>
+            
+            <div class="metadata">
+                <span class="status status-success">✅ Execution completed.</span>
+                <span>⏱️ 9.99s</span>
+                <span>📦 4 steps</span>
+            </div>
+            
+            <div class="test-steps">
+                <h4>📝 Input Steps:</h4>
+                <ol>
+                    <li><strong>Events</strong> → when green flag clicked</li>
+                    <li><strong>Control</strong> → forever</li>
+                    <li><strong>Motion</strong> → move steps</li>
+                    <li><strong>Motion</strong> → if on edge bounce</li>
+
+                </ol>
+            </div>
+            
+            <h4>📸 Visual Result:</h4>
+            <img src="screenshots/test_010_20251003_131619.png" alt="Test test_010 Screenshot" class="screenshot">
+            
+            <h4>📊 Workspace State:</h4>
+            <div class="workspace-state"> Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. forever Code block. Block Coordinates: (X: 350, Y: 175 ) 
+ 3. move Code block. Block Coordinates: (X: 361, Y: 208 ) 
+ 4. if on edge bounce Code block. Block Coordinates: (X: 361, Y: 240 )
+</div>
+        </div>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "prompt": "What's happening in my workspace?",
+  "expected_route": "code_explain",
+  "actual_route": "general_agent",
+  "routing_correct": false,
+  "execution_time": 7.07,
+  "agent_response": "Hey there, Scratch explorer! 👋\n\nIt sounds like you're curious about your Scratch workspace. That's awesome! To help you, tell me a bit more about what you're wondering:\n\n*   Do you see any **oops messages**? What do they say?\n*   Is your code doing something different than you thought? Tell me what you wanted to happen and what *is* happening.\n*   Are you stuck on a specific block or a group of blocks? Which one?\n*   Or are you just curious about how the whole Scratch workspace works?\n\nThe more you tell me, the better I can help you on your Scratch adventure! Let's have fun coding! 🚀",
+  "response_verification": {
+    "has_response": true,
+    "response_length": 590,
+    "is_accurate": false,
+    "accuracy_label": "Not Accurate",
+    "notes": [
+      "Wrong route: expected code_explain, got general_agent"
+    ]
+  },
+  "result": {
+    "query": "What's happening in my workspace?",
+    "result": {
+      "formatted_response": "Hey there, Scratch explorer! 👋\n\nIt sounds like you're curious about your Scratch workspace. That's awesome! To help you, tell me a bit more about what you're wondering:\n\n*   Do you see any **oops messages**? What do they say?\n*   Is your code doing something different than you thought? Tell me what you wanted to happen and what *is* happening.\n*   Are you stuck on a specific block or a group of blocks? Which one?\n*   Or are you just curious about how the whole Scratch workspace works?\n\nThe more you tell me, the better I can help you on your Scratch adventure! Let's have fun coding! 🚀"
+    }
+  }
+}

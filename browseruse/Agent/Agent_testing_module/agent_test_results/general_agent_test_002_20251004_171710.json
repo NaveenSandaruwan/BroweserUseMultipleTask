@@ -1,0 +1,24 @@
+{
+  "prompt": "Thank you for your help",
+  "expected_route": "general_agent",
+  "actual_route": "general_agent",
+  "routing_correct": true,
+  "execution_time": 5.45,
+  "agent_response": "Yay! I'm super happy I could help you with your Scratch project! If you need anything else, just ask. Have lots of fun Scratching and creating awesome things! You're doing great!",
+  "response_verification": {
+    "has_response": true,
+    "response_length": 178,
+    "is_accurate": true,
+    "accuracy_label": "Accurate",
+    "notes": [
+      "General response provided",
+      "Addresses prompt (2/3 key words match, 66.7%)"
+    ]
+  },
+  "result": {
+    "query": "Thank you for your help",
+    "result": {
+      "formatted_response": "Yay! I'm super happy I could help you with your Scratch project! If you need anything else, just ask. Have lots of fun Scratching and creating awesome things! You're doing great!"
+    }
+  }
+}

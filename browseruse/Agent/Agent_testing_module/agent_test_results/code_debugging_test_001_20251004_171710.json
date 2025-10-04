@@ -1,0 +1,24 @@
+{
+  "prompt": "My code isn't working, can you help?",
+  "expected_route": "code_debugging",
+  "actual_route": "code_debugging",
+  "routing_correct": true,
+  "execution_time": 12.41,
+  "agent_response": "Hey there, Scratch superstar! Let's make sure your blocks are working together to create something amazing!\n\n*   **\"When\" Block:** I see you have a \"when\" block, which is awesome because that's how your code knows when to start! But, there are many \"when\" blocks. Let's use \"when green flag clicked\", \"when key pressed\", \"when this sprite clicked\", \"when backdrop switches\", \"when greater than\", or \"when I receive message\".\n*   **\"Repeat\" Block:** You also have a \"repeat\" block, which is like saying, \"Do this a bunch of times!\" To work, it needs to be right after the \"when\" block.\n*   **\"Move\" Block:** And a \"move\" block! This tells your sprite to move. To make it move again and again, let's put it inside the \"repeat\" block.\n\n**So, here's the plan:**\n\n1.  Drag the \"repeat\" block under the \"when\" block. It's like connecting train cars!\n2.  Now, drag the \"move\" block inside the \"repeat\" block. This tells the sprite to move again and again!\n\n**Why do we do this?**\n\nThe blocks need to be in the right order, like a recipe! The \"when\" block starts the action, the \"repeat\" block says how many times to do it, and the \"move\" block says what to do! If they're not connected, your code won't know what to do. Keep up the great work!",
+  "response_verification": {
+    "has_response": true,
+    "response_length": 1236,
+    "is_accurate": true,
+    "accuracy_label": "Accurate",
+    "notes": [
+      "Contains debugging advice",
+      "Addresses prompt (1/4 key words match, 25.0%)"
+    ]
+  },
+  "result": {
+    "query": "My code isn't working, can you help?",
+    "result": {
+      "formatted_response": "Hey there, Scratch superstar! Let's make sure your blocks are working together to create something amazing!\n\n*   **\"When\" Block:** I see you have a \"when\" block, which is awesome because that's how your code knows when to start! But, there are many \"when\" blocks. Let's use \"when green flag clicked\", \"when key pressed\", \"when this sprite clicked\", \"when backdrop switches\", \"when greater than\", or \"when I receive message\".\n*   **\"Repeat\" Block:** You also have a \"repeat\" block, which is like saying, \"Do this a bunch of times!\" To work, it needs to be right after the \"when\" block.\n*   **\"Move\" Block:** And a \"move\" block! This tells your sprite to move. To make it move again and again, let's put it inside the \"repeat\" block.\n\n**So, here's the plan:**\n\n1.  Drag the \"repeat\" block under the \"when\" block. It's like connecting train cars!\n2.  Now, drag the \"move\" block inside the \"repeat\" block. This tells the sprite to move again and again!\n\n**Why do we do this?**\n\nThe blocks need to be in the right order, like a recipe! The \"when\" block starts the action, the \"repeat\" block says how many times to do it, and the \"move\" block says what to do! If they're not connected, your code won't know what to do. Keep up the great work!"
+    }
+  }
+}

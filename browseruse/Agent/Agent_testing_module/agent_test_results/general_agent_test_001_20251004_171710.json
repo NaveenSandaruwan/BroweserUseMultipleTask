@@ -1,0 +1,24 @@
+{
+  "prompt": "Hello!",
+  "expected_route": "general_agent",
+  "actual_route": "general_agent",
+  "routing_correct": true,
+  "execution_time": 5.97,
+  "agent_response": "Hello! I'm here to help you learn Scratch in a fun and easy way.\n\nIf you have a Scratch project you want to make, or if you're stuck on a step, just tell me. I can help you break it down into simple steps that are easy for kids to follow.\n\nLet's have fun creating with Scratch! What do you want to make today?",
+  "response_verification": {
+    "has_response": true,
+    "response_length": 309,
+    "is_accurate": true,
+    "accuracy_label": "Accurate",
+    "notes": [
+      "General response provided",
+      "Addresses prompt (1/1 key words match, 100.0%)"
+    ]
+  },
+  "result": {
+    "query": "Hello!",
+    "result": {
+      "formatted_response": "Hello! I'm here to help you learn Scratch in a fun and easy way.\n\nIf you have a Scratch project you want to make, or if you're stuck on a step, just tell me. I can help you break it down into simple steps that are easy for kids to follow.\n\nLet's have fun creating with Scratch! What do you want to make today?"
+    }
+  }
+}

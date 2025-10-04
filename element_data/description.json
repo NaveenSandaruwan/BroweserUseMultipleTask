@@ -17,9 +17,9 @@
       {"name": "set y", "description": "Place sprite at exact y.", "coordinates": "x: 74.5, y: 745"},
       {"name": "if on edge bounce", "description": "Bounce when sprite touches stage edge.", "coordinates": "x: 74.5, y: 810"},
       {"name": "set rotation style", "description": "Change how sprite rotates.", "coordinates": "x: 74.5, y: 870"},
-      {"name": "x position", "description": "Report x position.", "coordinates": "x: 74.5, y: 930"},
-      {"name": "y position", "description": "Report y position.", "coordinates": "x: 74.5, y: 962"},
-      {"name": "direction", "description": "Report direction.", "coordinates": "x: 74.5, y: 995"}
+      {"name": "x position", "description": "Report x position.", "coordinates": "x: 105.5, y: 930"},
+      {"name": "y position", "description": "Report y position.", "coordinates": "x: 105.5, y: 962"},
+      {"name": "direction", "description": "Report direction.", "coordinates": "x: 105.5, y: 995"}
     ]
   },
   "Looks": {
@@ -63,7 +63,7 @@
     ]
   },
   "Events": {
-    "coordinates": "x: 1, y: 231",
+    "coordinates": "x: 5, y: 238",
     "blocks": [
       {"name": "when green flag clicked", "description": "Trigger when project starts. Use only starting of the code.", "coordinates": "x: 74.5, y: 148"},
       {"name": "when key pressed", "description": "Trigger on key press.  Use only starting of the code.", "coordinates": "x: 74.5, y: 196"},
@@ -80,10 +80,10 @@
     "blocks": [
       {"name": "wait seconds", "description": "Pause script.", "coordinates": "x: 74.5, y: 148"},
       {"name": "repeat times", "description": "Repeat actions fixed number.", "coordinates": "x: 74.5, y: 210"},
-      {"name": "forever", "description": "Repeat actions infinitely.", "coordinates": "x: 74.5, y: 244"},
+      {"name": "forever", "description": "Repeat actions infinitely.", "coordinates": "x: 74.5, y: 294"},
       {"name": "if then", "description": "Run code only if true.", "coordinates": "x: 74.5, y: 390"},
       {"name": "if then else", "description": "Run code for true/false.", "coordinates": "x: 74.5, y: 472"},
-      {"name": "wait until", "description": "Pause until condition true.", "coordinates": "x: 74.5, y: 470"},
+      {"name": "wait until", "description": "Pause until condition true.", "coordinates": "x: 74.5, y: 590"},
       {"name": "repeat until", "description": "Repeat until condition met.", "coordinates": "x: 74.5, y: 640"},
 
       {"name": "stop", "description": "Stop script/project.", "coordinates": "x: 74.5, y: 735"},
@@ -141,34 +141,10 @@
   "Variables": {
     "coordinates": "x: 1, y: 415",
     "blocks": [
-      {"name": "set variable to", "description": "Assign value to variable.", "coordinates": "x: 74.5, y: 148"},
-      {"name": "change variable by", "description": "Increase/decrease variable.", "coordinates": "x: 74.5, y: 196"},
-      {"name": "show variable", "description": "Display variable on stage.", "coordinates": "x: 74.5, y: 244"},
-      {"name": "hide variable", "description": "Hide variable from stage.", "coordinates": "x: 74.5, y: 292"},
-      {"name": "variable reporter", "description": "Report variable value.", "coordinates": "x: 74.5, y: 340"}
-    ]
-  },
-  "Lists": {
-    "coordinates": "x: 1, y: 461",
-    "blocks": [
-      {"name": "add to list", "description": "Add item to list.", "coordinates": "x: 74.5, y: 148"},
-      {"name": "delete of list", "description": "Remove item from list.", "coordinates": "x: 74.5, y: 196"},
-      {"name": "delete all of list", "description": "Clear all list items.", "coordinates": "x: 74.5, y: 244"},
-      {"name": "insert at list", "description": "Insert item at position.", "coordinates": "x: 74.5, y: 292"},
-      {"name": "replace item of list", "description": "Replace list item.", "coordinates": "x: 74.5, y: 340"},
-      {"name": "item of list", "description": "Get list item.", "coordinates": "x: 74.5, y: 388"},
-      {"name": "item number of in list", "description": "Find item position in list.", "coordinates": "x: 74.5, y: 436"},
-      {"name": "length of list", "description": "Count list items.", "coordinates": "x: 74.5, y: 484"},
-      {"name": "list contains", "description": "Check if list has item.", "coordinates": "x: 74.5, y: 532"},
-      {"name": "show list", "description": "Display list on stage.", "coordinates": "x: 74.5, y: 580"},
-      {"name": "hide list", "description": "Hide list from stage.", "coordinates": "x: 74.5, y: 628"},
-      {"name": "list reporter", "description": "Report list contents.", "coordinates": "x: 74.5, y: 676"}
-    ]
-  },
-  "My Blocks": {
-    "coordinates": "x: 1, y: 507",
-    "blocks": [
-      {"name": "Make a Block", "description": "Create custom block.", "coordinates": "x: 74.5, y: 148"}
+      {"name": "set variable to", "description": "Assign value to variable.", "coordinates": "x: 74.5, y: 227"},
+      {"name": "change variable by", "description": "Increase/decrease variable.", "coordinates": "x: 74.5, y: 270"},
+      {"name": "show variable", "description": "Display variable on stage.", "coordinates": "x: 74.5, y: 310"},
+      {"name": "hide variable", "description": "Hide variable from stage.", "coordinates": "x: 74.5, y: 360"}
     ]
   }
 }

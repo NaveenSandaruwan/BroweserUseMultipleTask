@@ -1,0 +1,34 @@
+{
+  "test_id": "test_009",
+  "description": "Backdrop switching",
+  "timestamp": "2025-10-03T13:18:06.218481",
+  "execution_time_seconds": 7.55,
+  "steps_count": 4,
+  "input_plan": {
+    "steps": [
+      {
+        "step": 1,
+        "category": "Events",
+        "block": "when green flag clicked"
+      },
+      {
+        "step": 2,
+        "category": "Looks",
+        "block": "switch backdrop"
+      },
+      {
+        "step": 3,
+        "category": "Control",
+        "block": "wait seconds"
+      },
+      {
+        "step": 4,
+        "category": "Looks",
+        "block": "next backdrop"
+      }
+    ]
+  },
+  "execution_status": "✅ Execution completed.",
+  "workspace_state": " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) \n 2. wait Code block. Block Coordinates: (X: 350, Y: 175 ) \n",
+  "screenshot_path": "test_results/screenshots/test_009_20251003_131619.png"
+}
