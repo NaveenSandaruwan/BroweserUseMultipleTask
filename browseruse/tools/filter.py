@@ -16,12 +16,17 @@ from pathlib import Path
 
 def get_base_path():
     """Return folder where exe/script is located (for reading/writing files)."""
-    if getattr(sys, "frozen", False):
-        # Running as PyInstaller exe
-        return Path(sys.executable).parent
-    else:
-        # Running as Python script
-        return Path(__file__).parent.parent.parent
+    try:
+        if getattr(sys, "frozen", False):
+            # Running as PyInstaller exe
+            return Path(sys.executable).parent
+        else:
+            # Running as Python script
+            return Path(__file__).parent.parent.parent
+    except Exception as e:
+        print(f"Error determining base path: {e}")
+        # Fallback to current directory
+        return Path.cwd()
     
 BASE_DIR = get_base_path()
 WORDS_FILE = BASE_DIR / "element_data" / "browser_block.txt"
@@ -33,38 +38,52 @@ def filter_json():
     Filter JSON objects based on starting words from a text file.
     Returns a list of web elements current context.
     """
-    # Step 1: Load words
-    with open(WORDS_FILE, "r", encoding="utf-8") as f:
-        words = [line.strip() for line in f if line.strip()]
+    try:
+        # Step 1: Load words
+        try:
+            with open(WORDS_FILE, "r", encoding="utf-8") as f:
+                words = [line.strip() for line in f if line.strip()]
+        except FileNotFoundError:
+            print(f"Error: Words file not found at {WORDS_FILE}")
+            return []
+        except Exception as e:
+            print(f"Error reading words file: {type(e).__name__}: {e}")
+            return []
+
+        # Step 2: Load JSON data
+        try:
+            with open(JSON_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except FileNotFoundError:
+            print(f"Error: JSON file not found at {JSON_FILE}")
+            return []
+        except json.JSONDecodeError:
+            print(f"Error: Invalid JSON format in {JSON_FILE}")
+            return []
+        except Exception as e:
+            print(f"Error reading JSON file: {type(e).__name__}: {e}")
+            return []
+
+        # Step 3: Filter data
+        filtered = []
+        for obj in data.values():
+            text = obj.get("text_content","")
+            if text is None or not obj.get("tag_name") == "text":
+                continue
+            if any(text.startswith(w) for w in words):
+                filtered.append({
+                    "tag_name": obj["tag_name"],
+                    "text_content": obj["text_content"],
+                    "x": round(obj["bounding_box"]["x"]),
+                    "y": round(obj["bounding_box"]["y"])
+                })
+
+        filtered = sorted(filtered, key=lambda item: item["y"])
+        return filtered
         
-
-    # Step 2: Load JSON data
-    with open(JSON_FILE, "r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    # Step 3: Filter data
-    filtered = []
-    for obj in data.values():
-        text = obj.get("text_content","")
-        if text is None or not obj.get("tag_name") == "text":
-            continue
-        # print(f"Words to match: {words}")
-        # print(obj)
-        if any(text.startswith(w) for w in words):
-            
-            filtered.append({
-                "tag_name": obj["tag_name"],
-                "text_content": obj["text_content"],
-                "x": round(obj["bounding_box"]["x"]),
-                "y": round(obj["bounding_box"]["y"])
-            })
-
-    # Step 4: Print result
-    #print(json.dumps(filtered, indent=2, ensure_ascii=False))
-    filtered = sorted(filtered, key=lambda item: item["y"])
-    # print(f"Filtered: {data}")
-    # print(f" Path: {JSON_FILE}")
-    return filtered
+    except Exception as e:
+        print(f"Unexpected error in filter_json: {type(e).__name__}: {e}")
+        return []
 
 # print("Filtered JSON:", filter_json())
 
@@ -103,34 +122,33 @@ def get_list_of_used_blocks():
 
 
 def get_category_coordinates(json_file_path=None):
-    """
-    Read the description.json file and extract category titles and coordinates.
-    
-    Args:
-        json_file_path (str, optional): Path to the description.json file.
-            If None, uses default path in element_data folder.
-            
-    Returns:
-        str: Formatted string with category titles and coordinates
-    """
-    # Use default path if none provided
-    if json_file_path is None:
-        json_file_path = Path(DESCRIPTION_FILE)
-    
-    # Read and parse the JSON file
+    """Read the description.json file and extract category titles and coordinates."""
     try:
-        with open(json_file_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
+        # Use default path if none provided
+        if json_file_path is None:
+            json_file_path = Path(DESCRIPTION_FILE)
+        
+        # Check if file exists
+        if not json_file_path.exists():
+            return f"Error: File not found at {json_file_path}"
+        
+        # Read and parse the JSON file
+        try:
+            with open(json_file_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+        except json.JSONDecodeError:
+            return f"Error: Invalid JSON format in {json_file_path}"
+        except Exception as e:
+            return f"Error reading JSON file: {type(e).__name__}: {e}"
+        
+        # Format the output string
+        result = "Category Positions:\n"
+        for category, info in data.items():
+            result += f"{category}: {info['coordinates']}\n"
+        
+        return result
     except Exception as e:
-        return f"Error reading JSON file: {e}"
-    
-    # Format the output string
-    result = "Category Positions:\n"
-    for category, info in data.items():
-        result += f"{category}: {info['coordinates']}\n"
-    
-    return result
-
+        return f"Unexpected error in get_category_coordinates: {type(e).__name__}: {e}"
 
 # print("Category coordinates:", get_category_coordinates())
 

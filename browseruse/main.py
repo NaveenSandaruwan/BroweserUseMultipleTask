@@ -98,7 +98,7 @@ def setup_user_data(base_dir):
 
     if "chrome_path" not in user_data or not os.path.exists(user_data.get("chrome_path", "")):
         while True:
-            chrome_path = input("Enter full Chrome executable path: ").strip()
+            chrome_path = input("Enter full Chrome/Edge executable path: ").strip()
             if os.path.exists(chrome_path):
                 user_data["chrome_path"] = chrome_path
                 break
