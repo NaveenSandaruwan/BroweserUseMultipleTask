@@ -1,28 +1,126 @@
 import os
 import sys
+import json
+import socket
 import time
+import multiprocessing
+import getpass
+import threading
+import keyboard
+import pwinput
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 from browseruse.tools.browserUseClient import send_task
 from browseruse.tools.browserUseServer import start_server
-import threading
-import multiprocessing
 
 
-import asyncio
-import multiprocessing
-import socket
-import sys
-import time
+# ----------------------------
+# CLI Decorations
+# ----------------------------
+def print_logo():
+    logo = r"""
 
+                    ██████╗    ██████╗        ██████╗           █████╗ ██╗
+                  ██╔════╝ ██  ╔══    ═██╗  ██╔══    ██╗       ██╔══██╗██║
+                  ██║      ███ ╗██║   ██║   ██║      ███       ███████║██║
+                  ██║      ██║  ██║    ██║  ██║      ██║       ██╔══██║██║
+                   █╚██████╔╝  ╚██████╔╝    █╚██████╔╝         ██║  ██║██║
+                    ╚═════╝    ╚═════╝        ╚═════╝          ╚═   ╚═╝╚═╝
+
+                                     🟢 OBO JUNIOR AI
+    """
+    print(logo)
+
+
+def print_instructions():
+    instructions = """
+====================================================================================
+
+         ///////       Welcome to OBO JUNIOR AI Setup!    ///////
+
+                Instructions:
+                1. Enter the full path to your Chrome executable when prompted.
+                2. Provide your Gemini API key securely.
+                3. This setup is required only once;
+
+        ////////             Extension setup!         ////////
+
+                1. Open Chrome and go to: chrome://extensions/
+                2. Enable "Developer mode" (toggle in top right).
+                3. Click "Load unpacked"
+                4. Select the "extension" folder inside the "Package" directory.
+                5. Refresh the Scratch page.
+
+        ////////        Using OBO JUNIOR AI         ////////
+                1. Ensure Chrome is running with the extension loaded.
+                2. The AI will assist you in building Scratch projects.
+
+                - Press 'Ctrl + C' anytime to exit the application.
+                - Ensure the Scratch editor page is open in Chrome.
+
+=====================================================================================
+"""
+    print(instructions)
+
+
+# ----------------------------
+# JSON Handling
+# ----------------------------
+def load_user_data(file_path):
+    if not os.path.exists(file_path):
+        return {}
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def save_user_data(file_path, data):
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
+
+
+# ----------------------------
+# User Input Setup
+# ----------------------------
+def setup_user_data(base_dir):
+    USERDATA_DIR = os.path.join(base_dir, "userdata")
+    PROFILE_DIR = os.path.join(USERDATA_DIR, "profile")
+    USERDATA_FILE = os.path.join(USERDATA_DIR, "user_data.json")
+
+    os.makedirs(USERDATA_DIR, exist_ok=True)
+
+    user_data = load_user_data(USERDATA_FILE)
+
+    if "chrome_path" not in user_data or not os.path.exists(user_data.get("chrome_path", "")):
+        while True:
+            chrome_path = input("Enter full Chrome executable path: ").strip()
+            if os.path.exists(chrome_path):
+                user_data["chrome_path"] = chrome_path
+                break
+            print("❌ Path does not exist. Try again.")
+
+    if "gemini_api_key" not in user_data:
+        user_data["gemini_api_key"] = pwinput.pwinput("Enter your Gemini API key: ", mask="*")
+
+    if not os.path.exists(PROFILE_DIR):
+        os.makedirs(PROFILE_DIR, exist_ok=True)
+
+    user_data["profile_dir"] = PROFILE_DIR
+    save_user_data(USERDATA_FILE, user_data)
+
+    print(f"\n✅ User data saved at: {USERDATA_FILE}")
+    return user_data
 
 
 # ----------------------------
 # Helper: wait for server ready
 # ----------------------------
 def wait_for_server(host="127.0.0.1", port=65432, timeout=30):
-    """Wait until the server socket is open, or timeout."""
     for i in range(timeout):
         try:
             with socket.create_connection((host, port), timeout=2):
@@ -35,15 +133,56 @@ def wait_for_server(host="127.0.0.1", port=65432, timeout=30):
 
 
 # ----------------------------
+# Graceful shutdown
+# ----------------------------
+def shutdown(server_proc, agent_proc=None):
+    print("\n🛑 Shutting down OBO JUNIOR AI...")
+    send_task("exit")
+    time.sleep(5)
+    if server_proc and server_proc.is_alive():
+        server_proc.terminate()
+    if agent_proc and agent_proc.is_alive():
+        agent_proc.terminate()
+    sys.exit(0)
+
+
+# ----------------------------
+# Keyword interrupt listener
+# ----------------------------
+def listen_for_exit():
+    print("🔴 Press 'Esc' anytime to exit the application.")
+    keyboard.wait('esc')   # Blocks until ESC is pressed
+    print("\n👋 Exiting on user request...")
+    sys.exit(0)
+
+# ----------------------------
 # Main entrypoint
 # ----------------------------
-if __name__ == "__main__":
-    # Required for PyInstaller + multiprocessing on Windows
-    multiprocessing.freeze_support()
+def main():
+    print_logo()
+    print_instructions()
+
+    # Press any key to continue
+    input("Press any key to continue...")
+
+    # Determine base directory
+    if getattr(sys, 'frozen', False):
+        BASE_DIR = os.path.dirname(sys.executable)
+    else:
+        BASE_DIR = os.path.dirname(__file__)
+
+    # Setup user data
+    user_data = setup_user_data(BASE_DIR)
+    chrome_path = user_data["chrome_path"]
+    profile_dir = user_data["profile_dir"]
+    
 
     # 1. Start server process
-    browseruse_server_process = multiprocessing.Process(target=start_server)
+    browseruse_server_process = multiprocessing.Process(target=start_server,args=(chrome_path, profile_dir))
     browseruse_server_process.start()
+
+    # Start listening for exit commands in background
+    threading.Thread(target=listen_for_exit, args=(browseruse_server_process, None), daemon=True).start()
 
     # 2. Wait until server is listening
     if not wait_for_server():
@@ -51,15 +190,27 @@ if __name__ == "__main__":
         browseruse_server_process.terminate()
         sys.exit(1)
 
-    # 3. Send first task to server
-    a = send_task("Go to https://scratch.mit.edu/projects/editor/?tutorial=getStarted")
-    print(f"Task sent, success={a}")
+    # 3. Send first task
+    success = send_task("Go to https://scratch.mit.edu/projects/editor/?tutorial=getStarted")
+    print(f"Task sent, success={success}")
+
+
+    agent_server_process = None
     # 4. Start agent server if task succeeded
-    if a:
+    if success:
         from browseruse.Agent.main import start_agent_server
         agent_server_process = multiprocessing.Process(target=start_agent_server)
         agent_server_process.start()
-        agent_server_process.join()
 
-    # 5. Cleanup server process
-    browseruse_server_process.join()
+    # Keep alive until processes finish
+    try:
+        if agent_server_process:
+            agent_server_process.join()
+        browseruse_server_process.join()
+    except KeyboardInterrupt:
+        shutdown(browseruse_server_process, agent_server_process)
+
+
+if __name__ == "__main__":
+    multiprocessing.freeze_support()
+    main()

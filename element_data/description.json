@@ -2,17 +2,17 @@
   "Motion": {
     "coordinates": "x: 1, y: 93",
     "blocks": [
-      {"name": "move steps", "description": "Move sprite forward by given steps.", "coordinates": "x: 74.5, y: 148"},
-      {"name": "turn right", "description": "Rotate sprite clockwise.", "coordinates": "x: 74.5, y: 196"},
-      {"name": "turn left", "description": "Rotate sprite counterclockwise.", "coordinates": "x: 74.5, y: 239"},
-      {"name": "go to random position", "description": "Move sprite to random location.", "coordinates": "x: 74.5, y: 300"},
-      {"name": "go to position", "description": "Instantly move sprite to coordinates.", "coordinates": "x: 74.5, y: 348"},
-      {"name": "glide random positions", "description": "Smoothly move sprite to a random position.", "coordinates": "x: 74.5, y: 396"},
-      {"name": "glide", "description": "Face sprite in specific direction.", "coordinates": "x: 74.5, y: 440"},
-      {"name": "point in direction", "description": "Face sprite in specific direction.", "coordinates": "x: 74.5, y: 500"},
-      {"name": "point towards", "description": "Turn sprite to face another object.", "coordinates": "x: 74.5, y: 545"},
-      {"name": "change x", "description": "Move horizontally by value.", "coordinates": "x: 74.5, y: 610"},
-      {"name": "set x", "description": "Place sprite at exact x.", "coordinates": "x: 74.5, y: 655"},
+      {"name": "move steps", "description": "Move sprite forward by given steps.", "coordinates": "x: 74.5, y: 135"},
+      {"name": "turn right", "description": "Rotate sprite clockwise.", "coordinates": "x: 74.5, y: 181"},
+      {"name": "turn left", "description": "Rotate sprite counterclockwise.", "coordinates": "x: 74.5, y: 223"},
+      {"name": "go to random position", "description": "Move sprite to random location.", "coordinates": "x: 74.5, y: 292"},
+      {"name": "go to position", "description": "Instantly move sprite to coordinates.", "coordinates": "x: 74.5, y: 338"},
+      {"name": "glide random positions", "description": "Smoothly move sprite to a random position.", "coordinates": "x: 74.5, y: 381"},
+      {"name": "glide", "description": "Face sprite in specific direction.", "coordinates": "x: 74.5, y: 427"},
+      {"name": "point in direction", "description": "Face sprite in specific direction.", "coordinates": "x: 74.5, y: 492"},
+      {"name": "point towards", "description": "Turn sprite to face another object.", "coordinates": "x: 74.5, y: 535"},
+      {"name": "change x", "description": "Move horizontally by value.", "coordinates": "x: 74.5, y: 597"},
+      {"name": "set x", "description": "Place sprite at exact x.", "coordinates": "x: 74.5, y: 641"},
       {"name": "change y", "description": "Move vertically by value.", "coordinates": "x: 74.5, y: 690"},
       {"name": "set y", "description": "Place sprite at exact y.", "coordinates": "x: 74.5, y: 745"},
       {"name": "if on edge bounce", "description": "Bounce when sprite touches stage edge.", "coordinates": "x: 74.5, y: 810"},
@@ -25,7 +25,7 @@
   "Looks": {
     "coordinates": "x: 1, y: 139",
     "blocks": [
-      {"name": "say message for seconds", "description": "Display speech bubble for time.", "coordinates": "x: 74.5, y: 148"},
+      {"name": "say message for seconds", "description": "Display speech bubble for time.", "coordinates": "x: 74.5, y: 135"},
       {"name": "say message", "description": "Display a speech bubble.", "coordinates": "x: 74.5, y: 196"},
       {"name": "think message for seconds", "description": "Display thought bubble for time.", "coordinates": "x: 74.5, y: 239"},
       {"name": "think message", "description": "Display a thought bubble.", "coordinates": "x: 74.5, y: 285"},
@@ -51,40 +51,40 @@
   "Sound": {
     "coordinates": "x: 1, y: 185",
     "blocks": [
-      {"name": "play sound until done", "description": "Play sound and wait.", "coordinates": "x: 74.5, y: 148"},
-      {"name": "start sound", "description": "Play sound without waiting.", "coordinates": "x: 74.5, y: 196"},
-      {"name": "stop all sounds", "description": "Stop every sound playing.", "coordinates": "x: 74.5, y: 244"},
-      {"name": "change sound effect", "description": "Adjust sound effect.", "coordinates": "x: 74.5, y: 292"},
-      {"name": "set sound effect", "description": "Set specific sound effect.", "coordinates": "x: 74.5, y: 340"},
-      {"name": "clear sound effects", "description": "Remove sound effects.", "coordinates": "x: 74.5, y: 388"},
-      {"name": "change volume", "description": "Raise/lower volume.", "coordinates": "x: 74.5, y: 450"},
-      {"name": "set volume", "description": "Fix volume level.", "coordinates": "x: 74.5, y: 495"},
-      {"name": "volume", "description": "Report current volume.", "coordinates": "x: 100, y: 545"}
+      {"name": "play sound until done", "description": "Play sound and wait.", "coordinates": "x: 74.5, y: 135"},
+      {"name": "start sound", "description": "Play sound without waiting.", "coordinates": "x: 74.5, y: 181"},
+      {"name": "stop all sounds", "description": "Stop every sound playing.", "coordinates": "x: 74.5, y: 225"},
+      {"name": "change sound effect", "description": "Adjust sound effect.", "coordinates": "x: 74.5, y: 290"},
+      {"name": "set sound effect", "description": "Set specific sound effect.", "coordinates": "x: 74.5, y: 335"},
+      {"name": "clear sound effects", "description": "Remove sound effects.", "coordinates": "x: 74.5, y: 381"},
+      {"name": "change volume", "description": "Raise/lower volume.", "coordinates": "x: 74.5, y: 445"},
+      {"name": "set volume", "description": "Fix volume level.", "coordinates": "x: 74.5, y: 489"},
+      {"name": "volume", "description": "Report current volume.", "coordinates": "x: 100, y: 537"}
     ]
   },
   "Events": {
     "coordinates": "x: 1, y: 231",
     "blocks": [
-      {"name": "when green flag clicked", "description": "Trigger when project starts. Use only starting of the code.", "coordinates": "x: 74.5, y: 148"},
-      {"name": "when key pressed", "description": "Trigger on key press.  Use only starting of the code.", "coordinates": "x: 74.5, y: 196"},
-      {"name": "when this sprite clicked", "description": "Trigger on sprite click. Use only starting of the code.", "coordinates": "x: 74.5, y: 250"},
-      {"name": "when backdrop switches", "description": "Trigger when backdrop changes. Use only starting of the code.", "coordinates": "x: 74.5, y: 330"},
+      {"name": "when green flag clicked", "description": "Trigger when project starts. Use only starting of the code.", "coordinates": "x: 74.5, y: 141"},
+      {"name": "when key pressed", "description": "Trigger on key press.  Use only starting of the code.", "coordinates": "x: 74.5, y: 200"},
+      {"name": "when this sprite clicked", "description": "Trigger on sprite click. Use only starting of the code.", "coordinates": "x: 74.5, y: 255"},
+      {"name": "when backdrop switches", "description": "Trigger when backdrop changes. Use only starting of the code.", "coordinates": "x: 74.5, y: 312"},
       {"name": "when greater than", "description": "Trigger when value exceeds threshold. Use only starting of the code.", "coordinates": "x: 74.5, y: 390"},
-      {"name": "when I receive message", "description": "Trigger when message received. Use only starting of the code.", "coordinates": "x: 74.5, y: 470"},
-      {"name": "broadcast message", "description": "Send message to all sprites.", "coordinates": "x: 74.5, y: 521"},
-      {"name": "broadcast message and wait", "description": "Send message then wait.", "coordinates": "x: 74.5, y: 562"}
+      {"name": "when I receive message", "description": "Trigger when message received. Use only starting of the code.", "coordinates": "x: 74.5, y: 461"},
+      {"name": "broadcast message", "description": "Send message to all sprites.", "coordinates": "x: 74.5, y: 508"},
+      {"name": "broadcast message and wait", "description": "Send message then wait.", "coordinates": "x: 74.5, y: 555"}
     ]
   },
   "Control": {
     "coordinates": "x: 1, y: 277",
     "blocks": [
       {"name": "wait seconds", "description": "Pause script.", "coordinates": "x: 74.5, y: 148"},
-      {"name": "repeat times", "description": "Repeat actions fixed number.", "coordinates": "x: 74.5, y: 210"},
-      {"name": "forever", "description": "Repeat actions infinitely.", "coordinates": "x: 74.5, y: 244"},
-      {"name": "if then", "description": "Run code only if true.", "coordinates": "x: 74.5, y: 390"},
-      {"name": "if then else", "description": "Run code for true/false.", "coordinates": "x: 74.5, y: 472"},
-      {"name": "wait until", "description": "Pause until condition true.", "coordinates": "x: 74.5, y: 470"},
-      {"name": "repeat until", "description": "Repeat until condition met.", "coordinates": "x: 74.5, y: 640"},
+      {"name": "repeat times", "description": "Repeat actions fixed number.", "coordinates": "x: 74.5, y: 197"},
+      {"name": "forever", "description": "Repeat actions infinitely.", "coordinates": "x: 74.5, y: 281"},
+      {"name": "if then", "description": "Run code only if true.", "coordinates": "x: 74.5, y: 375"},
+      {"name": "if then else", "description": "Run code for true/false.", "coordinates": "x: 74.5, y: 461"},
+      {"name": "wait until", "description": "Pause until condition true.", "coordinates": "x: 74.5, y: 581"},
+      {"name": "repeat until", "description": "Repeat until condition met.", "coordinates": "x: 74.5, y: 627"},
 
       {"name": "stop", "description": "Stop script/project.", "coordinates": "x: 74.5, y: 735"},
       {"name": "when I start as a clone", "description": "Trigger when clone created.", "coordinates": "x: 74.5, y: 795"},

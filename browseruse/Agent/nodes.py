@@ -30,7 +30,28 @@ from browseruse.Agent.reactAgents import command_agent,explaining_agent,debuggin
 from browseruse.Agent.utils.state import State
 from browseruse.Agent.utils.tool import make_blocks
 
-GEMINIAPI = 'AIzaSyBRYRYAjFStLg_xFoNFTaSsaphNuNkmd_I'
+from pathlib import Path
+# load_dotenv()
+def get_base_path():
+    """Return folder where exe/script is located (for reading/writing files)."""
+    if getattr(sys, "frozen", False):
+        # Running as PyInstaller exe
+        return Path(sys.executable).parent
+    else:
+        # Running as Python script
+        return Path(__file__).parent.parent.parent
+
+BASE_DIR = get_base_path()
+USER_DATA_DIR = BASE_DIR / "userdata" / "user_data.json"
+
+# Load user data from JSON file
+with open(USER_DATA_DIR, "r", encoding="utf-8") as f:
+    user_data =     json.load(f)
+
+
+
+GEMINIAPI = user_data['gemini_api_key']
+
 model = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash",
     google_api_key=GEMINIAPI,
@@ -40,7 +61,7 @@ model = ChatGoogleGenerativeAI(
 model2 = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash",
     google_api_key=GEMINIAPI,
-    temperature=0.1  # Lower temperature for more consistent responses
+    temperature=0  # Lower temperature for more consistent responses
 )
 
 executor = Executor()
@@ -55,9 +76,9 @@ Given the user's query below, choose the most appropriate agent to handle it:
 User Query: "{query}"
   - code_explain -> Explain working space (user's code) of the user.
   - code_debugging -> Help user debug their Scratch programs.
-  - give_instructions -> Provide step-by-step instructions for using Scratch and How to code using Scratch. If user ask to give instuctions to do certain task, choose this.
+  - give_instructions -> Provide step-by-step instructions for using Scratch and How to code using Scratch. If user ask to give instuctions to do certain task, choose this.Also keywords like INSTRUCTIONS, STEPS, "How to do this", "How to do that", "Help me do this", "Help me do that", "I want to learn how to do this", "I want to learn how to do that", "Can you give me instructions for this?", "Can you give me steps for this?", "I need help with instructions", "I need help with steps", "Please give me instructions for this", "Please give me steps for this". If user say any of these or similar, choose give_instructions.
   - make_blocks -> Create Scratch blocks based on user input. If user want some help to create blocks, choose this. If user want to See how to do something, choose make_blocks.
-  - make_blocks -> Specially key words like "Create blocks", "Make blocks", "Show me how to do this in blocks", "How to do this in blocks", "Help me create blocks", "Help me make blocks", "I want to see the blocks for this", "I want to see how to do this in blocks", "Show me the blocks for this", "Show me how to do this in blocks", "Can you create the blocks for this?", "Can you make the blocks for this?", "Can you show me the blocks for this?", "Can you show me how to do this in blocks?", "I need help creating blocks", "I need help making blocks", "I need help with the blocks for this", "I need help with how to do this in blocks", "Please create the blocks for this", "Please make the blocks for this", "Please show me the blocks for this", "Please show me how to do this in blocks". If user say any of these or similar, choose make_blocks.
+  - make_blocks -> Specially key words like CREATE,SHOW, "Create blocks", "Make blocks", "Show me how to do this in blocks", "How to do this in blocks", "Help me create blocks", "Help me make blocks", "I want to see the blocks for this", "I want to see how to do this in blocks", "Show me the blocks for this", "Show me how to do this in blocks", "Can you create the blocks for this?", "Can you make the blocks for this?", "Can you show me the blocks for this?", "Can you show me how to do this in blocks?", "I need help creating blocks", "I need help making blocks", "I need help with the blocks for this", "I need help with how to do this in blocks", "Please create the blocks for this", "Please make the blocks for this", "Please show me the blocks for this", "Please show me how to do this in blocks". If user say any of these or similar, choose make_blocks.
   - general_agent -> For all other queries that do not fit the above categories if it is a just not code related, provide a general response. If use say "Hi", "Hello", "Thank you", "Thanks", "What is your name?", "Who are you?" or any other general question like this, choose this.
 
   specially identify if the user is asking for instructions on how to do something in Scratch, or if they want you to create blocks for them. In these cases, you must choose "give_instructions" or "make_blocks" respectively.

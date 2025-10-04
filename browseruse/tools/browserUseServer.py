@@ -1,21 +1,42 @@
 # agent_server.py
+import json
 import os
 import asyncio
 import sys
 import socket
 import threading
 from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv()
-USER_DATA_DIR="E:\\VS CODE\\Agentic AI\\profile"
-CHROME_EXECUTABLE_PATH="C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
-BROWSER_USE_PATH = "E:\\VS CODE\\Agentic AI\\BrowserUse\\browseruse"
+# def get_base_path():
+#     """Return folder where exe/script is located (for reading/writing files)."""
+#     if getattr(sys, "frozen", False):
+#         # Running as PyInstaller exe
+#         return Path(sys.executable).parent
+#     else:
+#         # Running as Python script
+#         return Path(__file__).parent.parent.parent
+    
+# BASE_DIR = get_base_path()
+# USER_DATA_DIR = BASE_DIR / "userdata" / "user_data.json"
 
-# print("BROWSER_USE_PATH:", BROWSER_USE_PATH)
-sys.path.append(BROWSER_USE_PATH)
-from browser_use import ChatGoogle
-from browser_use.agent.service import execute_task, create_persistent_agent
-from browser_use.browser.permissions_manager import BrowserPermissionsManager
+# # Load user data from JSON file
+# with open(USER_DATA_DIR, "r", encoding="utf-8") as f:
+#     user_data = json.load(f)
+
+# USER_DATA_DIR = user_data["profile_dir"]
+# CHROME_EXECUTABLE_PATH = user_data["chrome_path"]
+
+# load_dotenv()
+# USER_DATA_DIR="E:\\VS CODE\\Agentic AI\\profile"
+# CHROME_EXECUTABLE_PATH="C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+# # BROWSER_USE_PATH = "E:\\VS CODE\\Agentic AI\\BrowserUse\\browseruse"
+
+# # print("BROWSER_USE_PATH:", BROWSER_USE_PATH)
+# sys.path.append(BROWSER_USE_PATH)
+from browseruse.browser_use import ChatGoogle
+from browseruse.browser_use.agent.service import execute_task, create_persistent_agent
+from browseruse.browser_use.browser.permissions_manager import BrowserPermissionsManager
 
 
 
@@ -34,27 +55,27 @@ async def agent_worker(agent):
             task_queue.task_done()
             break
 
-        print(f"\n🔄 Executing task: {task}")
+        # print(f"\n🔄 Executing task: {task}")
         try:
             # Special task handling
             if task == "refresh" or task == "screenshot":
                 try:
-                    print("\n📸 Taking screenshot and updating DOM...")
+                    # print("\n📸 Taking screenshot and updating DOM...")
                     
                     # Use the function to capture browser state and elements
                     from browser_use.agent.service import capture_element_positions
                     browser_state, elements_file = await capture_element_positions(agent)
                     
-                    print(f"✅ Screenshot captured with {len(browser_state.dom_state.selector_map)} elements")
-                    print(f"✅ Element data stored at: {elements_file}")
+                    # print(f"✅ Screenshot captured with {len(browser_state.dom_state.selector_map)} elements")
+                    # print(f"✅ Element data stored at: {elements_file}")
                     
                 except Exception as e:
-                    print(f"❌ Error during refresh: {type(e).__name__}: {e}")
+                    # print(f"❌ Error during refresh: {type(e).__name__}: {e}")
                     import traceback
                     traceback.print_exc()
             else:
                 # ADDED: Execute regular tasks through the agent
-                print(f"🤖 Agent executing: {task}")
+                # print(f"🤖 Agent executing: {task}")
                 result = await execute_task(agent, task)
                 print(f"✅ Task completed: {task}")
                 # Optionally print result summary
@@ -90,7 +111,7 @@ def socket_listener(loop):
                 break
 
 
-async def main():
+async def main(CHROME_EXECUTABLE_PATH,USER_DATA_DIR):
     print("🚀 Starting agent...")
     profile = BrowserPermissionsManager.create_voice_enabled_profile(
         user_data_dir=USER_DATA_DIR,
@@ -120,7 +141,7 @@ async def main():
     if hasattr(agent, "browser_session") and agent.browser_session:
         await agent.browser_session.kill()
 
-def start_server():
-    asyncio.run(main())
+def start_server(CHROME_EXECUTABLE_PATH,USER_DATA_DIR):
+    asyncio.run(main(CHROME_EXECUTABLE_PATH,USER_DATA_DIR))
 # if __name__ == "__main__":
 #     start_server()

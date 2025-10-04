@@ -22,8 +22,28 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 
-# Initialize model
-GEMINIAPI = 'AIzaSyBRYRYAjFStLg_xFoNFTaSsaphNuNkmd_I'
+from pathlib import Path
+# load_dotenv()
+def get_base_path():
+    """Return folder where exe/script is located (for reading/writing files)."""
+    if getattr(sys, "frozen", False):
+        # Running as PyInstaller exe
+        return Path(sys.executable).parent
+    else:
+        # Running as Python script
+        return Path(__file__).parent.parent.parent
+
+BASE_DIR = get_base_path()
+USER_DATA_DIR = BASE_DIR / "userdata" / "user_data.json"
+
+# Load user data from JSON file
+with open(USER_DATA_DIR, "r", encoding="utf-8") as f:
+    user_data =     json.load(f)
+
+
+
+GEMINIAPI = user_data['gemini_api_key']
+
 model = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash",
     google_api_key=GEMINIAPI,
@@ -194,7 +214,7 @@ so that they are simple, clear, and fun for children to understand.
 - Present the steps in a way that kids can follow easily.
 
 Input: The message from the supervisor or other agents.
-Output: A child-friendly version of that message not more than 200 words.
+Output: A child-friendly version of that message not more than 300 words.Remove this kind of coordinates if exist  (349, 267).
 """
         )
 

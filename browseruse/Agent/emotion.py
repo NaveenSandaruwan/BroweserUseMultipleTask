@@ -1,12 +1,31 @@
+import json
 import os
+import sys
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
+from pathlib import Path
+# load_dotenv()
+def get_base_path():
+    """Return folder where exe/script is located (for reading/writing files)."""
+    if getattr(sys, "frozen", False):
+        # Running as PyInstaller exe
+        return Path(sys.executable).parent
+    else:
+        # Running as Python script
+        return Path(__file__).parent.parent.parent
 
-load_dotenv()
+BASE_DIR = get_base_path()
+USER_DATA_DIR = BASE_DIR / "userdata" / "user_data.json"
 
-GEMINIAPI = 'AIzaSyBRYRYAjFStLg_xFoNFTaSsaphNuNkmd_I'
+# Load user data from JSON file
+with open(USER_DATA_DIR, "r", encoding="utf-8") as f:
+    user_data = json.load(f)
+
+
+
+GEMINIAPI = user_data['gemini_api_key']
 
 class EmotionIdentifier:
     def __init__(self):
@@ -24,6 +43,7 @@ class EmotionIdentifier:
         """
         prompt = (
             "Identify the primary emotion expressed in the following text. "
+            "Imagine you are in conversation with a child. And you have to identify the emotion should react from their text.\n"
             "Respond with only one word by most suitable emotion from here happy, sad, angry, surprised, fearful, disgusted, neutral.\n\n"
             "Imagine you are a learning assistant for children. "
             "You have to identify the reaction emotion of the user from their text.\n"

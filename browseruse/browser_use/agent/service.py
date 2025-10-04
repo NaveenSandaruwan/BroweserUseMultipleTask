@@ -2036,7 +2036,7 @@ class Agent(Generic[Context, AgentStructuredOutput]):
 		# Run initial task
 		try:
 			result = await self.run(max_steps=max_steps_per_task)
-			print("\n✅ Task completed. Browser session remains active.")
+			# print("\n✅ Task completed. Browser session remains active.")
 		except Exception as e:
 			print(f"\n❌ Error during initial task: {e}")
 			print("Attempting to continue anyway...")
@@ -2094,11 +2094,11 @@ class Agent(Generic[Context, AgentStructuredOutput]):
 					input()
 					continue
 				except KeyboardInterrupt:
-					print("\nExiting continuous browser control mode...")
+					# print("\nExiting continuous browser control mode...")
 					break
 			except Exception as e:
-				print(f"\n❌ Error: {e}")
-				print("Browser session may be in an inconsistent state.")
+				# print(f"\n❌ Error: {e}")
+				# print("Browser session may be in an inconsistent state.")
 				choice = input("Continue anyway? (y/n): ")
 				if choice.lower() != 'y':
 					break
