@@ -1,0 +1,24 @@
+{
+  "prompt": "How can I make my sprite jump?",
+  "expected_route": "give_instructions",
+  "actual_route": "give_instructions",
+  "routing_correct": true,
+  "execution_time": 13.13,
+  "agent_response": "Hey there, future game developers! Let's make your Scratch sprite jump! It's super fun!\n\n**First, pick how you want to make your sprite jump:**\n\n*   Press a key? Use the `when key pressed` block. You can find it in the \"Events\" blocks. Choose your favorite key, like the space bar!\n*   Click the sprite? Use the `when this sprite clicked` block, also in \"Events.\"\n\n**Now, let's make the sprite jump up and down:**\n\n1.  **Jump Up:** Use the `change y by` block from the \"Motion\" blocks. Put in a positive number, like 50, to make it go up!\n2.  **Wait at the Top:** Add a `wait seconds` block from the \"Control\" blocks. A short wait, like 0.2 seconds, will do!\n3.  **Come Down:** Use another `change y by` block, but this time with a negative number, like -50. This brings the sprite back down!\n\n**Make it even cooler with a loop!**\n\n1.  Use the `repeat` block from the \"Control\" blocks.\n2.  Put `change y by (10)` and `wait (0.01) seconds` inside the `repeat` block.\n3.  Repeat with `change y by (-10)` and `wait (0.01) seconds` to come down smoothly.\n\nTry different numbers to make the jump higher or lower. Have fun experimenting!",
+  "response_verification": {
+    "has_response": true,
+    "response_length": 1131,
+    "is_accurate": true,
+    "accuracy_label": "Accurate",
+    "notes": [
+      "Contains instructional content",
+      "Addresses prompt (2/3 key words match, 66.7%)"
+    ]
+  },
+  "result": {
+    "query": "How can I make my sprite jump?",
+    "result": {
+      "formatted_response": "Hey there, future game developers! Let's make your Scratch sprite jump! It's super fun!\n\n**First, pick how you want to make your sprite jump:**\n\n*   Press a key? Use the `when key pressed` block. You can find it in the \"Events\" blocks. Choose your favorite key, like the space bar!\n*   Click the sprite? Use the `when this sprite clicked` block, also in \"Events.\"\n\n**Now, let's make the sprite jump up and down:**\n\n1.  **Jump Up:** Use the `change y by` block from the \"Motion\" blocks. Put in a positive number, like 50, to make it go up!\n2.  **Wait at the Top:** Add a `wait seconds` block from the \"Control\" blocks. A short wait, like 0.2 seconds, will do!\n3.  **Come Down:** Use another `change y by` block, but this time with a negative number, like -50. This brings the sprite back down!\n\n**Make it even cooler with a loop!**\n\n1.  Use the `repeat` block from the \"Control\" blocks.\n2.  Put `change y by (10)` and `wait (0.01) seconds` inside the `repeat` block.\n3.  Repeat with `change y by (-10)` and `wait (0.01) seconds` to come down smoothly.\n\nTry different numbers to make the jump higher or lower. Have fun experimenting!"
+    }
+  }
+}

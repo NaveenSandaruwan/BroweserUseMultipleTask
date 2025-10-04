@@ -1,0 +1,194 @@
+[
+  {
+    "prompt": "My code isn't working, can you help?",
+    "expected_route": "code_debugging",
+    "actual_route": "code_debugging",
+    "routing_correct": true,
+    "execution_time": 12.41,
+    "agent_response": "Hey there, Scratch superstar! Let's make sure your blocks are working together to create something amazing!\n\n*   **\"When\" Block:** I see you have a \"when\" block, which is awesome because that's how your code knows when to start! But, there are many \"when\" blocks. Let's use \"when green flag clicked\", \"when key pressed\", \"when this sprite clicked\", \"when backdrop switches\", \"when greater than\", or \"when I receive message\".\n*   **\"Repeat\" Block:** You also have a \"repeat\" block, which is like saying, \"Do this a bunch of times!\" To work, it needs to be right after the \"when\" block.\n*   **\"Move\" Block:** And a \"move\" block! This tells your sprite to move. To make it move again and again, let's put it inside the \"repeat\" block.\n\n**So, here's the plan:**\n\n1.  Drag the \"repeat\" block under the \"when\" block. It's like connecting train cars!\n2.  Now, drag the \"move\" block inside the \"repeat\" block. This tells the sprite to move again and again!\n\n**Why do we do this?**\n\nThe blocks need to be in the right order, like a recipe! The \"when\" block starts the action, the \"repeat\" block says how many times to do it, and the \"move\" block says what to do! If they're not connected, your code won't know what to do. Keep up the great work!",
+    "response_verification": {
+      "has_response": true,
+      "response_length": 1236,
+      "is_accurate": true,
+      "accuracy_label": "Accurate",
+      "notes": [
+        "Contains debugging advice",
+        "Addresses prompt (1/4 key words match, 25.0%)"
+      ]
+    },
+    "result": {
+      "query": "My code isn't working, can you help?",
+      "result": {
+        "formatted_response": "Hey there, Scratch superstar! Let's make sure your blocks are working together to create something amazing!\n\n*   **\"When\" Block:** I see you have a \"when\" block, which is awesome because that's how your code knows when to start! But, there are many \"when\" blocks. Let's use \"when green flag clicked\", \"when key pressed\", \"when this sprite clicked\", \"when backdrop switches\", \"when greater than\", or \"when I receive message\".\n*   **\"Repeat\" Block:** You also have a \"repeat\" block, which is like saying, \"Do this a bunch of times!\" To work, it needs to be right after the \"when\" block.\n*   **\"Move\" Block:** And a \"move\" block! This tells your sprite to move. To make it move again and again, let's put it inside the \"repeat\" block.\n\n**So, here's the plan:**\n\n1.  Drag the \"repeat\" block under the \"when\" block. It's like connecting train cars!\n2.  Now, drag the \"move\" block inside the \"repeat\" block. This tells the sprite to move again and again!\n\n**Why do we do this?**\n\nThe blocks need to be in the right order, like a recipe! The \"when\" block starts the action, the \"repeat\" block says how many times to do it, and the \"move\" block says what to do! If they're not connected, your code won't know what to do. Keep up the great work!"
+      }
+    }
+  },
+  {
+    "prompt": "Why isn't my sprite moving?",
+    "expected_route": "code_debugging",
+    "actual_route": "code_debugging",
+    "routing_correct": true,
+    "execution_time": 11.96,
+    "agent_response": "Hey there, Scratch coder! Let's get your sprite moving!\n\nHere's what I see in your code:\n\n*   The `when green flag clicked` block is like the \"go\" button for your code!\n*   The `repeat 10` block is like saying, \"Do this 10 times!\"\n*   The `move 10 steps` block is what tells your sprite to walk.\n\nBut, uh-oh! It looks like your sprite isn't listening to you because the `move 10 steps` block isn't *inside* the `repeat 10` block. It's like telling someone to walk, but not telling them *how many times* to walk!\n\nHere's how to fix it:\n\n1.  Drag the `move 10 steps` block *inside* the `repeat 10` block. You'll see the `repeat` block light up when it's ready to \"catch\" the `move` block.\n\nNow, when you click the green flag, your sprite will move 10 steps, and it will do that 10 times! Yay!\n\nIf it *still* doesn't work, don't worry! We'll figure it out together! Just let me know!",
+    "response_verification": {
+      "has_response": true,
+      "response_length": 880,
+      "is_accurate": false,
+      "accuracy_label": "Not Accurate",
+      "notes": [
+        "Missing debugging analysis or solutions",
+        "Response doesn't sufficiently address prompt or route requirements"
+      ]
+    },
+    "result": {
+      "query": "Why isn't my sprite moving?",
+      "result": {
+        "formatted_response": "Hey there, Scratch coder! Let's get your sprite moving!\n\nHere's what I see in your code:\n\n*   The `when green flag clicked` block is like the \"go\" button for your code!\n*   The `repeat 10` block is like saying, \"Do this 10 times!\"\n*   The `move 10 steps` block is what tells your sprite to walk.\n\nBut, uh-oh! It looks like your sprite isn't listening to you because the `move 10 steps` block isn't *inside* the `repeat 10` block. It's like telling someone to walk, but not telling them *how many times* to walk!\n\nHere's how to fix it:\n\n1.  Drag the `move 10 steps` block *inside* the `repeat 10` block. You'll see the `repeat` block light up when it's ready to \"catch\" the `move` block.\n\nNow, when you click the green flag, your sprite will move 10 steps, and it will do that 10 times! Yay!\n\nIf it *still* doesn't work, don't worry! We'll figure it out together! Just let me know!"
+      }
+    }
+  },
+  {
+    "prompt": "There's something wrong with my program",
+    "expected_route": "code_debugging",
+    "actual_route": "code_debugging",
+    "routing_correct": true,
+    "execution_time": 10.89,
+    "agent_response": "Hey there, Scratch superstar! I've checked out your awesome project, and it looks like you're about to make something super cool happen!\n\nHere's the lowdown:\n\n*   You've got a \"when green flag clicked\" block. That's the perfect way to kick off your program when you press the green flag!\n*   You also have a \"repeat 10\" block. This is like saying, \"Do this stuff 10 times!\"\n*   And a \"move 10 steps\" block to make your character move.\n\n**Uh-oh!**\n\nIt looks like your \"move 10 steps\" block isn't quite inside the \"repeat 10\" block yet. That means your character won't move 10 steps, 10 times.\n\n**Let's fix it!**\n\nDrag the \"move 10 steps\" block into the \"repeat 10\" block. It's like giving the \"repeat\" block a hug!\n\n**Ta-da!**\n\nNow, when you click the green flag, your character will move 10 steps, and it will do it 10 times in a row! How cool is that? You're doing great!",
+    "response_verification": {
+      "has_response": true,
+      "response_length": 872,
+      "is_accurate": false,
+      "accuracy_label": "Not Accurate",
+      "notes": [
+        "Missing debugging analysis or solutions",
+        "Response doesn't sufficiently address prompt or route requirements"
+      ]
+    },
+    "result": {
+      "query": "There's something wrong with my program",
+      "result": {
+        "formatted_response": "Hey there, Scratch superstar! I've checked out your awesome project, and it looks like you're about to make something super cool happen!\n\nHere's the lowdown:\n\n*   You've got a \"when green flag clicked\" block. That's the perfect way to kick off your program when you press the green flag!\n*   You also have a \"repeat 10\" block. This is like saying, \"Do this stuff 10 times!\"\n*   And a \"move 10 steps\" block to make your character move.\n\n**Uh-oh!**\n\nIt looks like your \"move 10 steps\" block isn't quite inside the \"repeat 10\" block yet. That means your character won't move 10 steps, 10 times.\n\n**Let's fix it!**\n\nDrag the \"move 10 steps\" block into the \"repeat 10\" block. It's like giving the \"repeat\" block a hug!\n\n**Ta-da!**\n\nNow, when you click the green flag, your character will move 10 steps, and it will do it 10 times in a row! How cool is that? You're doing great!"
+      }
+    }
+  },
+  {
+    "prompt": "Help me fix this bug",
+    "expected_route": "code_debugging",
+    "actual_route": "code_debugging",
+    "routing_correct": true,
+    "execution_time": 10.43,
+    "agent_response": "Hey there, Scratch superstar! I looked at your code, and it's almost perfect!\n\n*   The `when green flag clicked` block is great. It tells your code to start when you click the green flag.\n*   The `repeat 10` block is super cool. It's like saying, \"Do this 10 times!\"\n*   The `move 10 steps` block makes your character move forward.\n\nHere's a tiny thing to fix:\n\nRight now, the `move 10 steps` block isn't *inside* the `repeat 10` block. That means your character will only move once.\n\n**Here's how to make it awesome:**\n\nDrag the `move 10 steps` block *inside* the `repeat 10` block. It's like putting a toy inside a box. Now, your character will move 10 steps, and it will do that 10 times! Yay!",
+    "response_verification": {
+      "has_response": true,
+      "response_length": 696,
+      "is_accurate": false,
+      "accuracy_label": "Not Accurate",
+      "notes": [
+        "Missing debugging analysis or solutions",
+        "Response doesn't sufficiently address prompt or route requirements"
+      ]
+    },
+    "result": {
+      "query": "Help me fix this bug",
+      "result": {
+        "formatted_response": "Hey there, Scratch superstar! I looked at your code, and it's almost perfect!\n\n*   The `when green flag clicked` block is great. It tells your code to start when you click the green flag.\n*   The `repeat 10` block is super cool. It's like saying, \"Do this 10 times!\"\n*   The `move 10 steps` block makes your character move forward.\n\nHere's a tiny thing to fix:\n\nRight now, the `move 10 steps` block isn't *inside* the `repeat 10` block. That means your character will only move once.\n\n**Here's how to make it awesome:**\n\nDrag the `move 10 steps` block *inside* the `repeat 10` block. It's like putting a toy inside a box. Now, your character will move 10 steps, and it will do that 10 times! Yay!"
+      }
+    }
+  },
+  {
+    "prompt": "My blocks aren't doing what I expected",
+    "expected_route": "code_debugging",
+    "actual_route": "code_debugging",
+    "routing_correct": true,
+    "execution_time": 15.7,
+    "agent_response": "Hey there, Scratch superstar! I've looked at your awesome project, and I have a super simple tip to make it even better!\n\nYou have a \"when green flag clicked\" block - that's perfect for starting your code! You also have a \"repeat (10)\" block, which is great for doing something again and again. And I see a \"move (10) steps\" block to make your character move.\n\nHere's the trick:\n\nThe \"move (10) steps\" block needs to go INSIDE the \"repeat (10)\" block. Think of it like putting toys inside a box!\n\n*   Drag the \"move (10) steps\" block up into the \"repeat (10)\" block.\n*   You'll see a white line show you where it will go. Let the \"move\" block go, and it will snap right inside!\n\nNow, when you click the green flag, your character will move ten times! Awesome!",
+    "response_verification": {
+      "has_response": true,
+      "response_length": 759,
+      "is_accurate": false,
+      "accuracy_label": "Not Accurate",
+      "notes": [
+        "Missing debugging analysis or solutions",
+        "Response doesn't sufficiently address prompt or route requirements"
+      ]
+    },
+    "result": {
+      "query": "My blocks aren't doing what I expected",
+      "result": {
+        "formatted_response": "Hey there, Scratch superstar! I've looked at your awesome project, and I have a super simple tip to make it even better!\n\nYou have a \"when green flag clicked\" block - that's perfect for starting your code! You also have a \"repeat (10)\" block, which is great for doing something again and again. And I see a \"move (10) steps\" block to make your character move.\n\nHere's the trick:\n\nThe \"move (10) steps\" block needs to go INSIDE the \"repeat (10)\" block. Think of it like putting toys inside a box!\n\n*   Drag the \"move (10) steps\" block up into the \"repeat (10)\" block.\n*   You'll see a white line show you where it will go. Let the \"move\" block go, and it will snap right inside!\n\nNow, when you click the green flag, your character will move ten times! Awesome!"
+      }
+    }
+  },
+  {
+    "prompt": "Debug my Scratch project",
+    "expected_route": "code_debugging",
+    "actual_route": "code_debugging",
+    "routing_correct": true,
+    "execution_time": 10.61,
+    "agent_response": "Hey there, Scratch superstar!\n\nI looked at your code, and it's almost perfect! Here's a tiny tweak to make it even better:\n\nYou have a \"when green flag clicked\" block—that's great for starting your project! You also have a \"repeat 10\" block, which is awesome for making things happen again and again. And I see you have a \"move 10 steps\" block to make your character move.\n\nBut, the \"move 10 steps\" block needs to be *inside* the \"repeat 10\" block. Think of it like this: the \"repeat\" block is like a loop, and you want the \"move\" block to be inside the loop so it happens over and over.\n\nJust drag the \"move 10 steps\" block into the \"repeat 10\" block. Now, when you click the green flag, your character will move ten steps, ten times!\n\nKeep up the fantastic work!",
+    "response_verification": {
+      "has_response": true,
+      "response_length": 764,
+      "is_accurate": false,
+      "accuracy_label": "Not Accurate",
+      "notes": [
+        "Missing debugging analysis or solutions",
+        "Response doesn't sufficiently address prompt or route requirements"
+      ]
+    },
+    "result": {
+      "query": "Debug my Scratch project",
+      "result": {
+        "formatted_response": "Hey there, Scratch superstar!\n\nI looked at your code, and it's almost perfect! Here's a tiny tweak to make it even better:\n\nYou have a \"when green flag clicked\" block—that's great for starting your project! You also have a \"repeat 10\" block, which is awesome for making things happen again and again. And I see you have a \"move 10 steps\" block to make your character move.\n\nBut, the \"move 10 steps\" block needs to be *inside* the \"repeat 10\" block. Think of it like this: the \"repeat\" block is like a loop, and you want the \"move\" block to be inside the loop so it happens over and over.\n\nJust drag the \"move 10 steps\" block into the \"repeat 10\" block. Now, when you click the green flag, your character will move ten steps, ten times!\n\nKeep up the fantastic work!"
+      }
+    }
+  },
+  {
+    "prompt": "What's wrong with my code?",
+    "expected_route": "code_debugging",
+    "actual_route": "code_debugging",
+    "routing_correct": true,
+    "execution_time": 10.33,
+    "agent_response": "Hey there, Scratch superstar! I've checked out your awesome project, and I have a super easy tip to make it even better!\n\nI see you have these blocks:\n\n*   The **`when green flag clicked`** block: This is like the \"start\" button for your code!\n*   The **`repeat (10)`** block: This block is like saying, \"Do this 10 times!\"\n*   The **`move (10) steps`** block: This tells your character to move a little bit.\n\nHere's the trick: The `move` block needs to go INSIDE the `repeat` block. It's like putting a toy inside a box!\n\n**Here's how:**\n\n1.  Click and drag the `move (10) steps` block.\n2.  Move it over the `repeat (10)` block. You'll see a white line show you where it will go.\n3.  Let go of the mouse, and *poof*, it's inside!\n\nNow, when you click the green flag, your character will move 10 steps, and it will do that 10 times in a row! Awesome, right? Keep up the fantastic work!",
+    "response_verification": {
+      "has_response": true,
+      "response_length": 885,
+      "is_accurate": false,
+      "accuracy_label": "Not Accurate",
+      "notes": [
+        "Missing debugging analysis or solutions",
+        "Response doesn't sufficiently address prompt or route requirements"
+      ]
+    },
+    "result": {
+      "query": "What's wrong with my code?",
+      "result": {
+        "formatted_response": "Hey there, Scratch superstar! I've checked out your awesome project, and I have a super easy tip to make it even better!\n\nI see you have these blocks:\n\n*   The **`when green flag clicked`** block: This is like the \"start\" button for your code!\n*   The **`repeat (10)`** block: This block is like saying, \"Do this 10 times!\"\n*   The **`move (10) steps`** block: This tells your character to move a little bit.\n\nHere's the trick: The `move` block needs to go INSIDE the `repeat` block. It's like putting a toy inside a box!\n\n**Here's how:**\n\n1.  Click and drag the `move (10) steps` block.\n2.  Move it over the `repeat (10)` block. You'll see a white line show you where it will go.\n3.  Let go of the mouse, and *poof*, it's inside!\n\nNow, when you click the green flag, your character will move 10 steps, and it will do that 10 times in a row! Awesome, right? Keep up the fantastic work!"
+      }
+    }
+  },
+  {
+    "prompt": "My sprite keeps disappearing",
+    "expected_route": "code_debugging",
+    "actual_route": "code_debugging",
+    "routing_correct": true,
+    "execution_time": 12.97,
+    "agent_response": "Hey there! I'm here to help you find your missing sprite! It's like a fun detective game!\n\nHere's what we can do:\n\n1.  **Make Sure Your Sprite Can Be Seen:**\n    *   Sometimes, sprites hide and forget to come back! Let's add a \"show\" block right after the green flag. It's like telling your sprite, \"Time to shine!\"\n    *   Check if there is a \"hide\" block that might be making your sprite disappear.\n\n2.  **Keep Your Sprite on the Stage:**\n    *   Your sprite might be running off the stage where we can't see it.\n    *   Let's add a \"if on edge, bounce\" block inside the \"repeat\" loop. It's like a little bumper that says, \"Oops, turn back!\"\n    *   Or, we can tell your sprite to take smaller steps so it doesn't run away too fast.\n\nLet's put these blocks together like this:\n\n```scratch\nwhen [green flag clicked]\nshow\nrepeat [10]\nmove [10] steps\nif on edge, bounce\n```\n\nTry these tricks, and let me know if your sprite is back! If not, we'll keep searching together!",
+    "response_verification": {
+      "has_response": true,
+      "response_length": 970,
+      "is_accurate": true,
+      "accuracy_label": "Accurate",
+      "notes": [
+        "Contains debugging advice",
+        "Addresses prompt (1/3 key words match, 33.3%)"
+      ]
+    },
+    "result": {
+      "query": "My sprite keeps disappearing",
+      "result": {
+        "formatted_response": "Hey there! I'm here to help you find your missing sprite! It's like a fun detective game!\n\nHere's what we can do:\n\n1.  **Make Sure Your Sprite Can Be Seen:**\n    *   Sometimes, sprites hide and forget to come back! Let's add a \"show\" block right after the green flag. It's like telling your sprite, \"Time to shine!\"\n    *   Check if there is a \"hide\" block that might be making your sprite disappear.\n\n2.  **Keep Your Sprite on the Stage:**\n    *   Your sprite might be running off the stage where we can't see it.\n    *   Let's add a \"if on edge, bounce\" block inside the \"repeat\" loop. It's like a little bumper that says, \"Oops, turn back!\"\n    *   Or, we can tell your sprite to take smaller steps so it doesn't run away too fast.\n\nLet's put these blocks together like this:\n\n```scratch\nwhen [green flag clicked]\nshow\nrepeat [10]\nmove [10] steps\nif on edge, bounce\n```\n\nTry these tricks, and let me know if your sprite is back! If not, we'll keep searching together!"
+      }
+    }
+  }
+]

@@ -1,0 +1,29 @@
+{
+  "test_id": "test_004",
+  "description": "Control structures with repeat",
+  "timestamp": "2025-10-03T13:17:05.921468",
+  "execution_time_seconds": 7.53,
+  "steps_count": 3,
+  "input_plan": {
+    "steps": [
+      {
+        "step": 1,
+        "category": "Events",
+        "block": "when green flag clicked"
+      },
+      {
+        "step": 2,
+        "category": "Control",
+        "block": "repeat times"
+      },
+      {
+        "step": 3,
+        "category": "Motion",
+        "block": "move steps"
+      }
+    ]
+  },
+  "execution_status": "✅ Execution completed.",
+  "workspace_state": " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) \n 2. repeat Code block. Block Coordinates: (X: 350, Y: 175 ) \n 3. move Code block. Block Coordinates: (X: 361, Y: 208 ) \n",
+  "screenshot_path": "test_results/screenshots/test_004_20251003_131619.png"
+}

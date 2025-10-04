@@ -1,0 +1,12 @@
+Test ID: make_blocks_test_005
+Timestamp: 2025-10-04T17:19:14.953611
+================================================================================
+WORKSPACE DATA FROM get_list_of_used_blocks()
+================================================================================
+
+ Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. say Code block. Block Coordinates: (X: 350, Y: 175 ) 
+ 3. hide Code block. Block Coordinates: (X: 350, Y: 208 ) 
+ 4. wait Code block. Block Coordinates: (X: 350, Y: 240 ) 
+ 5. show Code block. Block Coordinates: (X: 350, Y: 272 ) 

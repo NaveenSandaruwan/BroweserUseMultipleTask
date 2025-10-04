@@ -1,0 +1,24 @@
+{
+  "prompt": "Explain how to use if-then blocks",
+  "expected_route": "give_instructions",
+  "actual_route": "give_instructions",
+  "routing_correct": true,
+  "execution_time": 11.08,
+  "agent_response": "Hey there, Scratch Explorers!\n\nWant to make your Scratch games super smart? Let's learn about the `if then` block! It's like a brain for your code, helping it make choices.\n\n**What it does:** The `if then` block checks if something is true. If it is, then the code inside the block runs! If not, Scratch skips that code.\n\n**How to use it:**\n\n1.  Find the `if then` block in the \"Control\" blocks (it's at the bottom of the list). Drag it into your code.\n2.  Now, we need to tell the `if then` block *what* to check. We need to put a condition in the hexagonal space. You can find conditions in \"Sensing\" or \"Operators.\"\n    *   `touching object`: Is my sprite touching something?\n    *   `key pressed`: Is someone pressing a key?\n    *   `greater than`, `less than`, `equals`: Are two numbers the same?\n3.  Put the code you want to run *inside* the `if then` block. This code will only run if your condition is true!\n\n**Example:**\n\nLet's make a sprite say \"Hello!\" when you press the space key.\n\n1.  Get a `when key pressed` block from the \"Events\" blocks. Choose \"space.\"\n2.  Put an `if then` block inside the `when key pressed` block.\n3.  Drag a `key pressed` block from \"Sensing\" into the `if then` block's hexagon. Choose \"space\" again.\n4.  Put a `say message` block inside the `if then` block. Change the message to \"Hello!\".\n\nNow, your sprite will only say \"Hello!\" when you press the space key! Isn't that cool?\n\nThe `if then` block helps you make games that react to what's happening. Have fun experimenting!",
+  "response_verification": {
+    "has_response": true,
+    "response_length": 1515,
+    "is_accurate": true,
+    "accuracy_label": "Accurate",
+    "notes": [
+      "Contains instructional content",
+      "Addresses prompt (1/3 key words match, 33.3%)"
+    ]
+  },
+  "result": {
+    "query": "Explain how to use if-then blocks",
+    "result": {
+      "formatted_response": "Hey there, Scratch Explorers!\n\nWant to make your Scratch games super smart? Let's learn about the `if then` block! It's like a brain for your code, helping it make choices.\n\n**What it does:** The `if then` block checks if something is true. If it is, then the code inside the block runs! If not, Scratch skips that code.\n\n**How to use it:**\n\n1.  Find the `if then` block in the \"Control\" blocks (it's at the bottom of the list). Drag it into your code.\n2.  Now, we need to tell the `if then` block *what* to check. We need to put a condition in the hexagonal space. You can find conditions in \"Sensing\" or \"Operators.\"\n    *   `touching object`: Is my sprite touching something?\n    *   `key pressed`: Is someone pressing a key?\n    *   `greater than`, `less than`, `equals`: Are two numbers the same?\n3.  Put the code you want to run *inside* the `if then` block. This code will only run if your condition is true!\n\n**Example:**\n\nLet's make a sprite say \"Hello!\" when you press the space key.\n\n1.  Get a `when key pressed` block from the \"Events\" blocks. Choose \"space.\"\n2.  Put an `if then` block inside the `when key pressed` block.\n3.  Drag a `key pressed` block from \"Sensing\" into the `if then` block's hexagon. Choose \"space\" again.\n4.  Put a `say message` block inside the `if then` block. Change the message to \"Hello!\".\n\nNow, your sprite will only say \"Hello!\" when you press the space key! Isn't that cool?\n\nThe `if then` block helps you make games that react to what's happening. Have fun experimenting!"
+    }
+  }
+}

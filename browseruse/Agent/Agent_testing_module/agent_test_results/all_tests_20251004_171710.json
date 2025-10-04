@@ -1,0 +1,932 @@
+{
+  "session_id": "20251004_171710",
+  "timestamp": "2025-10-04T17:26:45.968837",
+  "statistics": {
+    "total_tests": 34,
+    "routing_correct": 32,
+    "routing_accuracy": 94.12,
+    "average_execution_time": 11.77,
+    "total_accurate_responses": 26,
+    "overall_response_accuracy": 76.47,
+    "category_stats": {
+      "make_blocks": {
+        "total": 7,
+        "correct": 6,
+        "accuracy": 85.71,
+        "average_time": 13.49,
+        "accurate_responses": 6,
+        "response_accuracy": 85.71
+      },
+      "code_explain": {
+        "total": 8,
+        "correct": 7,
+        "accuracy": 87.5,
+        "average_time": 11.0,
+        "accurate_responses": 7,
+        "response_accuracy": 87.5
+      },
+      "code_debugging": {
+        "total": 8,
+        "correct": 8,
+        "accuracy": 100.0,
+        "average_time": 11.91,
+        "accurate_responses": 2,
+        "response_accuracy": 25.0
+      },
+      "give_instructions": {
+        "total": 8,
+        "correct": 8,
+        "accuracy": 100.0,
+        "average_time": 13.07,
+        "accurate_responses": 8,
+        "response_accuracy": 100.0
+      },
+      "general_agent": {
+        "total": 3,
+        "correct": 3,
+        "accuracy": 100.0,
+        "average_time": 5.97,
+        "accurate_responses": 3,
+        "response_accuracy": 100.0
+      }
+    }
+  },
+  "results": {
+    "make_blocks": [
+      {
+        "prompt": "Create blocks to move the sprite 10 steps when green flag clicked",
+        "expected_route": "make_blocks",
+        "actual_route": "make_blocks",
+        "routing_correct": true,
+        "execution_time": 13.01,
+        "agent_response": "Okay, I'm ready to turn those techy instructions into super fun and easy steps for kids! Just paste the message here, and I'll make it awesome. ✨",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 145,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains block creation instructions",
+            "Make_blocks route - lenient accuracy"
+          ]
+        },
+        "result": {
+          "query": "Create blocks to move the sprite 10 steps when green flag clicked",
+          "result": {
+            "formatted_response": "Okay, I'm ready to turn those techy instructions into super fun and easy steps for kids! Just paste the message here, and I'll make it awesome. ✨"
+          }
+        },
+        "blocks_test": {
+          "blocks_tested": true,
+          "workspace_state": " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) \n 2. move Code block. Block Coordinates: (X: 350, Y: 175 ) \n",
+          "workspace_data_path": "agent_test_results/workspace_data/make_blocks_test_001_workspace_20251004_171710.txt",
+          "screenshot_path": "agent_test_results/screenshots/make_blocks_test_001_20251004_171710.png",
+          "blocks_found": true,
+          "workspace_length": 210
+        }
+      },
+      {
+        "prompt": "Show me how to make the sprite say hello",
+        "expected_route": "make_blocks",
+        "actual_route": "give_instructions",
+        "routing_correct": false,
+        "execution_time": 8.31,
+        "agent_response": "Hey there, Scratch Explorers! Let's make your sprite talk! It's super easy and fun.\n\n1.  **Start with a Green Flag:**\n    *   Go to \"Events\" (it's in the blocks on the left side of the screen).\n    *   Grab the \"when green flag clicked\" block. It's like the \"go\" button for your code!\n\n2.  **Make Your Sprite Say Something:**\n    *   Now, go to \"Looks\" (also on the left, where the blocks are).\n    *   Find the \"say message\" block and snap it right under the \"when green flag clicked\" block.\n    *   See the word \"Hello!\" in the \"say message\" block? Click on it and type whatever you want your sprite to say!\n\nIt should look like this:\n\n```scratch\nwhen green flag clicked\nsay [Hello!]\n```\n\nNow, click the green flag above the stage. Ta-da! Your sprite will say \"Hello!\" or whatever cool message you typed in! Isn't that awesome?",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 829,
+          "is_accurate": false,
+          "accuracy_label": "Not Accurate",
+          "notes": [
+            "Wrong route: expected make_blocks, got give_instructions"
+          ]
+        },
+        "result": {
+          "query": "Show me how to make the sprite say hello",
+          "result": {
+            "formatted_response": "Hey there, Scratch Explorers! Let's make your sprite talk! It's super easy and fun.\n\n1.  **Start with a Green Flag:**\n    *   Go to \"Events\" (it's in the blocks on the left side of the screen).\n    *   Grab the \"when green flag clicked\" block. It's like the \"go\" button for your code!\n\n2.  **Make Your Sprite Say Something:**\n    *   Now, go to \"Looks\" (also on the left, where the blocks are).\n    *   Find the \"say message\" block and snap it right under the \"when green flag clicked\" block.\n    *   See the word \"Hello!\" in the \"say message\" block? Click on it and type whatever you want your sprite to say!\n\nIt should look like this:\n\n```scratch\nwhen green flag clicked\nsay [Hello!]\n```\n\nNow, click the green flag above the stage. Ta-da! Your sprite will say \"Hello!\" or whatever cool message you typed in! Isn't that awesome?"
+          }
+        },
+        "blocks_test": {
+          "blocks_tested": false,
+          "reason": "Not a make_blocks test"
+        }
+      },
+      {
+        "prompt": "I want you to make blocks that turn right 15 degrees and move 10 steps",
+        "expected_route": "make_blocks",
+        "actual_route": "make_blocks",
+        "routing_correct": true,
+        "execution_time": 13.01,
+        "agent_response": "Okay, I'm ready to turn those techy instructions into super fun steps for kids! Let's make Scratch programming easy and exciting! Just give me the message!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 155,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains block creation instructions",
+            "Make_blocks route - lenient accuracy"
+          ]
+        },
+        "result": {
+          "query": "I want you to make blocks that turn right 15 degrees and move 10 steps",
+          "result": {
+            "formatted_response": "Okay, I'm ready to turn those techy instructions into super fun steps for kids! Let's make Scratch programming easy and exciting! Just give me the message!"
+          }
+        },
+        "blocks_test": {
+          "blocks_tested": true,
+          "workspace_state": " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) \n 2. turn Code block. Block Coordinates: (X: 350, Y: 175 ) \n 3. move Code block. Block Coordinates: (X: 350, Y: 208 ) \n",
+          "workspace_data_path": "agent_test_results/workspace_data/make_blocks_test_003_workspace_20251004_171710.txt",
+          "screenshot_path": "agent_test_results/screenshots/make_blocks_test_003_20251004_171710.png",
+          "blocks_found": true,
+          "workspace_length": 269
+        }
+      },
+      {
+        "prompt": "Help me create blocks when the green flag clicked repeatedly move 10 steps while making a sound",
+        "expected_route": "make_blocks",
+        "actual_route": "make_blocks",
+        "routing_correct": true,
+        "execution_time": 13.62,
+        "agent_response": "Okay, I'm ready to turn those techy instructions into super fun and easy steps for kids! Just paste the message here, and I'll make it awesome!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 143,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains block creation instructions",
+            "Make_blocks route - lenient accuracy"
+          ]
+        },
+        "result": {
+          "query": "Help me create blocks when the green flag clicked repeatedly move 10 steps while making a sound",
+          "result": {
+            "formatted_response": "Okay, I'm ready to turn those techy instructions into super fun and easy steps for kids! Just paste the message here, and I'll make it awesome!"
+          }
+        },
+        "blocks_test": {
+          "blocks_tested": true,
+          "workspace_state": " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) \n 2. forever Code block. Block Coordinates: (X: 350, Y: 175 ) \n 3. move Code block. Block Coordinates: (X: 361, Y: 208 ) \n",
+          "workspace_data_path": "agent_test_results/workspace_data/make_blocks_test_004_workspace_20251004_171710.txt",
+          "screenshot_path": "agent_test_results/screenshots/make_blocks_test_004_20251004_171710.png",
+          "blocks_found": true,
+          "workspace_length": 272
+        }
+      },
+      {
+        "prompt": "Create blocks that say hello for 2 seconds, then hide and show the sprite",
+        "expected_route": "make_blocks",
+        "actual_route": "make_blocks",
+        "routing_correct": true,
+        "execution_time": 18.17,
+        "agent_response": "Okay, I'm ready to turn techy instructions into super fun and easy steps for kids! Just give me the message, and I'll make it awesome! ",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 135,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains block creation instructions",
+            "Make_blocks route - lenient accuracy"
+          ]
+        },
+        "result": {
+          "query": "Create blocks that say hello for 2 seconds, then hide and show the sprite",
+          "result": {
+            "formatted_response": "Okay, I'm ready to turn techy instructions into super fun and easy steps for kids! Just give me the message, and I'll make it awesome! "
+          }
+        },
+        "blocks_test": {
+          "blocks_tested": true,
+          "workspace_state": " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) \n 2. say Code block. Block Coordinates: (X: 350, Y: 175 ) \n 3. hide Code block. Block Coordinates: (X: 350, Y: 208 ) \n 4. wait Code block. Block Coordinates: (X: 350, Y: 240 ) \n 5. show Code block. Block Coordinates: (X: 350, Y: 272 ) \n",
+          "workspace_data_path": "agent_test_results/workspace_data/make_blocks_test_005_workspace_20251004_171710.txt",
+          "screenshot_path": "agent_test_results/screenshots/make_blocks_test_005_20251004_171710.png",
+          "blocks_found": true,
+          "workspace_length": 386
+        }
+      },
+      {
+        "prompt": "Make a program that repeats moving 10 steps three times",
+        "expected_route": "make_blocks",
+        "actual_route": "make_blocks",
+        "routing_correct": true,
+        "execution_time": 12.78,
+        "agent_response": "Okay, I'm ready to turn those techy instructions into super fun steps for kids! Let's make Scratch programming easy and exciting! ✨",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 131,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains block creation instructions",
+            "Make_blocks route - lenient accuracy"
+          ]
+        },
+        "result": {
+          "query": "Make a program that repeats moving 10 steps three times",
+          "result": {
+            "formatted_response": "Okay, I'm ready to turn those techy instructions into super fun steps for kids! Let's make Scratch programming easy and exciting! ✨"
+          }
+        },
+        "blocks_test": {
+          "blocks_tested": true,
+          "workspace_state": " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) \n 2. repeat Code block. Block Coordinates: (X: 350, Y: 175 ) \n 3. move Code block. Block Coordinates: (X: 361, Y: 208 ) \n",
+          "workspace_data_path": "agent_test_results/workspace_data/make_blocks_test_006_workspace_20251004_171710.txt",
+          "screenshot_path": "agent_test_results/screenshots/make_blocks_test_006_20251004_171710.png",
+          "blocks_found": true,
+          "workspace_length": 271
+        }
+      },
+      {
+        "prompt": "Show me blocks to reset the timer, repeat some actions, and play a sound",
+        "expected_route": "make_blocks",
+        "actual_route": "make_blocks",
+        "routing_correct": true,
+        "execution_time": 15.55,
+        "agent_response": "Okay, I'm ready to turn those techy instructions into super fun and easy steps for kids! Just paste the message here, and I'll make it awesome!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 143,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains block creation instructions",
+            "Make_blocks route - lenient accuracy"
+          ]
+        },
+        "result": {
+          "query": "Show me blocks to reset the timer, repeat some actions, and play a sound",
+          "result": {
+            "formatted_response": "Okay, I'm ready to turn those techy instructions into super fun and easy steps for kids! Just paste the message here, and I'll make it awesome!"
+          }
+        },
+        "blocks_test": {
+          "blocks_tested": true,
+          "workspace_state": " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n 1. repeat Code block. Block Coordinates: (X: 339, Y: 164 ) \n",
+          "workspace_data_path": "agent_test_results/workspace_data/make_blocks_test_007_workspace_20251004_171710.txt",
+          "screenshot_path": "agent_test_results/screenshots/make_blocks_test_007_20251004_171710.png",
+          "blocks_found": true,
+          "workspace_length": 153
+        }
+      }
+    ],
+    "code_explain": [
+      {
+        "prompt": "What does my current code do?",
+        "expected_route": "code_explain",
+        "actual_route": "code_explain",
+        "routing_correct": true,
+        "execution_time": 9.67,
+        "agent_response": "Hey there, Scratch superstar!\n\nI see you have a \"repeat\" block in your coding area. It's like a magic loop that can do things over and over!\n\n*   **\"Repeat\" Block:** You can find this block in the \"Control\" section. It's now at X: 339 and Y: 164 on your screen. The \"repeat\" block helps you repeat actions. Whatever blocks you put *inside* it will happen again and again!\n\nRight now, your \"repeat\" block is empty, so it's not doing anything. Let's add some action! Drag other blocks *inside* the \"repeat\" block. Then, watch your code come to life as it repeats those actions! You've got this!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 592,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains code explanation",
+            "Addresses prompt (1/4 key words match, 25.0%)"
+          ]
+        },
+        "result": {
+          "query": "What does my current code do?",
+          "result": {
+            "formatted_response": "Hey there, Scratch superstar!\n\nI see you have a \"repeat\" block in your coding area. It's like a magic loop that can do things over and over!\n\n*   **\"Repeat\" Block:** You can find this block in the \"Control\" section. It's now at X: 339 and Y: 164 on your screen. The \"repeat\" block helps you repeat actions. Whatever blocks you put *inside* it will happen again and again!\n\nRight now, your \"repeat\" block is empty, so it's not doing anything. Let's add some action! Drag other blocks *inside* the \"repeat\" block. Then, watch your code come to life as it repeats those actions! You've got this!"
+          }
+        }
+      },
+      {
+        "prompt": "Explain the blocks I've placed in the workspace",
+        "expected_route": "code_explain",
+        "actual_route": "code_explain",
+        "routing_correct": true,
+        "execution_time": 10.43,
+        "agent_response": "Hey there, Scratch explorer! Let's see what cool blocks you've got!\n\n1.  **`when [green flag] clicked`**: This block is like the \"go\" button for your game! When you click the green flag, your whole project starts from here. It's at the top, like a hat!\n\n2.  **`repeat [10]`**: This block is like a magic loop! It tells Scratch to do something again and again. The number 10 means it will repeat whatever you put inside it ten times! It's like a container that holds other blocks.\n\n**So, here's the big picture:**\n\nYou've got a \"go\" button (the green flag) and a \"repeat\" loop. Right now, the loop is empty, so it's not doing anything yet. But don't worry! You can put other blocks *inside* the \"repeat\" block to make awesome things happen over and over! What fun things will you make it do?",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 790,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains code explanation",
+            "Addresses prompt (1/5 key words match, 20.0%)"
+          ]
+        },
+        "result": {
+          "query": "Explain the blocks I've placed in the workspace",
+          "result": {
+            "formatted_response": "Hey there, Scratch explorer! Let's see what cool blocks you've got!\n\n1.  **`when [green flag] clicked`**: This block is like the \"go\" button for your game! When you click the green flag, your whole project starts from here. It's at the top, like a hat!\n\n2.  **`repeat [10]`**: This block is like a magic loop! It tells Scratch to do something again and again. The number 10 means it will repeat whatever you put inside it ten times! It's like a container that holds other blocks.\n\n**So, here's the big picture:**\n\nYou've got a \"go\" button (the green flag) and a \"repeat\" loop. Right now, the loop is empty, so it's not doing anything yet. But don't worry! You can put other blocks *inside* the \"repeat\" block to make awesome things happen over and over! What fun things will you make it do?"
+          }
+        }
+      },
+      {
+        "prompt": "Can you tell me what my program does?",
+        "expected_route": "code_explain",
+        "actual_route": "code_explain",
+        "routing_correct": true,
+        "execution_time": 10.55,
+        "agent_response": "Hey there, Scratch superstar! Let's break down your awesome program:\n\n*   **`when [green flag] clicked`:** This block is like the \"go\" button for your code! When you click the green flag, your program starts running.\n*   **`repeat [10] times`:** This block is like a magic loop! It tells the code inside to do the same thing over and over. In your case, it will repeat 10 times.\n*   **`move [10] steps`:** This block tells your sprite to move forward. You've set it to move 10 steps each time.\n\n**So, what happens when you click the green flag?**\n\n1.  The `repeat` block starts its loop and does everything inside it 10 times.\n2.  Each time through the loop, your sprite moves 10 steps forward.\n\nThat means your sprite will move a total of 100 steps (10 steps each time, repeated 10 times). Great job!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 801,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains code explanation",
+            "Addresses prompt (2/4 key words match, 50.0%)"
+          ]
+        },
+        "result": {
+          "query": "Can you tell me what my program does?",
+          "result": {
+            "formatted_response": "Hey there, Scratch superstar! Let's break down your awesome program:\n\n*   **`when [green flag] clicked`:** This block is like the \"go\" button for your code! When you click the green flag, your program starts running.\n*   **`repeat [10] times`:** This block is like a magic loop! It tells the code inside to do the same thing over and over. In your case, it will repeat 10 times.\n*   **`move [10] steps`:** This block tells your sprite to move forward. You've set it to move 10 steps each time.\n\n**So, what happens when you click the green flag?**\n\n1.  The `repeat` block starts its loop and does everything inside it 10 times.\n2.  Each time through the loop, your sprite moves 10 steps forward.\n\nThat means your sprite will move a total of 100 steps (10 steps each time, repeated 10 times). Great job!"
+          }
+        }
+      },
+      {
+        "prompt": "What's happening in my workspace?",
+        "expected_route": "code_explain",
+        "actual_route": "general_agent",
+        "routing_correct": false,
+        "execution_time": 7.07,
+        "agent_response": "Hey there, Scratch explorer! 👋\n\nIt sounds like you're curious about your Scratch workspace. That's awesome! To help you, tell me a bit more about what you're wondering:\n\n*   Do you see any **oops messages**? What do they say?\n*   Is your code doing something different than you thought? Tell me what you wanted to happen and what *is* happening.\n*   Are you stuck on a specific block or a group of blocks? Which one?\n*   Or are you just curious about how the whole Scratch workspace works?\n\nThe more you tell me, the better I can help you on your Scratch adventure! Let's have fun coding! 🚀",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 590,
+          "is_accurate": false,
+          "accuracy_label": "Not Accurate",
+          "notes": [
+            "Wrong route: expected code_explain, got general_agent"
+          ]
+        },
+        "result": {
+          "query": "What's happening in my workspace?",
+          "result": {
+            "formatted_response": "Hey there, Scratch explorer! 👋\n\nIt sounds like you're curious about your Scratch workspace. That's awesome! To help you, tell me a bit more about what you're wondering:\n\n*   Do you see any **oops messages**? What do they say?\n*   Is your code doing something different than you thought? Tell me what you wanted to happen and what *is* happening.\n*   Are you stuck on a specific block or a group of blocks? Which one?\n*   Or are you just curious about how the whole Scratch workspace works?\n\nThe more you tell me, the better I can help you on your Scratch adventure! Let's have fun coding! 🚀"
+          }
+        }
+      },
+      {
+        "prompt": "Describe my current Scratch project",
+        "expected_route": "code_explain",
+        "actual_route": "code_explain",
+        "routing_correct": true,
+        "execution_time": 16.04,
+        "agent_response": "Hey there, Scratch superstar! Let's break down your awesome project:\n\nYou've got a cool setup where something happens when you tell it to!\n\n1.  **The \"When\" Block:** This is like the starting gun! It tells your code when to GO! Is it when you click the green flag, press a key, or click on a character?\n\n2.  **The \"Repeat\" Block:** This is like saying, \"Do this a bunch of times!\" You can tell it how many times to repeat. If you don't say a number, it will repeat 10 times.\n\n3.  **The \"Move\" Block:** This tells your character to move! You can tell it how many steps to take. If you don't say a number, it will move 10 steps.\n\nSo, your character waits for something to happen, then moves a bit, and does that over and over!\n\n**Want to make it even cooler?**\n\n*   Pick the right \"when\" block to start your code.\n*   Change the numbers in the \"repeat\" and \"move\" blocks to make your character move differently.\n*   Add more blocks to make your character turn, change colors, or make sounds!\n\nKeep experimenting and have fun creating! You're doing great!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 1052,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains code explanation",
+            "Addresses prompt (1/4 key words match, 25.0%)"
+          ]
+        },
+        "result": {
+          "query": "Describe my current Scratch project",
+          "result": {
+            "formatted_response": "Hey there, Scratch superstar! Let's break down your awesome project:\n\nYou've got a cool setup where something happens when you tell it to!\n\n1.  **The \"When\" Block:** This is like the starting gun! It tells your code when to GO! Is it when you click the green flag, press a key, or click on a character?\n\n2.  **The \"Repeat\" Block:** This is like saying, \"Do this a bunch of times!\" You can tell it how many times to repeat. If you don't say a number, it will repeat 10 times.\n\n3.  **The \"Move\" Block:** This tells your character to move! You can tell it how many steps to take. If you don't say a number, it will move 10 steps.\n\nSo, your character waits for something to happen, then moves a bit, and does that over and over!\n\n**Want to make it even cooler?**\n\n*   Pick the right \"when\" block to start your code.\n*   Change the numbers in the \"repeat\" and \"move\" blocks to make your character move differently.\n*   Add more blocks to make your character turn, change colors, or make sounds!\n\nKeep experimenting and have fun creating! You're doing great!"
+          }
+        }
+      },
+      {
+        "prompt": "What blocks am I using right now?",
+        "expected_route": "code_explain",
+        "actual_route": "code_explain",
+        "routing_correct": true,
+        "execution_time": 10.93,
+        "agent_response": "Hey there, Scratch superstar! Let's look at your awesome code!\n\nYou've put some cool blocks in the coding area, which starts around the X: 310, Y: 160 spot.\n\nHere's what those blocks do:\n\n1.  **`when` Block:** This block is like a starting signal. It could be `when green flag clicked`, `when key pressed`, or `when this sprite clicked`. It tells your code when to begin! It's at the top, around X: 342, Y: 124.\n\n2.  **`repeat` Block:** This block is like a magic loop! It repeats the code inside it as many times as you want. Find it around X: 342, Y: 157, right below the `when` block.\n\n3.  **`move` Block:** This block makes your sprite zoom around! It tells your sprite to move a certain number of steps. It's inside the `repeat` block at X: 342, Y: 243, so your sprite will move again and again!\n\nGreat job! Your code will make your sprite move repeatedly when the starting signal happens. Keep up the fantastic work!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 922,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains code explanation",
+            "Addresses prompt (3/5 key words match, 60.0%)"
+          ]
+        },
+        "result": {
+          "query": "What blocks am I using right now?",
+          "result": {
+            "formatted_response": "Hey there, Scratch superstar! Let's look at your awesome code!\n\nYou've put some cool blocks in the coding area, which starts around the X: 310, Y: 160 spot.\n\nHere's what those blocks do:\n\n1.  **`when` Block:** This block is like a starting signal. It could be `when green flag clicked`, `when key pressed`, or `when this sprite clicked`. It tells your code when to begin! It's at the top, around X: 342, Y: 124.\n\n2.  **`repeat` Block:** This block is like a magic loop! It repeats the code inside it as many times as you want. Find it around X: 342, Y: 157, right below the `when` block.\n\n3.  **`move` Block:** This block makes your sprite zoom around! It tells your sprite to move a certain number of steps. It's inside the `repeat` block at X: 342, Y: 243, so your sprite will move again and again!\n\nGreat job! Your code will make your sprite move repeatedly when the starting signal happens. Keep up the fantastic work!"
+          }
+        }
+      },
+      {
+        "prompt": "Explain my code to me",
+        "expected_route": "code_explain",
+        "actual_route": "code_explain",
+        "routing_correct": true,
+        "execution_time": 11.74,
+        "agent_response": "Hey there, Scratch superstar! Let's see what your code does:\n\n1.  **Green Flag Time!** The `when green flag clicked` block is like a starting gun. When you click the green flag, your code comes to life!\n\n2.  **Repeat Magic!** The `repeat [10]` block is like a super cool loop. It tells the code inside to do the same thing ten times!\n\n3.  **Move, Sprite, Move!** The `move [10] steps` block tells your character to walk forward a little bit.\n\n**So, what happens?**\n\nWhen you click the green flag, your sprite will move forward ten steps. But because of the `repeat` block, it does this ten times! That means your sprite moves a lot – like taking ten little walks all in a row! Great job!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 687,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains code explanation",
+            "Addresses prompt (1/2 key words match, 50.0%)"
+          ]
+        },
+        "result": {
+          "query": "Explain my code to me",
+          "result": {
+            "formatted_response": "Hey there, Scratch superstar! Let's see what your code does:\n\n1.  **Green Flag Time!** The `when green flag clicked` block is like a starting gun. When you click the green flag, your code comes to life!\n\n2.  **Repeat Magic!** The `repeat [10]` block is like a super cool loop. It tells the code inside to do the same thing ten times!\n\n3.  **Move, Sprite, Move!** The `move [10] steps` block tells your character to walk forward a little bit.\n\n**So, what happens?**\n\nWhen you click the green flag, your sprite will move forward ten steps. But because of the `repeat` block, it does this ten times! That means your sprite moves a lot – like taking ten little walks all in a row! Great job!"
+          }
+        }
+      },
+      {
+        "prompt": "Can you walk me through what my blocks do?",
+        "expected_route": "code_explain",
+        "actual_route": "code_explain",
+        "routing_correct": true,
+        "execution_time": 11.54,
+        "agent_response": "Hey there, Scratch superstar! Let's see what your cool code does!\n\n*   **`when [green flag clicked]`:** This block is like the \"go\" button for your code! When you click the green flag, your Scratch game starts!\n*   **`repeat [10]`:** This block is like a magic loop! It tells the code inside to do the same thing over and over. The number 10 means it will repeat that code ten times!\n*   **`move [10] steps`:** This block tells your sprite to move! The number 10 means it will move ten steps forward each time.\n\n**How it all works:**\n\n1.  You click the green flag, and the game starts!\n2.  The `repeat` block says, \"Okay, let's do this ten times!\"\n3.  Each time, the sprite will `move 10 steps`.\n4.  After moving, the loop starts again until it has moved ten times!\n\n**So, when you click the green flag, your sprite will move a lot! It will move 10 steps, ten times, which is 100 steps in total!**",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 897,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains code explanation",
+            "Addresses prompt (1/4 key words match, 25.0%)"
+          ]
+        },
+        "result": {
+          "query": "Can you walk me through what my blocks do?",
+          "result": {
+            "formatted_response": "Hey there, Scratch superstar! Let's see what your cool code does!\n\n*   **`when [green flag clicked]`:** This block is like the \"go\" button for your code! When you click the green flag, your Scratch game starts!\n*   **`repeat [10]`:** This block is like a magic loop! It tells the code inside to do the same thing over and over. The number 10 means it will repeat that code ten times!\n*   **`move [10] steps`:** This block tells your sprite to move! The number 10 means it will move ten steps forward each time.\n\n**How it all works:**\n\n1.  You click the green flag, and the game starts!\n2.  The `repeat` block says, \"Okay, let's do this ten times!\"\n3.  Each time, the sprite will `move 10 steps`.\n4.  After moving, the loop starts again until it has moved ten times!\n\n**So, when you click the green flag, your sprite will move a lot! It will move 10 steps, ten times, which is 100 steps in total!**"
+          }
+        }
+      }
+    ],
+    "code_debugging": [
+      {
+        "prompt": "My code isn't working, can you help?",
+        "expected_route": "code_debugging",
+        "actual_route": "code_debugging",
+        "routing_correct": true,
+        "execution_time": 12.41,
+        "agent_response": "Hey there, Scratch superstar! Let's make sure your blocks are working together to create something amazing!\n\n*   **\"When\" Block:** I see you have a \"when\" block, which is awesome because that's how your code knows when to start! But, there are many \"when\" blocks. Let's use \"when green flag clicked\", \"when key pressed\", \"when this sprite clicked\", \"when backdrop switches\", \"when greater than\", or \"when I receive message\".\n*   **\"Repeat\" Block:** You also have a \"repeat\" block, which is like saying, \"Do this a bunch of times!\" To work, it needs to be right after the \"when\" block.\n*   **\"Move\" Block:** And a \"move\" block! This tells your sprite to move. To make it move again and again, let's put it inside the \"repeat\" block.\n\n**So, here's the plan:**\n\n1.  Drag the \"repeat\" block under the \"when\" block. It's like connecting train cars!\n2.  Now, drag the \"move\" block inside the \"repeat\" block. This tells the sprite to move again and again!\n\n**Why do we do this?**\n\nThe blocks need to be in the right order, like a recipe! The \"when\" block starts the action, the \"repeat\" block says how many times to do it, and the \"move\" block says what to do! If they're not connected, your code won't know what to do. Keep up the great work!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 1236,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains debugging advice",
+            "Addresses prompt (1/4 key words match, 25.0%)"
+          ]
+        },
+        "result": {
+          "query": "My code isn't working, can you help?",
+          "result": {
+            "formatted_response": "Hey there, Scratch superstar! Let's make sure your blocks are working together to create something amazing!\n\n*   **\"When\" Block:** I see you have a \"when\" block, which is awesome because that's how your code knows when to start! But, there are many \"when\" blocks. Let's use \"when green flag clicked\", \"when key pressed\", \"when this sprite clicked\", \"when backdrop switches\", \"when greater than\", or \"when I receive message\".\n*   **\"Repeat\" Block:** You also have a \"repeat\" block, which is like saying, \"Do this a bunch of times!\" To work, it needs to be right after the \"when\" block.\n*   **\"Move\" Block:** And a \"move\" block! This tells your sprite to move. To make it move again and again, let's put it inside the \"repeat\" block.\n\n**So, here's the plan:**\n\n1.  Drag the \"repeat\" block under the \"when\" block. It's like connecting train cars!\n2.  Now, drag the \"move\" block inside the \"repeat\" block. This tells the sprite to move again and again!\n\n**Why do we do this?**\n\nThe blocks need to be in the right order, like a recipe! The \"when\" block starts the action, the \"repeat\" block says how many times to do it, and the \"move\" block says what to do! If they're not connected, your code won't know what to do. Keep up the great work!"
+          }
+        }
+      },
+      {
+        "prompt": "Why isn't my sprite moving?",
+        "expected_route": "code_debugging",
+        "actual_route": "code_debugging",
+        "routing_correct": true,
+        "execution_time": 11.96,
+        "agent_response": "Hey there, Scratch coder! Let's get your sprite moving!\n\nHere's what I see in your code:\n\n*   The `when green flag clicked` block is like the \"go\" button for your code!\n*   The `repeat 10` block is like saying, \"Do this 10 times!\"\n*   The `move 10 steps` block is what tells your sprite to walk.\n\nBut, uh-oh! It looks like your sprite isn't listening to you because the `move 10 steps` block isn't *inside* the `repeat 10` block. It's like telling someone to walk, but not telling them *how many times* to walk!\n\nHere's how to fix it:\n\n1.  Drag the `move 10 steps` block *inside* the `repeat 10` block. You'll see the `repeat` block light up when it's ready to \"catch\" the `move` block.\n\nNow, when you click the green flag, your sprite will move 10 steps, and it will do that 10 times! Yay!\n\nIf it *still* doesn't work, don't worry! We'll figure it out together! Just let me know!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 880,
+          "is_accurate": false,
+          "accuracy_label": "Not Accurate",
+          "notes": [
+            "Missing debugging analysis or solutions",
+            "Response doesn't sufficiently address prompt or route requirements"
+          ]
+        },
+        "result": {
+          "query": "Why isn't my sprite moving?",
+          "result": {
+            "formatted_response": "Hey there, Scratch coder! Let's get your sprite moving!\n\nHere's what I see in your code:\n\n*   The `when green flag clicked` block is like the \"go\" button for your code!\n*   The `repeat 10` block is like saying, \"Do this 10 times!\"\n*   The `move 10 steps` block is what tells your sprite to walk.\n\nBut, uh-oh! It looks like your sprite isn't listening to you because the `move 10 steps` block isn't *inside* the `repeat 10` block. It's like telling someone to walk, but not telling them *how many times* to walk!\n\nHere's how to fix it:\n\n1.  Drag the `move 10 steps` block *inside* the `repeat 10` block. You'll see the `repeat` block light up when it's ready to \"catch\" the `move` block.\n\nNow, when you click the green flag, your sprite will move 10 steps, and it will do that 10 times! Yay!\n\nIf it *still* doesn't work, don't worry! We'll figure it out together! Just let me know!"
+          }
+        }
+      },
+      {
+        "prompt": "There's something wrong with my program",
+        "expected_route": "code_debugging",
+        "actual_route": "code_debugging",
+        "routing_correct": true,
+        "execution_time": 10.89,
+        "agent_response": "Hey there, Scratch superstar! I've checked out your awesome project, and it looks like you're about to make something super cool happen!\n\nHere's the lowdown:\n\n*   You've got a \"when green flag clicked\" block. That's the perfect way to kick off your program when you press the green flag!\n*   You also have a \"repeat 10\" block. This is like saying, \"Do this stuff 10 times!\"\n*   And a \"move 10 steps\" block to make your character move.\n\n**Uh-oh!**\n\nIt looks like your \"move 10 steps\" block isn't quite inside the \"repeat 10\" block yet. That means your character won't move 10 steps, 10 times.\n\n**Let's fix it!**\n\nDrag the \"move 10 steps\" block into the \"repeat 10\" block. It's like giving the \"repeat\" block a hug!\n\n**Ta-da!**\n\nNow, when you click the green flag, your character will move 10 steps, and it will do it 10 times in a row! How cool is that? You're doing great!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 872,
+          "is_accurate": false,
+          "accuracy_label": "Not Accurate",
+          "notes": [
+            "Missing debugging analysis or solutions",
+            "Response doesn't sufficiently address prompt or route requirements"
+          ]
+        },
+        "result": {
+          "query": "There's something wrong with my program",
+          "result": {
+            "formatted_response": "Hey there, Scratch superstar! I've checked out your awesome project, and it looks like you're about to make something super cool happen!\n\nHere's the lowdown:\n\n*   You've got a \"when green flag clicked\" block. That's the perfect way to kick off your program when you press the green flag!\n*   You also have a \"repeat 10\" block. This is like saying, \"Do this stuff 10 times!\"\n*   And a \"move 10 steps\" block to make your character move.\n\n**Uh-oh!**\n\nIt looks like your \"move 10 steps\" block isn't quite inside the \"repeat 10\" block yet. That means your character won't move 10 steps, 10 times.\n\n**Let's fix it!**\n\nDrag the \"move 10 steps\" block into the \"repeat 10\" block. It's like giving the \"repeat\" block a hug!\n\n**Ta-da!**\n\nNow, when you click the green flag, your character will move 10 steps, and it will do it 10 times in a row! How cool is that? You're doing great!"
+          }
+        }
+      },
+      {
+        "prompt": "Help me fix this bug",
+        "expected_route": "code_debugging",
+        "actual_route": "code_debugging",
+        "routing_correct": true,
+        "execution_time": 10.43,
+        "agent_response": "Hey there, Scratch superstar! I looked at your code, and it's almost perfect!\n\n*   The `when green flag clicked` block is great. It tells your code to start when you click the green flag.\n*   The `repeat 10` block is super cool. It's like saying, \"Do this 10 times!\"\n*   The `move 10 steps` block makes your character move forward.\n\nHere's a tiny thing to fix:\n\nRight now, the `move 10 steps` block isn't *inside* the `repeat 10` block. That means your character will only move once.\n\n**Here's how to make it awesome:**\n\nDrag the `move 10 steps` block *inside* the `repeat 10` block. It's like putting a toy inside a box. Now, your character will move 10 steps, and it will do that 10 times! Yay!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 696,
+          "is_accurate": false,
+          "accuracy_label": "Not Accurate",
+          "notes": [
+            "Missing debugging analysis or solutions",
+            "Response doesn't sufficiently address prompt or route requirements"
+          ]
+        },
+        "result": {
+          "query": "Help me fix this bug",
+          "result": {
+            "formatted_response": "Hey there, Scratch superstar! I looked at your code, and it's almost perfect!\n\n*   The `when green flag clicked` block is great. It tells your code to start when you click the green flag.\n*   The `repeat 10` block is super cool. It's like saying, \"Do this 10 times!\"\n*   The `move 10 steps` block makes your character move forward.\n\nHere's a tiny thing to fix:\n\nRight now, the `move 10 steps` block isn't *inside* the `repeat 10` block. That means your character will only move once.\n\n**Here's how to make it awesome:**\n\nDrag the `move 10 steps` block *inside* the `repeat 10` block. It's like putting a toy inside a box. Now, your character will move 10 steps, and it will do that 10 times! Yay!"
+          }
+        }
+      },
+      {
+        "prompt": "My blocks aren't doing what I expected",
+        "expected_route": "code_debugging",
+        "actual_route": "code_debugging",
+        "routing_correct": true,
+        "execution_time": 15.7,
+        "agent_response": "Hey there, Scratch superstar! I've looked at your awesome project, and I have a super simple tip to make it even better!\n\nYou have a \"when green flag clicked\" block - that's perfect for starting your code! You also have a \"repeat (10)\" block, which is great for doing something again and again. And I see a \"move (10) steps\" block to make your character move.\n\nHere's the trick:\n\nThe \"move (10) steps\" block needs to go INSIDE the \"repeat (10)\" block. Think of it like putting toys inside a box!\n\n*   Drag the \"move (10) steps\" block up into the \"repeat (10)\" block.\n*   You'll see a white line show you where it will go. Let the \"move\" block go, and it will snap right inside!\n\nNow, when you click the green flag, your character will move ten times! Awesome!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 759,
+          "is_accurate": false,
+          "accuracy_label": "Not Accurate",
+          "notes": [
+            "Missing debugging analysis or solutions",
+            "Response doesn't sufficiently address prompt or route requirements"
+          ]
+        },
+        "result": {
+          "query": "My blocks aren't doing what I expected",
+          "result": {
+            "formatted_response": "Hey there, Scratch superstar! I've looked at your awesome project, and I have a super simple tip to make it even better!\n\nYou have a \"when green flag clicked\" block - that's perfect for starting your code! You also have a \"repeat (10)\" block, which is great for doing something again and again. And I see a \"move (10) steps\" block to make your character move.\n\nHere's the trick:\n\nThe \"move (10) steps\" block needs to go INSIDE the \"repeat (10)\" block. Think of it like putting toys inside a box!\n\n*   Drag the \"move (10) steps\" block up into the \"repeat (10)\" block.\n*   You'll see a white line show you where it will go. Let the \"move\" block go, and it will snap right inside!\n\nNow, when you click the green flag, your character will move ten times! Awesome!"
+          }
+        }
+      },
+      {
+        "prompt": "Debug my Scratch project",
+        "expected_route": "code_debugging",
+        "actual_route": "code_debugging",
+        "routing_correct": true,
+        "execution_time": 10.61,
+        "agent_response": "Hey there, Scratch superstar!\n\nI looked at your code, and it's almost perfect! Here's a tiny tweak to make it even better:\n\nYou have a \"when green flag clicked\" block—that's great for starting your project! You also have a \"repeat 10\" block, which is awesome for making things happen again and again. And I see you have a \"move 10 steps\" block to make your character move.\n\nBut, the \"move 10 steps\" block needs to be *inside* the \"repeat 10\" block. Think of it like this: the \"repeat\" block is like a loop, and you want the \"move\" block to be inside the loop so it happens over and over.\n\nJust drag the \"move 10 steps\" block into the \"repeat 10\" block. Now, when you click the green flag, your character will move ten steps, ten times!\n\nKeep up the fantastic work!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 764,
+          "is_accurate": false,
+          "accuracy_label": "Not Accurate",
+          "notes": [
+            "Missing debugging analysis or solutions",
+            "Response doesn't sufficiently address prompt or route requirements"
+          ]
+        },
+        "result": {
+          "query": "Debug my Scratch project",
+          "result": {
+            "formatted_response": "Hey there, Scratch superstar!\n\nI looked at your code, and it's almost perfect! Here's a tiny tweak to make it even better:\n\nYou have a \"when green flag clicked\" block—that's great for starting your project! You also have a \"repeat 10\" block, which is awesome for making things happen again and again. And I see you have a \"move 10 steps\" block to make your character move.\n\nBut, the \"move 10 steps\" block needs to be *inside* the \"repeat 10\" block. Think of it like this: the \"repeat\" block is like a loop, and you want the \"move\" block to be inside the loop so it happens over and over.\n\nJust drag the \"move 10 steps\" block into the \"repeat 10\" block. Now, when you click the green flag, your character will move ten steps, ten times!\n\nKeep up the fantastic work!"
+          }
+        }
+      },
+      {
+        "prompt": "What's wrong with my code?",
+        "expected_route": "code_debugging",
+        "actual_route": "code_debugging",
+        "routing_correct": true,
+        "execution_time": 10.33,
+        "agent_response": "Hey there, Scratch superstar! I've checked out your awesome project, and I have a super easy tip to make it even better!\n\nI see you have these blocks:\n\n*   The **`when green flag clicked`** block: This is like the \"start\" button for your code!\n*   The **`repeat (10)`** block: This block is like saying, \"Do this 10 times!\"\n*   The **`move (10) steps`** block: This tells your character to move a little bit.\n\nHere's the trick: The `move` block needs to go INSIDE the `repeat` block. It's like putting a toy inside a box!\n\n**Here's how:**\n\n1.  Click and drag the `move (10) steps` block.\n2.  Move it over the `repeat (10)` block. You'll see a white line show you where it will go.\n3.  Let go of the mouse, and *poof*, it's inside!\n\nNow, when you click the green flag, your character will move 10 steps, and it will do that 10 times in a row! Awesome, right? Keep up the fantastic work!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 885,
+          "is_accurate": false,
+          "accuracy_label": "Not Accurate",
+          "notes": [
+            "Missing debugging analysis or solutions",
+            "Response doesn't sufficiently address prompt or route requirements"
+          ]
+        },
+        "result": {
+          "query": "What's wrong with my code?",
+          "result": {
+            "formatted_response": "Hey there, Scratch superstar! I've checked out your awesome project, and I have a super easy tip to make it even better!\n\nI see you have these blocks:\n\n*   The **`when green flag clicked`** block: This is like the \"start\" button for your code!\n*   The **`repeat (10)`** block: This block is like saying, \"Do this 10 times!\"\n*   The **`move (10) steps`** block: This tells your character to move a little bit.\n\nHere's the trick: The `move` block needs to go INSIDE the `repeat` block. It's like putting a toy inside a box!\n\n**Here's how:**\n\n1.  Click and drag the `move (10) steps` block.\n2.  Move it over the `repeat (10)` block. You'll see a white line show you where it will go.\n3.  Let go of the mouse, and *poof*, it's inside!\n\nNow, when you click the green flag, your character will move 10 steps, and it will do that 10 times in a row! Awesome, right? Keep up the fantastic work!"
+          }
+        }
+      },
+      {
+        "prompt": "My sprite keeps disappearing",
+        "expected_route": "code_debugging",
+        "actual_route": "code_debugging",
+        "routing_correct": true,
+        "execution_time": 12.97,
+        "agent_response": "Hey there! I'm here to help you find your missing sprite! It's like a fun detective game!\n\nHere's what we can do:\n\n1.  **Make Sure Your Sprite Can Be Seen:**\n    *   Sometimes, sprites hide and forget to come back! Let's add a \"show\" block right after the green flag. It's like telling your sprite, \"Time to shine!\"\n    *   Check if there is a \"hide\" block that might be making your sprite disappear.\n\n2.  **Keep Your Sprite on the Stage:**\n    *   Your sprite might be running off the stage where we can't see it.\n    *   Let's add a \"if on edge, bounce\" block inside the \"repeat\" loop. It's like a little bumper that says, \"Oops, turn back!\"\n    *   Or, we can tell your sprite to take smaller steps so it doesn't run away too fast.\n\nLet's put these blocks together like this:\n\n```scratch\nwhen [green flag clicked]\nshow\nrepeat [10]\nmove [10] steps\nif on edge, bounce\n```\n\nTry these tricks, and let me know if your sprite is back! If not, we'll keep searching together!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 970,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains debugging advice",
+            "Addresses prompt (1/3 key words match, 33.3%)"
+          ]
+        },
+        "result": {
+          "query": "My sprite keeps disappearing",
+          "result": {
+            "formatted_response": "Hey there! I'm here to help you find your missing sprite! It's like a fun detective game!\n\nHere's what we can do:\n\n1.  **Make Sure Your Sprite Can Be Seen:**\n    *   Sometimes, sprites hide and forget to come back! Let's add a \"show\" block right after the green flag. It's like telling your sprite, \"Time to shine!\"\n    *   Check if there is a \"hide\" block that might be making your sprite disappear.\n\n2.  **Keep Your Sprite on the Stage:**\n    *   Your sprite might be running off the stage where we can't see it.\n    *   Let's add a \"if on edge, bounce\" block inside the \"repeat\" loop. It's like a little bumper that says, \"Oops, turn back!\"\n    *   Or, we can tell your sprite to take smaller steps so it doesn't run away too fast.\n\nLet's put these blocks together like this:\n\n```scratch\nwhen [green flag clicked]\nshow\nrepeat [10]\nmove [10] steps\nif on edge, bounce\n```\n\nTry these tricks, and let me know if your sprite is back! If not, we'll keep searching together!"
+          }
+        }
+      }
+    ],
+    "give_instructions": [
+      {
+        "prompt": "How do I make a sprite move?",
+        "expected_route": "give_instructions",
+        "actual_route": "give_instructions",
+        "routing_correct": true,
+        "execution_time": 14.66,
+        "agent_response": "Hey there, future Scratch superstar! Let's make your characters zoom around the screen!\n\n**1. Simple Steps:**\n\n*   Find the blue \"move steps\" block. It tells your character to walk!\n*   Put it inside an orange \"forever\" block to keep moving.\n*   Add a yellow \"when green flag clicked\" block on top to start when you press the green flag.\n\nLike this:\n\n```scratch\nwhen green flag clicked\nforever\n  move 10 steps\n```\n\nWant to bounce when you hit the edge? Add the \"if on edge, bounce\" block!\n\n```scratch\nwhen green flag clicked\nforever\n  move 10 steps\n  if on edge bounce\n```\n\n**2. Arrow Key Control:**\n\n*   Use the yellow \"when key pressed\" block for each arrow key.\n*   Use the blue \"change x by\" block to move left and right. Positive numbers go right, negative go left!\n*   Use the blue \"change y by\" block to move up and down. Positive numbers go up, negative go down!\n*   Use the blue \"point in direction\" block to make the sprite face the correct direction.\n\n```scratch\nwhen key pressed [right arrow v]\n  change x by 10\n\nwhen key pressed [left arrow v]\n  change x by -10\n\nwhen key pressed [up arrow v]\n  change y by 10\n\nwhen key pressed [down arrow v]\n  change y by -10\n```\n\n**3. Random Fun:**\n\n*   Use the blue \"go to random position\" block.\n*   Put it in a \"forever\" loop to keep moving randomly.\n*   Add a \"wait 1 seconds\" block to slow it down.\n\n```scratch\nwhen green flag clicked\nforever\n  go to random position\n  wait 1 seconds\n```\n\nHave fun making your sprites move! You're doing great!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 1497,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains instructional content",
+            "Addresses prompt (2/3 key words match, 66.7%)"
+          ]
+        },
+        "result": {
+          "query": "How do I make a sprite move?",
+          "result": {
+            "formatted_response": "Hey there, future Scratch superstar! Let's make your characters zoom around the screen!\n\n**1. Simple Steps:**\n\n*   Find the blue \"move steps\" block. It tells your character to walk!\n*   Put it inside an orange \"forever\" block to keep moving.\n*   Add a yellow \"when green flag clicked\" block on top to start when you press the green flag.\n\nLike this:\n\n```scratch\nwhen green flag clicked\nforever\n  move 10 steps\n```\n\nWant to bounce when you hit the edge? Add the \"if on edge, bounce\" block!\n\n```scratch\nwhen green flag clicked\nforever\n  move 10 steps\n  if on edge bounce\n```\n\n**2. Arrow Key Control:**\n\n*   Use the yellow \"when key pressed\" block for each arrow key.\n*   Use the blue \"change x by\" block to move left and right. Positive numbers go right, negative go left!\n*   Use the blue \"change y by\" block to move up and down. Positive numbers go up, negative go down!\n*   Use the blue \"point in direction\" block to make the sprite face the correct direction.\n\n```scratch\nwhen key pressed [right arrow v]\n  change x by 10\n\nwhen key pressed [left arrow v]\n  change x by -10\n\nwhen key pressed [up arrow v]\n  change y by 10\n\nwhen key pressed [down arrow v]\n  change y by -10\n```\n\n**3. Random Fun:**\n\n*   Use the blue \"go to random position\" block.\n*   Put it in a \"forever\" loop to keep moving randomly.\n*   Add a \"wait 1 seconds\" block to slow it down.\n\n```scratch\nwhen green flag clicked\nforever\n  go to random position\n  wait 1 seconds\n```\n\nHave fun making your sprites move! You're doing great!"
+          }
+        }
+      },
+      {
+        "prompt": "Teach me how to use repeat blocks",
+        "expected_route": "give_instructions",
+        "actual_route": "give_instructions",
+        "routing_correct": true,
+        "execution_time": 12.68,
+        "agent_response": "Hey there, Scratch explorer! Let's learn about the \"repeat\" block. It's like a magic trick to make things happen again and again!\n\n**What it does:** The \"repeat\" block does the same thing many times.\n\n**How to use it:**\n\n1.  **Find it:** Go to the **Control** blocks. You'll see the \"repeat\" block.\n2.  **Drag it:** Bring the \"repeat\" block to your workspace.\n3.  **Set the number:** Type a number in the white box. This tells Scratch how many times to repeat. Like \"5\" or \"10\"!\n4.  **Add blocks inside:** Put the blocks you want to repeat *inside* the \"repeat\" block.\n5.  **Start it:** Use a \"when green flag clicked\" block from **Events** to start the repeating.\n\n**Example:**\n\nLet's make a sprite move 10 steps forward 5 times.\n\n1.  Get a \"when green flag clicked\" block.\n2.  Add a \"repeat\" block and type \"5\" inside.\n3.  Put a \"move 10 steps\" block (from **Motion**) *inside* the \"repeat\" block.\n\nNow, when you click the green flag, your sprite will move 10 steps, then do it again, and again, until it has moved 5 times!\n\n**Another Example: Changing Color**\n\nLet's change the color of a sprite 20 times.\n\n1.  Get a \"when green flag clicked\" block.\n2.  Add a \"repeat\" block and type \"20\" inside.\n3.  Put a \"change color effect by 25\" block (from **Looks**) *inside* the \"repeat\" block.\n\nThe color will change 20 times.\n\nHave fun repeating!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 1343,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains instructional content",
+            "Addresses prompt (2/3 key words match, 66.7%)"
+          ]
+        },
+        "result": {
+          "query": "Teach me how to use repeat blocks",
+          "result": {
+            "formatted_response": "Hey there, Scratch explorer! Let's learn about the \"repeat\" block. It's like a magic trick to make things happen again and again!\n\n**What it does:** The \"repeat\" block does the same thing many times.\n\n**How to use it:**\n\n1.  **Find it:** Go to the **Control** blocks. You'll see the \"repeat\" block.\n2.  **Drag it:** Bring the \"repeat\" block to your workspace.\n3.  **Set the number:** Type a number in the white box. This tells Scratch how many times to repeat. Like \"5\" or \"10\"!\n4.  **Add blocks inside:** Put the blocks you want to repeat *inside* the \"repeat\" block.\n5.  **Start it:** Use a \"when green flag clicked\" block from **Events** to start the repeating.\n\n**Example:**\n\nLet's make a sprite move 10 steps forward 5 times.\n\n1.  Get a \"when green flag clicked\" block.\n2.  Add a \"repeat\" block and type \"5\" inside.\n3.  Put a \"move 10 steps\" block (from **Motion**) *inside* the \"repeat\" block.\n\nNow, when you click the green flag, your sprite will move 10 steps, then do it again, and again, until it has moved 5 times!\n\n**Another Example: Changing Color**\n\nLet's change the color of a sprite 20 times.\n\n1.  Get a \"when green flag clicked\" block.\n2.  Add a \"repeat\" block and type \"20\" inside.\n3.  Put a \"change color effect by 25\" block (from **Looks**) *inside* the \"repeat\" block.\n\nThe color will change 20 times.\n\nHave fun repeating!"
+          }
+        }
+      },
+      {
+        "prompt": "What's the best way to make animations?",
+        "expected_route": "give_instructions",
+        "actual_route": "give_instructions",
+        "routing_correct": true,
+        "execution_time": 13.93,
+        "agent_response": "Hey there, future animators! Let's learn how to make things move in Scratch!\n\n**1. Costume Magic (Like a Flipbook!):**\n\n*   Imagine you're making a flipbook. You draw the same thing over and over, but change it a little bit each time. In Scratch, we use **costumes** to do the same thing!\n*   **What to use:**\n    *   `next costume`: This block changes your character to the next picture.\n    *   `wait [number] seconds`: This block makes Scratch wait a little bit before changing to the next picture.\n    *   `forever`: This block makes your animation keep going and going!\n*   **Example:**\n\n```scratch\nwhen green flag clicked\nforever\n  next costume\n  wait 0.1 seconds\nend\n```\n\n**2. Moving Around:**\n\n*   Instead of changing costumes, we can make our character move across the screen!\n*   **What to use:**\n    *   `move [number] steps`: This block makes your character take steps.\n    *   `change x by [number]`: This block moves your character left or right.\n    *   `change y by [number]`: This block moves your character up or down.\n*   **Example:**\n\n```scratch\nwhen green flag clicked\nforever\n  change x by 10\n  wait 0.05 seconds\n  if <(x position) > (240)> then\n     set x to (-240)\n  end\nend\n```\n\n**3. Super Animation Combo!**\n\n*   Want to be a super animator? Use both costumes and moving around! Imagine a character walking - you'd change their leg costumes *and* move them forward!\n\n**Tips for Awesome Animations:**\n\n*   Start simple!\n*   Plan what you want to make.\n*   Have fun experimenting!\n*   Use more than one character!\n\nYou got this! Now go make some amazing animations!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 1589,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains instructional content",
+            "Addresses prompt (1/4 key words match, 25.0%)"
+          ]
+        },
+        "result": {
+          "query": "What's the best way to make animations?",
+          "result": {
+            "formatted_response": "Hey there, future animators! Let's learn how to make things move in Scratch!\n\n**1. Costume Magic (Like a Flipbook!):**\n\n*   Imagine you're making a flipbook. You draw the same thing over and over, but change it a little bit each time. In Scratch, we use **costumes** to do the same thing!\n*   **What to use:**\n    *   `next costume`: This block changes your character to the next picture.\n    *   `wait [number] seconds`: This block makes Scratch wait a little bit before changing to the next picture.\n    *   `forever`: This block makes your animation keep going and going!\n*   **Example:**\n\n```scratch\nwhen green flag clicked\nforever\n  next costume\n  wait 0.1 seconds\nend\n```\n\n**2. Moving Around:**\n\n*   Instead of changing costumes, we can make our character move across the screen!\n*   **What to use:**\n    *   `move [number] steps`: This block makes your character take steps.\n    *   `change x by [number]`: This block moves your character left or right.\n    *   `change y by [number]`: This block moves your character up or down.\n*   **Example:**\n\n```scratch\nwhen green flag clicked\nforever\n  change x by 10\n  wait 0.05 seconds\n  if <(x position) > (240)> then\n     set x to (-240)\n  end\nend\n```\n\n**3. Super Animation Combo!**\n\n*   Want to be a super animator? Use both costumes and moving around! Imagine a character walking - you'd change their leg costumes *and* move them forward!\n\n**Tips for Awesome Animations:**\n\n*   Start simple!\n*   Plan what you want to make.\n*   Have fun experimenting!\n*   Use more than one character!\n\nYou got this! Now go make some amazing animations!"
+          }
+        }
+      },
+      {
+        "prompt": "How can I make my sprite jump?",
+        "expected_route": "give_instructions",
+        "actual_route": "give_instructions",
+        "routing_correct": true,
+        "execution_time": 13.13,
+        "agent_response": "Hey there, future game developers! Let's make your Scratch sprite jump! It's super fun!\n\n**First, pick how you want to make your sprite jump:**\n\n*   Press a key? Use the `when key pressed` block. You can find it in the \"Events\" blocks. Choose your favorite key, like the space bar!\n*   Click the sprite? Use the `when this sprite clicked` block, also in \"Events.\"\n\n**Now, let's make the sprite jump up and down:**\n\n1.  **Jump Up:** Use the `change y by` block from the \"Motion\" blocks. Put in a positive number, like 50, to make it go up!\n2.  **Wait at the Top:** Add a `wait seconds` block from the \"Control\" blocks. A short wait, like 0.2 seconds, will do!\n3.  **Come Down:** Use another `change y by` block, but this time with a negative number, like -50. This brings the sprite back down!\n\n**Make it even cooler with a loop!**\n\n1.  Use the `repeat` block from the \"Control\" blocks.\n2.  Put `change y by (10)` and `wait (0.01) seconds` inside the `repeat` block.\n3.  Repeat with `change y by (-10)` and `wait (0.01) seconds` to come down smoothly.\n\nTry different numbers to make the jump higher or lower. Have fun experimenting!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 1131,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains instructional content",
+            "Addresses prompt (2/3 key words match, 66.7%)"
+          ]
+        },
+        "result": {
+          "query": "How can I make my sprite jump?",
+          "result": {
+            "formatted_response": "Hey there, future game developers! Let's make your Scratch sprite jump! It's super fun!\n\n**First, pick how you want to make your sprite jump:**\n\n*   Press a key? Use the `when key pressed` block. You can find it in the \"Events\" blocks. Choose your favorite key, like the space bar!\n*   Click the sprite? Use the `when this sprite clicked` block, also in \"Events.\"\n\n**Now, let's make the sprite jump up and down:**\n\n1.  **Jump Up:** Use the `change y by` block from the \"Motion\" blocks. Put in a positive number, like 50, to make it go up!\n2.  **Wait at the Top:** Add a `wait seconds` block from the \"Control\" blocks. A short wait, like 0.2 seconds, will do!\n3.  **Come Down:** Use another `change y by` block, but this time with a negative number, like -50. This brings the sprite back down!\n\n**Make it even cooler with a loop!**\n\n1.  Use the `repeat` block from the \"Control\" blocks.\n2.  Put `change y by (10)` and `wait (0.01) seconds` inside the `repeat` block.\n3.  Repeat with `change y by (-10)` and `wait (0.01) seconds` to come down smoothly.\n\nTry different numbers to make the jump higher or lower. Have fun experimenting!"
+          }
+        }
+      },
+      {
+        "prompt": "Explain how to use if-then blocks",
+        "expected_route": "give_instructions",
+        "actual_route": "give_instructions",
+        "routing_correct": true,
+        "execution_time": 11.08,
+        "agent_response": "Hey there, Scratch Explorers!\n\nWant to make your Scratch games super smart? Let's learn about the `if then` block! It's like a brain for your code, helping it make choices.\n\n**What it does:** The `if then` block checks if something is true. If it is, then the code inside the block runs! If not, Scratch skips that code.\n\n**How to use it:**\n\n1.  Find the `if then` block in the \"Control\" blocks (it's at the bottom of the list). Drag it into your code.\n2.  Now, we need to tell the `if then` block *what* to check. We need to put a condition in the hexagonal space. You can find conditions in \"Sensing\" or \"Operators.\"\n    *   `touching object`: Is my sprite touching something?\n    *   `key pressed`: Is someone pressing a key?\n    *   `greater than`, `less than`, `equals`: Are two numbers the same?\n3.  Put the code you want to run *inside* the `if then` block. This code will only run if your condition is true!\n\n**Example:**\n\nLet's make a sprite say \"Hello!\" when you press the space key.\n\n1.  Get a `when key pressed` block from the \"Events\" blocks. Choose \"space.\"\n2.  Put an `if then` block inside the `when key pressed` block.\n3.  Drag a `key pressed` block from \"Sensing\" into the `if then` block's hexagon. Choose \"space\" again.\n4.  Put a `say message` block inside the `if then` block. Change the message to \"Hello!\".\n\nNow, your sprite will only say \"Hello!\" when you press the space key! Isn't that cool?\n\nThe `if then` block helps you make games that react to what's happening. Have fun experimenting!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 1515,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains instructional content",
+            "Addresses prompt (1/3 key words match, 33.3%)"
+          ]
+        },
+        "result": {
+          "query": "Explain how to use if-then blocks",
+          "result": {
+            "formatted_response": "Hey there, Scratch Explorers!\n\nWant to make your Scratch games super smart? Let's learn about the `if then` block! It's like a brain for your code, helping it make choices.\n\n**What it does:** The `if then` block checks if something is true. If it is, then the code inside the block runs! If not, Scratch skips that code.\n\n**How to use it:**\n\n1.  Find the `if then` block in the \"Control\" blocks (it's at the bottom of the list). Drag it into your code.\n2.  Now, we need to tell the `if then` block *what* to check. We need to put a condition in the hexagonal space. You can find conditions in \"Sensing\" or \"Operators.\"\n    *   `touching object`: Is my sprite touching something?\n    *   `key pressed`: Is someone pressing a key?\n    *   `greater than`, `less than`, `equals`: Are two numbers the same?\n3.  Put the code you want to run *inside* the `if then` block. This code will only run if your condition is true!\n\n**Example:**\n\nLet's make a sprite say \"Hello!\" when you press the space key.\n\n1.  Get a `when key pressed` block from the \"Events\" blocks. Choose \"space.\"\n2.  Put an `if then` block inside the `when key pressed` block.\n3.  Drag a `key pressed` block from \"Sensing\" into the `if then` block's hexagon. Choose \"space\" again.\n4.  Put a `say message` block inside the `if then` block. Change the message to \"Hello!\".\n\nNow, your sprite will only say \"Hello!\" when you press the space key! Isn't that cool?\n\nThe `if then` block helps you make games that react to what's happening. Have fun experimenting!"
+          }
+        }
+      },
+      {
+        "prompt": "How do I add sound to my project?",
+        "expected_route": "give_instructions",
+        "actual_route": "give_instructions",
+        "routing_correct": true,
+        "execution_time": 10.67,
+        "agent_response": "Hey there, future sound designers! Let's add some awesome sounds to your Scratch project!\n\n1.  **Find the Sound Blocks:** Look on the left side of your screen for the \"Sound\" button. Click it, and you'll see all the sound blocks you can use!\n\n2.  **Pick a Sound Block:**\n\n    *   `play sound until done`: This block plays the whole sound before moving on.\n    *   `start sound`: This block starts the sound, but keeps going with the code right away. Great for background music!\n    *   `stop all sounds`: This block stops all the sounds.\n\n3.  **Choose When to Play the Sound:**\n\n    *   `when green flag clicked`: The sound plays when you start the project.\n    *   `when key pressed`: The sound plays when you press a key.\n    *   `when this sprite clicked`: The sound plays when you click on a sprite.\n\n4.  **Put the Blocks Together:** Drag the \"when\" block to the middle. Then, drag your sound block and snap it under the \"when\" block.\n\n5.  **Pick Your Sound:** Click the little arrow on the sound block to pick a sound. Scratch has lots of sounds to choose from! You can even add your own sound by clicking \"Choose a Sound\" in the \"Sounds\" tab!\n\n**Example:**\n\nTo play a sound when the green flag is clicked:\n\n*   Use `when green flag clicked`\n*   Use `play sound until done`\n\nSnap them together and pick your sound. Now, click the green flag and hear your sound play! You did it!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 1383,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains instructional content",
+            "Addresses prompt (1/2 key words match, 50.0%)"
+          ]
+        },
+        "result": {
+          "query": "How do I add sound to my project?",
+          "result": {
+            "formatted_response": "Hey there, future sound designers! Let's add some awesome sounds to your Scratch project!\n\n1.  **Find the Sound Blocks:** Look on the left side of your screen for the \"Sound\" button. Click it, and you'll see all the sound blocks you can use!\n\n2.  **Pick a Sound Block:**\n\n    *   `play sound until done`: This block plays the whole sound before moving on.\n    *   `start sound`: This block starts the sound, but keeps going with the code right away. Great for background music!\n    *   `stop all sounds`: This block stops all the sounds.\n\n3.  **Choose When to Play the Sound:**\n\n    *   `when green flag clicked`: The sound plays when you start the project.\n    *   `when key pressed`: The sound plays when you press a key.\n    *   `when this sprite clicked`: The sound plays when you click on a sprite.\n\n4.  **Put the Blocks Together:** Drag the \"when\" block to the middle. Then, drag your sound block and snap it under the \"when\" block.\n\n5.  **Pick Your Sound:** Click the little arrow on the sound block to pick a sound. Scratch has lots of sounds to choose from! You can even add your own sound by clicking \"Choose a Sound\" in the \"Sounds\" tab!\n\n**Example:**\n\nTo play a sound when the green flag is clicked:\n\n*   Use `when green flag clicked`\n*   Use `play sound until done`\n\nSnap them together and pick your sound. Now, click the green flag and hear your sound play! You did it!"
+          }
+        }
+      },
+      {
+        "prompt": "What are the steps to create a game?",
+        "expected_route": "give_instructions",
+        "actual_route": "give_instructions",
+        "routing_correct": true,
+        "execution_time": 16.42,
+        "agent_response": "Hey there, future game developer! Let's make a Scratch game together!\n\n1.  **Dream It, Plan It:**\n    *   What kind of game do you want? A jumping game? A puzzle?\n    *   What will players do? What are the rules?\n    *   Draw your game! What will it look like? Who are the characters?\n\n2.  **Set the Stage:**\n    *   **Pick a Backdrop:** Go to \"Looks\" and pick a cool background! Use the `switch backdrop to` block to show it.\n    *   **Add Sprites:** These are your characters and things in the game. You can draw them or pick from Scratch's library!\n\n3.  **Make It Move:**\n    *   **Start Button:** Use `when green flag clicked` (in \"Events\") to start the game.\n    *   **Move Around:** Use \"Motion\" blocks to move your sprites!\n        *   `move [10] steps` makes it move forward.\n        *   `turn right [15] degrees` makes it turn.\n    *   **Use the Keyboard:** Use `when key pressed` (in \"Events\") to move with the arrow keys!\n\n4.  **Make It Interact:**\n    *   **Touching:** Use `touching [object v]` (in \"Sensing\") to see when sprites bump into each other.\n    *   **If...Then:** Use `if then` (in \"Control\") to make things happen when they touch!\n\n5.  **Keep Score:**\n    *   **Make a Variable:** In \"Variables,\" make a box to hold the score.\n    *   **Add Points:** Use `change [score v] by [1]` to add to the score.\n    *   **Show the Score:** Use `show variable [score v]` to show it on the screen.\n\n6.  **Add Sounds:**\n    *   **Pick Sounds:** Go to \"Sound\" and choose fun noises!\n    *   **Play Sounds:** Use `start sound [sound name v]` to play them when things happen.\n\n7.  **Repeat Actions:**\n    *   **Forever:** Use `forever` (in \"Control\") to keep checking things.\n    *   **Repeat:** Use `repeat [10]` to do something a few times.\n\n8.  **Game Over:**\n    *   **When to Stop:** Use `if then` to check if the game is over (like if you run out of lives).\n    *   **Stop It:** Use `stop [all v]` (in \"Control\") to end the game.\n\n9.  **Make It Awesome:**\n    *   **Costumes:** Change how your sprites look with \"Looks\"!\n    *   **Messages:** Use `broadcast [message v]` (in \"Events\") to let sprites talk to each other.\n\nStart small and add more cool stuff as you go! Have fun!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 2192,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains instructional content",
+            "Addresses prompt (2/4 key words match, 50.0%)"
+          ]
+        },
+        "result": {
+          "query": "What are the steps to create a game?",
+          "result": {
+            "formatted_response": "Hey there, future game developer! Let's make a Scratch game together!\n\n1.  **Dream It, Plan It:**\n    *   What kind of game do you want? A jumping game? A puzzle?\n    *   What will players do? What are the rules?\n    *   Draw your game! What will it look like? Who are the characters?\n\n2.  **Set the Stage:**\n    *   **Pick a Backdrop:** Go to \"Looks\" and pick a cool background! Use the `switch backdrop to` block to show it.\n    *   **Add Sprites:** These are your characters and things in the game. You can draw them or pick from Scratch's library!\n\n3.  **Make It Move:**\n    *   **Start Button:** Use `when green flag clicked` (in \"Events\") to start the game.\n    *   **Move Around:** Use \"Motion\" blocks to move your sprites!\n        *   `move [10] steps` makes it move forward.\n        *   `turn right [15] degrees` makes it turn.\n    *   **Use the Keyboard:** Use `when key pressed` (in \"Events\") to move with the arrow keys!\n\n4.  **Make It Interact:**\n    *   **Touching:** Use `touching [object v]` (in \"Sensing\") to see when sprites bump into each other.\n    *   **If...Then:** Use `if then` (in \"Control\") to make things happen when they touch!\n\n5.  **Keep Score:**\n    *   **Make a Variable:** In \"Variables,\" make a box to hold the score.\n    *   **Add Points:** Use `change [score v] by [1]` to add to the score.\n    *   **Show the Score:** Use `show variable [score v]` to show it on the screen.\n\n6.  **Add Sounds:**\n    *   **Pick Sounds:** Go to \"Sound\" and choose fun noises!\n    *   **Play Sounds:** Use `start sound [sound name v]` to play them when things happen.\n\n7.  **Repeat Actions:**\n    *   **Forever:** Use `forever` (in \"Control\") to keep checking things.\n    *   **Repeat:** Use `repeat [10]` to do something a few times.\n\n8.  **Game Over:**\n    *   **When to Stop:** Use `if then` to check if the game is over (like if you run out of lives).\n    *   **Stop It:** Use `stop [all v]` (in \"Control\") to end the game.\n\n9.  **Make It Awesome:**\n    *   **Costumes:** Change how your sprites look with \"Looks\"!\n    *   **Messages:** Use `broadcast [message v]` (in \"Events\") to let sprites talk to each other.\n\nStart small and add more cool stuff as you go! Have fun!"
+          }
+        }
+      },
+      {
+        "prompt": "How do variables work in Scratch?",
+        "expected_route": "give_instructions",
+        "actual_route": "give_instructions",
+        "routing_correct": true,
+        "execution_time": 12.03,
+        "agent_response": "Hey there, Scratch Explorers!\n\nVariables are like special boxes that hold secrets in your Scratch games. Let's learn how to use them!\n\n1.  **Make a Box (Variable):**\n    *   Go to \"Variables\" and click \"Make a Variable.\"\n    *   Give it a cool name like \"score\" or \"speed.\"\n\n2.  **Put Something in the Box:**\n    *   Use \"set variable to\" to give your box a starting value.\n    *   Like, `set [score v] to [0]` to start the score at zero!\n\n3.  **Change What's in the Box:**\n    *   Use \"change variable by\" to add or subtract from the value.\n    *   `change [score v] by [1]` to add one to the score!\n\n4.  **Use the Box's Secret:**\n    *   Drag your variable into other blocks.\n    *   `move [speed v] steps` makes your character move faster or slower.\n    *   `say [join[Score: ][score v]]` to show the score on the screen!\n\n5.  **Show or Hide the Box:**\n    *   Use \"show variable\" and \"hide variable\" to make the value visible or invisible on the stage.\n\n**Example:**\n\n1.  Make a \"score\" variable.\n2.  Set \"score\" to 0 at the start.\n3.  Add 1 to \"score\" when the player gets a point.\n4.  Show the \"score\" on the stage!\n\nVariables help you make awesome, interactive games. Have fun experimenting!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 1198,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "Contains instructional content",
+            "Addresses prompt (1/3 key words match, 33.3%)"
+          ]
+        },
+        "result": {
+          "query": "How do variables work in Scratch?",
+          "result": {
+            "formatted_response": "Hey there, Scratch Explorers!\n\nVariables are like special boxes that hold secrets in your Scratch games. Let's learn how to use them!\n\n1.  **Make a Box (Variable):**\n    *   Go to \"Variables\" and click \"Make a Variable.\"\n    *   Give it a cool name like \"score\" or \"speed.\"\n\n2.  **Put Something in the Box:**\n    *   Use \"set variable to\" to give your box a starting value.\n    *   Like, `set [score v] to [0]` to start the score at zero!\n\n3.  **Change What's in the Box:**\n    *   Use \"change variable by\" to add or subtract from the value.\n    *   `change [score v] by [1]` to add one to the score!\n\n4.  **Use the Box's Secret:**\n    *   Drag your variable into other blocks.\n    *   `move [speed v] steps` makes your character move faster or slower.\n    *   `say [join[Score: ][score v]]` to show the score on the screen!\n\n5.  **Show or Hide the Box:**\n    *   Use \"show variable\" and \"hide variable\" to make the value visible or invisible on the stage.\n\n**Example:**\n\n1.  Make a \"score\" variable.\n2.  Set \"score\" to 0 at the start.\n3.  Add 1 to \"score\" when the player gets a point.\n4.  Show the \"score\" on the stage!\n\nVariables help you make awesome, interactive games. Have fun experimenting!"
+          }
+        }
+      }
+    ],
+    "general_agent": [
+      {
+        "prompt": "Hello!",
+        "expected_route": "general_agent",
+        "actual_route": "general_agent",
+        "routing_correct": true,
+        "execution_time": 5.97,
+        "agent_response": "Hello! I'm here to help you learn Scratch in a fun and easy way.\n\nIf you have a Scratch project you want to make, or if you're stuck on a step, just tell me. I can help you break it down into simple steps that are easy for kids to follow.\n\nLet's have fun creating with Scratch! What do you want to make today?",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 309,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "General response provided",
+            "Addresses prompt (1/1 key words match, 100.0%)"
+          ]
+        },
+        "result": {
+          "query": "Hello!",
+          "result": {
+            "formatted_response": "Hello! I'm here to help you learn Scratch in a fun and easy way.\n\nIf you have a Scratch project you want to make, or if you're stuck on a step, just tell me. I can help you break it down into simple steps that are easy for kids to follow.\n\nLet's have fun creating with Scratch! What do you want to make today?"
+          }
+        }
+      },
+      {
+        "prompt": "Thank you for your help",
+        "expected_route": "general_agent",
+        "actual_route": "general_agent",
+        "routing_correct": true,
+        "execution_time": 5.45,
+        "agent_response": "Yay! I'm super happy I could help you with your Scratch project! If you need anything else, just ask. Have lots of fun Scratching and creating awesome things! You're doing great!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 178,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "General response provided",
+            "Addresses prompt (2/3 key words match, 66.7%)"
+          ]
+        },
+        "result": {
+          "query": "Thank you for your help",
+          "result": {
+            "formatted_response": "Yay! I'm super happy I could help you with your Scratch project! If you need anything else, just ask. Have lots of fun Scratching and creating awesome things! You're doing great!"
+          }
+        }
+      },
+      {
+        "prompt": "What is Scratch?",
+        "expected_route": "general_agent",
+        "actual_route": "general_agent",
+        "routing_correct": true,
+        "execution_time": 6.49,
+        "agent_response": "Hey there, future coder!\n\nScratch is like a super fun playground where you can make your own games, stories, and cartoons!\n\nInstead of typing complicated code, you get to use colorful blocks that snap together like LEGOs. Each block tells your characters what to do. It's like giving them instructions with puzzle pieces!\n\nYou can drag and drop these blocks to make your characters move, talk, and even dance. It's super easy to learn, and you'll be amazed at what you can create.\n\nOnce you've made something awesome, you can share it with other kids in the Scratch community. You can also check out their projects and get inspired. It's a great way to learn and make new friends!\n\nSo, get ready to unleash your imagination and start creating with Scratch!",
+        "response_verification": {
+          "has_response": true,
+          "response_length": 756,
+          "is_accurate": true,
+          "accuracy_label": "Accurate",
+          "notes": [
+            "General response provided",
+            "Addresses prompt (1/2 key words match, 50.0%)"
+          ]
+        },
+        "result": {
+          "query": "What is Scratch?",
+          "result": {
+            "formatted_response": "Hey there, future coder!\n\nScratch is like a super fun playground where you can make your own games, stories, and cartoons!\n\nInstead of typing complicated code, you get to use colorful blocks that snap together like LEGOs. Each block tells your characters what to do. It's like giving them instructions with puzzle pieces!\n\nYou can drag and drop these blocks to make your characters move, talk, and even dance. It's super easy to learn, and you'll be amazed at what you can create.\n\nOnce you've made something awesome, you can share it with other kids in the Scratch community. You can also check out their projects and get inspired. It's a great way to learn and make new friends!\n\nSo, get ready to unleash your imagination and start creating with Scratch!"
+          }
+        }
+      }
+    ]
+  }
+}

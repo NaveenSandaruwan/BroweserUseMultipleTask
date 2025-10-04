@@ -1,0 +1,24 @@
+{
+  "prompt": "What is Scratch?",
+  "expected_route": "general_agent",
+  "actual_route": "general_agent",
+  "routing_correct": true,
+  "execution_time": 6.49,
+  "agent_response": "Hey there, future coder!\n\nScratch is like a super fun playground where you can make your own games, stories, and cartoons!\n\nInstead of typing complicated code, you get to use colorful blocks that snap together like LEGOs. Each block tells your characters what to do. It's like giving them instructions with puzzle pieces!\n\nYou can drag and drop these blocks to make your characters move, talk, and even dance. It's super easy to learn, and you'll be amazed at what you can create.\n\nOnce you've made something awesome, you can share it with other kids in the Scratch community. You can also check out their projects and get inspired. It's a great way to learn and make new friends!\n\nSo, get ready to unleash your imagination and start creating with Scratch!",
+  "response_verification": {
+    "has_response": true,
+    "response_length": 756,
+    "is_accurate": true,
+    "accuracy_label": "Accurate",
+    "notes": [
+      "General response provided",
+      "Addresses prompt (1/2 key words match, 50.0%)"
+    ]
+  },
+  "result": {
+    "query": "What is Scratch?",
+    "result": {
+      "formatted_response": "Hey there, future coder!\n\nScratch is like a super fun playground where you can make your own games, stories, and cartoons!\n\nInstead of typing complicated code, you get to use colorful blocks that snap together like LEGOs. Each block tells your characters what to do. It's like giving them instructions with puzzle pieces!\n\nYou can drag and drop these blocks to make your characters move, talk, and even dance. It's super easy to learn, and you'll be amazed at what you can create.\n\nOnce you've made something awesome, you can share it with other kids in the Scratch community. You can also check out their projects and get inspired. It's a great way to learn and make new friends!\n\nSo, get ready to unleash your imagination and start creating with Scratch!"
+    }
+  }
+}

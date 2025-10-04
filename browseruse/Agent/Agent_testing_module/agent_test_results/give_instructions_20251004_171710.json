@@ -1,0 +1,194 @@
+[
+  {
+    "prompt": "How do I make a sprite move?",
+    "expected_route": "give_instructions",
+    "actual_route": "give_instructions",
+    "routing_correct": true,
+    "execution_time": 14.66,
+    "agent_response": "Hey there, future Scratch superstar! Let's make your characters zoom around the screen!\n\n**1. Simple Steps:**\n\n*   Find the blue \"move steps\" block. It tells your character to walk!\n*   Put it inside an orange \"forever\" block to keep moving.\n*   Add a yellow \"when green flag clicked\" block on top to start when you press the green flag.\n\nLike this:\n\n```scratch\nwhen green flag clicked\nforever\n  move 10 steps\n```\n\nWant to bounce when you hit the edge? Add the \"if on edge, bounce\" block!\n\n```scratch\nwhen green flag clicked\nforever\n  move 10 steps\n  if on edge bounce\n```\n\n**2. Arrow Key Control:**\n\n*   Use the yellow \"when key pressed\" block for each arrow key.\n*   Use the blue \"change x by\" block to move left and right. Positive numbers go right, negative go left!\n*   Use the blue \"change y by\" block to move up and down. Positive numbers go up, negative go down!\n*   Use the blue \"point in direction\" block to make the sprite face the correct direction.\n\n```scratch\nwhen key pressed [right arrow v]\n  change x by 10\n\nwhen key pressed [left arrow v]\n  change x by -10\n\nwhen key pressed [up arrow v]\n  change y by 10\n\nwhen key pressed [down arrow v]\n  change y by -10\n```\n\n**3. Random Fun:**\n\n*   Use the blue \"go to random position\" block.\n*   Put it in a \"forever\" loop to keep moving randomly.\n*   Add a \"wait 1 seconds\" block to slow it down.\n\n```scratch\nwhen green flag clicked\nforever\n  go to random position\n  wait 1 seconds\n```\n\nHave fun making your sprites move! You're doing great!",
+    "response_verification": {
+      "has_response": true,
+      "response_length": 1497,
+      "is_accurate": true,
+      "accuracy_label": "Accurate",
+      "notes": [
+        "Contains instructional content",
+        "Addresses prompt (2/3 key words match, 66.7%)"
+      ]
+    },
+    "result": {
+      "query": "How do I make a sprite move?",
+      "result": {
+        "formatted_response": "Hey there, future Scratch superstar! Let's make your characters zoom around the screen!\n\n**1. Simple Steps:**\n\n*   Find the blue \"move steps\" block. It tells your character to walk!\n*   Put it inside an orange \"forever\" block to keep moving.\n*   Add a yellow \"when green flag clicked\" block on top to start when you press the green flag.\n\nLike this:\n\n```scratch\nwhen green flag clicked\nforever\n  move 10 steps\n```\n\nWant to bounce when you hit the edge? Add the \"if on edge, bounce\" block!\n\n```scratch\nwhen green flag clicked\nforever\n  move 10 steps\n  if on edge bounce\n```\n\n**2. Arrow Key Control:**\n\n*   Use the yellow \"when key pressed\" block for each arrow key.\n*   Use the blue \"change x by\" block to move left and right. Positive numbers go right, negative go left!\n*   Use the blue \"change y by\" block to move up and down. Positive numbers go up, negative go down!\n*   Use the blue \"point in direction\" block to make the sprite face the correct direction.\n\n```scratch\nwhen key pressed [right arrow v]\n  change x by 10\n\nwhen key pressed [left arrow v]\n  change x by -10\n\nwhen key pressed [up arrow v]\n  change y by 10\n\nwhen key pressed [down arrow v]\n  change y by -10\n```\n\n**3. Random Fun:**\n\n*   Use the blue \"go to random position\" block.\n*   Put it in a \"forever\" loop to keep moving randomly.\n*   Add a \"wait 1 seconds\" block to slow it down.\n\n```scratch\nwhen green flag clicked\nforever\n  go to random position\n  wait 1 seconds\n```\n\nHave fun making your sprites move! You're doing great!"
+      }
+    }
+  },
+  {
+    "prompt": "Teach me how to use repeat blocks",
+    "expected_route": "give_instructions",
+    "actual_route": "give_instructions",
+    "routing_correct": true,
+    "execution_time": 12.68,
+    "agent_response": "Hey there, Scratch explorer! Let's learn about the \"repeat\" block. It's like a magic trick to make things happen again and again!\n\n**What it does:** The \"repeat\" block does the same thing many times.\n\n**How to use it:**\n\n1.  **Find it:** Go to the **Control** blocks. You'll see the \"repeat\" block.\n2.  **Drag it:** Bring the \"repeat\" block to your workspace.\n3.  **Set the number:** Type a number in the white box. This tells Scratch how many times to repeat. Like \"5\" or \"10\"!\n4.  **Add blocks inside:** Put the blocks you want to repeat *inside* the \"repeat\" block.\n5.  **Start it:** Use a \"when green flag clicked\" block from **Events** to start the repeating.\n\n**Example:**\n\nLet's make a sprite move 10 steps forward 5 times.\n\n1.  Get a \"when green flag clicked\" block.\n2.  Add a \"repeat\" block and type \"5\" inside.\n3.  Put a \"move 10 steps\" block (from **Motion**) *inside* the \"repeat\" block.\n\nNow, when you click the green flag, your sprite will move 10 steps, then do it again, and again, until it has moved 5 times!\n\n**Another Example: Changing Color**\n\nLet's change the color of a sprite 20 times.\n\n1.  Get a \"when green flag clicked\" block.\n2.  Add a \"repeat\" block and type \"20\" inside.\n3.  Put a \"change color effect by 25\" block (from **Looks**) *inside* the \"repeat\" block.\n\nThe color will change 20 times.\n\nHave fun repeating!",
+    "response_verification": {
+      "has_response": true,
+      "response_length": 1343,
+      "is_accurate": true,
+      "accuracy_label": "Accurate",
+      "notes": [
+        "Contains instructional content",
+        "Addresses prompt (2/3 key words match, 66.7%)"
+      ]
+    },
+    "result": {
+      "query": "Teach me how to use repeat blocks",
+      "result": {
+        "formatted_response": "Hey there, Scratch explorer! Let's learn about the \"repeat\" block. It's like a magic trick to make things happen again and again!\n\n**What it does:** The \"repeat\" block does the same thing many times.\n\n**How to use it:**\n\n1.  **Find it:** Go to the **Control** blocks. You'll see the \"repeat\" block.\n2.  **Drag it:** Bring the \"repeat\" block to your workspace.\n3.  **Set the number:** Type a number in the white box. This tells Scratch how many times to repeat. Like \"5\" or \"10\"!\n4.  **Add blocks inside:** Put the blocks you want to repeat *inside* the \"repeat\" block.\n5.  **Start it:** Use a \"when green flag clicked\" block from **Events** to start the repeating.\n\n**Example:**\n\nLet's make a sprite move 10 steps forward 5 times.\n\n1.  Get a \"when green flag clicked\" block.\n2.  Add a \"repeat\" block and type \"5\" inside.\n3.  Put a \"move 10 steps\" block (from **Motion**) *inside* the \"repeat\" block.\n\nNow, when you click the green flag, your sprite will move 10 steps, then do it again, and again, until it has moved 5 times!\n\n**Another Example: Changing Color**\n\nLet's change the color of a sprite 20 times.\n\n1.  Get a \"when green flag clicked\" block.\n2.  Add a \"repeat\" block and type \"20\" inside.\n3.  Put a \"change color effect by 25\" block (from **Looks**) *inside* the \"repeat\" block.\n\nThe color will change 20 times.\n\nHave fun repeating!"
+      }
+    }
+  },
+  {
+    "prompt": "What's the best way to make animations?",
+    "expected_route": "give_instructions",
+    "actual_route": "give_instructions",
+    "routing_correct": true,
+    "execution_time": 13.93,
+    "agent_response": "Hey there, future animators! Let's learn how to make things move in Scratch!\n\n**1. Costume Magic (Like a Flipbook!):**\n\n*   Imagine you're making a flipbook. You draw the same thing over and over, but change it a little bit each time. In Scratch, we use **costumes** to do the same thing!\n*   **What to use:**\n    *   `next costume`: This block changes your character to the next picture.\n    *   `wait [number] seconds`: This block makes Scratch wait a little bit before changing to the next picture.\n    *   `forever`: This block makes your animation keep going and going!\n*   **Example:**\n\n```scratch\nwhen green flag clicked\nforever\n  next costume\n  wait 0.1 seconds\nend\n```\n\n**2. Moving Around:**\n\n*   Instead of changing costumes, we can make our character move across the screen!\n*   **What to use:**\n    *   `move [number] steps`: This block makes your character take steps.\n    *   `change x by [number]`: This block moves your character left or right.\n    *   `change y by [number]`: This block moves your character up or down.\n*   **Example:**\n\n```scratch\nwhen green flag clicked\nforever\n  change x by 10\n  wait 0.05 seconds\n  if <(x position) > (240)> then\n     set x to (-240)\n  end\nend\n```\n\n**3. Super Animation Combo!**\n\n*   Want to be a super animator? Use both costumes and moving around! Imagine a character walking - you'd change their leg costumes *and* move them forward!\n\n**Tips for Awesome Animations:**\n\n*   Start simple!\n*   Plan what you want to make.\n*   Have fun experimenting!\n*   Use more than one character!\n\nYou got this! Now go make some amazing animations!",
+    "response_verification": {
+      "has_response": true,
+      "response_length": 1589,
+      "is_accurate": true,
+      "accuracy_label": "Accurate",
+      "notes": [
+        "Contains instructional content",
+        "Addresses prompt (1/4 key words match, 25.0%)"
+      ]
+    },
+    "result": {
+      "query": "What's the best way to make animations?",
+      "result": {
+        "formatted_response": "Hey there, future animators! Let's learn how to make things move in Scratch!\n\n**1. Costume Magic (Like a Flipbook!):**\n\n*   Imagine you're making a flipbook. You draw the same thing over and over, but change it a little bit each time. In Scratch, we use **costumes** to do the same thing!\n*   **What to use:**\n    *   `next costume`: This block changes your character to the next picture.\n    *   `wait [number] seconds`: This block makes Scratch wait a little bit before changing to the next picture.\n    *   `forever`: This block makes your animation keep going and going!\n*   **Example:**\n\n```scratch\nwhen green flag clicked\nforever\n  next costume\n  wait 0.1 seconds\nend\n```\n\n**2. Moving Around:**\n\n*   Instead of changing costumes, we can make our character move across the screen!\n*   **What to use:**\n    *   `move [number] steps`: This block makes your character take steps.\n    *   `change x by [number]`: This block moves your character left or right.\n    *   `change y by [number]`: This block moves your character up or down.\n*   **Example:**\n\n```scratch\nwhen green flag clicked\nforever\n  change x by 10\n  wait 0.05 seconds\n  if <(x position) > (240)> then\n     set x to (-240)\n  end\nend\n```\n\n**3. Super Animation Combo!**\n\n*   Want to be a super animator? Use both costumes and moving around! Imagine a character walking - you'd change their leg costumes *and* move them forward!\n\n**Tips for Awesome Animations:**\n\n*   Start simple!\n*   Plan what you want to make.\n*   Have fun experimenting!\n*   Use more than one character!\n\nYou got this! Now go make some amazing animations!"
+      }
+    }
+  },
+  {
+    "prompt": "How can I make my sprite jump?",
+    "expected_route": "give_instructions",
+    "actual_route": "give_instructions",
+    "routing_correct": true,
+    "execution_time": 13.13,
+    "agent_response": "Hey there, future game developers! Let's make your Scratch sprite jump! It's super fun!\n\n**First, pick how you want to make your sprite jump:**\n\n*   Press a key? Use the `when key pressed` block. You can find it in the \"Events\" blocks. Choose your favorite key, like the space bar!\n*   Click the sprite? Use the `when this sprite clicked` block, also in \"Events.\"\n\n**Now, let's make the sprite jump up and down:**\n\n1.  **Jump Up:** Use the `change y by` block from the \"Motion\" blocks. Put in a positive number, like 50, to make it go up!\n2.  **Wait at the Top:** Add a `wait seconds` block from the \"Control\" blocks. A short wait, like 0.2 seconds, will do!\n3.  **Come Down:** Use another `change y by` block, but this time with a negative number, like -50. This brings the sprite back down!\n\n**Make it even cooler with a loop!**\n\n1.  Use the `repeat` block from the \"Control\" blocks.\n2.  Put `change y by (10)` and `wait (0.01) seconds` inside the `repeat` block.\n3.  Repeat with `change y by (-10)` and `wait (0.01) seconds` to come down smoothly.\n\nTry different numbers to make the jump higher or lower. Have fun experimenting!",
+    "response_verification": {
+      "has_response": true,
+      "response_length": 1131,
+      "is_accurate": true,
+      "accuracy_label": "Accurate",
+      "notes": [
+        "Contains instructional content",
+        "Addresses prompt (2/3 key words match, 66.7%)"
+      ]
+    },
+    "result": {
+      "query": "How can I make my sprite jump?",
+      "result": {
+        "formatted_response": "Hey there, future game developers! Let's make your Scratch sprite jump! It's super fun!\n\n**First, pick how you want to make your sprite jump:**\n\n*   Press a key? Use the `when key pressed` block. You can find it in the \"Events\" blocks. Choose your favorite key, like the space bar!\n*   Click the sprite? Use the `when this sprite clicked` block, also in \"Events.\"\n\n**Now, let's make the sprite jump up and down:**\n\n1.  **Jump Up:** Use the `change y by` block from the \"Motion\" blocks. Put in a positive number, like 50, to make it go up!\n2.  **Wait at the Top:** Add a `wait seconds` block from the \"Control\" blocks. A short wait, like 0.2 seconds, will do!\n3.  **Come Down:** Use another `change y by` block, but this time with a negative number, like -50. This brings the sprite back down!\n\n**Make it even cooler with a loop!**\n\n1.  Use the `repeat` block from the \"Control\" blocks.\n2.  Put `change y by (10)` and `wait (0.01) seconds` inside the `repeat` block.\n3.  Repeat with `change y by (-10)` and `wait (0.01) seconds` to come down smoothly.\n\nTry different numbers to make the jump higher or lower. Have fun experimenting!"
+      }
+    }
+  },
+  {
+    "prompt": "Explain how to use if-then blocks",
+    "expected_route": "give_instructions",
+    "actual_route": "give_instructions",
+    "routing_correct": true,
+    "execution_time": 11.08,
+    "agent_response": "Hey there, Scratch Explorers!\n\nWant to make your Scratch games super smart? Let's learn about the `if then` block! It's like a brain for your code, helping it make choices.\n\n**What it does:** The `if then` block checks if something is true. If it is, then the code inside the block runs! If not, Scratch skips that code.\n\n**How to use it:**\n\n1.  Find the `if then` block in the \"Control\" blocks (it's at the bottom of the list). Drag it into your code.\n2.  Now, we need to tell the `if then` block *what* to check. We need to put a condition in the hexagonal space. You can find conditions in \"Sensing\" or \"Operators.\"\n    *   `touching object`: Is my sprite touching something?\n    *   `key pressed`: Is someone pressing a key?\n    *   `greater than`, `less than`, `equals`: Are two numbers the same?\n3.  Put the code you want to run *inside* the `if then` block. This code will only run if your condition is true!\n\n**Example:**\n\nLet's make a sprite say \"Hello!\" when you press the space key.\n\n1.  Get a `when key pressed` block from the \"Events\" blocks. Choose \"space.\"\n2.  Put an `if then` block inside the `when key pressed` block.\n3.  Drag a `key pressed` block from \"Sensing\" into the `if then` block's hexagon. Choose \"space\" again.\n4.  Put a `say message` block inside the `if then` block. Change the message to \"Hello!\".\n\nNow, your sprite will only say \"Hello!\" when you press the space key! Isn't that cool?\n\nThe `if then` block helps you make games that react to what's happening. Have fun experimenting!",
+    "response_verification": {
+      "has_response": true,
+      "response_length": 1515,
+      "is_accurate": true,
+      "accuracy_label": "Accurate",
+      "notes": [
+        "Contains instructional content",
+        "Addresses prompt (1/3 key words match, 33.3%)"
+      ]
+    },
+    "result": {
+      "query": "Explain how to use if-then blocks",
+      "result": {
+        "formatted_response": "Hey there, Scratch Explorers!\n\nWant to make your Scratch games super smart? Let's learn about the `if then` block! It's like a brain for your code, helping it make choices.\n\n**What it does:** The `if then` block checks if something is true. If it is, then the code inside the block runs! If not, Scratch skips that code.\n\n**How to use it:**\n\n1.  Find the `if then` block in the \"Control\" blocks (it's at the bottom of the list). Drag it into your code.\n2.  Now, we need to tell the `if then` block *what* to check. We need to put a condition in the hexagonal space. You can find conditions in \"Sensing\" or \"Operators.\"\n    *   `touching object`: Is my sprite touching something?\n    *   `key pressed`: Is someone pressing a key?\n    *   `greater than`, `less than`, `equals`: Are two numbers the same?\n3.  Put the code you want to run *inside* the `if then` block. This code will only run if your condition is true!\n\n**Example:**\n\nLet's make a sprite say \"Hello!\" when you press the space key.\n\n1.  Get a `when key pressed` block from the \"Events\" blocks. Choose \"space.\"\n2.  Put an `if then` block inside the `when key pressed` block.\n3.  Drag a `key pressed` block from \"Sensing\" into the `if then` block's hexagon. Choose \"space\" again.\n4.  Put a `say message` block inside the `if then` block. Change the message to \"Hello!\".\n\nNow, your sprite will only say \"Hello!\" when you press the space key! Isn't that cool?\n\nThe `if then` block helps you make games that react to what's happening. Have fun experimenting!"
+      }
+    }
+  },
+  {
+    "prompt": "How do I add sound to my project?",
+    "expected_route": "give_instructions",
+    "actual_route": "give_instructions",
+    "routing_correct": true,
+    "execution_time": 10.67,
+    "agent_response": "Hey there, future sound designers! Let's add some awesome sounds to your Scratch project!\n\n1.  **Find the Sound Blocks:** Look on the left side of your screen for the \"Sound\" button. Click it, and you'll see all the sound blocks you can use!\n\n2.  **Pick a Sound Block:**\n\n    *   `play sound until done`: This block plays the whole sound before moving on.\n    *   `start sound`: This block starts the sound, but keeps going with the code right away. Great for background music!\n    *   `stop all sounds`: This block stops all the sounds.\n\n3.  **Choose When to Play the Sound:**\n\n    *   `when green flag clicked`: The sound plays when you start the project.\n    *   `when key pressed`: The sound plays when you press a key.\n    *   `when this sprite clicked`: The sound plays when you click on a sprite.\n\n4.  **Put the Blocks Together:** Drag the \"when\" block to the middle. Then, drag your sound block and snap it under the \"when\" block.\n\n5.  **Pick Your Sound:** Click the little arrow on the sound block to pick a sound. Scratch has lots of sounds to choose from! You can even add your own sound by clicking \"Choose a Sound\" in the \"Sounds\" tab!\n\n**Example:**\n\nTo play a sound when the green flag is clicked:\n\n*   Use `when green flag clicked`\n*   Use `play sound until done`\n\nSnap them together and pick your sound. Now, click the green flag and hear your sound play! You did it!",
+    "response_verification": {
+      "has_response": true,
+      "response_length": 1383,
+      "is_accurate": true,
+      "accuracy_label": "Accurate",
+      "notes": [
+        "Contains instructional content",
+        "Addresses prompt (1/2 key words match, 50.0%)"
+      ]
+    },
+    "result": {
+      "query": "How do I add sound to my project?",
+      "result": {
+        "formatted_response": "Hey there, future sound designers! Let's add some awesome sounds to your Scratch project!\n\n1.  **Find the Sound Blocks:** Look on the left side of your screen for the \"Sound\" button. Click it, and you'll see all the sound blocks you can use!\n\n2.  **Pick a Sound Block:**\n\n    *   `play sound until done`: This block plays the whole sound before moving on.\n    *   `start sound`: This block starts the sound, but keeps going with the code right away. Great for background music!\n    *   `stop all sounds`: This block stops all the sounds.\n\n3.  **Choose When to Play the Sound:**\n\n    *   `when green flag clicked`: The sound plays when you start the project.\n    *   `when key pressed`: The sound plays when you press a key.\n    *   `when this sprite clicked`: The sound plays when you click on a sprite.\n\n4.  **Put the Blocks Together:** Drag the \"when\" block to the middle. Then, drag your sound block and snap it under the \"when\" block.\n\n5.  **Pick Your Sound:** Click the little arrow on the sound block to pick a sound. Scratch has lots of sounds to choose from! You can even add your own sound by clicking \"Choose a Sound\" in the \"Sounds\" tab!\n\n**Example:**\n\nTo play a sound when the green flag is clicked:\n\n*   Use `when green flag clicked`\n*   Use `play sound until done`\n\nSnap them together and pick your sound. Now, click the green flag and hear your sound play! You did it!"
+      }
+    }
+  },
+  {
+    "prompt": "What are the steps to create a game?",
+    "expected_route": "give_instructions",
+    "actual_route": "give_instructions",
+    "routing_correct": true,
+    "execution_time": 16.42,
+    "agent_response": "Hey there, future game developer! Let's make a Scratch game together!\n\n1.  **Dream It, Plan It:**\n    *   What kind of game do you want? A jumping game? A puzzle?\n    *   What will players do? What are the rules?\n    *   Draw your game! What will it look like? Who are the characters?\n\n2.  **Set the Stage:**\n    *   **Pick a Backdrop:** Go to \"Looks\" and pick a cool background! Use the `switch backdrop to` block to show it.\n    *   **Add Sprites:** These are your characters and things in the game. You can draw them or pick from Scratch's library!\n\n3.  **Make It Move:**\n    *   **Start Button:** Use `when green flag clicked` (in \"Events\") to start the game.\n    *   **Move Around:** Use \"Motion\" blocks to move your sprites!\n        *   `move [10] steps` makes it move forward.\n        *   `turn right [15] degrees` makes it turn.\n    *   **Use the Keyboard:** Use `when key pressed` (in \"Events\") to move with the arrow keys!\n\n4.  **Make It Interact:**\n    *   **Touching:** Use `touching [object v]` (in \"Sensing\") to see when sprites bump into each other.\n    *   **If...Then:** Use `if then` (in \"Control\") to make things happen when they touch!\n\n5.  **Keep Score:**\n    *   **Make a Variable:** In \"Variables,\" make a box to hold the score.\n    *   **Add Points:** Use `change [score v] by [1]` to add to the score.\n    *   **Show the Score:** Use `show variable [score v]` to show it on the screen.\n\n6.  **Add Sounds:**\n    *   **Pick Sounds:** Go to \"Sound\" and choose fun noises!\n    *   **Play Sounds:** Use `start sound [sound name v]` to play them when things happen.\n\n7.  **Repeat Actions:**\n    *   **Forever:** Use `forever` (in \"Control\") to keep checking things.\n    *   **Repeat:** Use `repeat [10]` to do something a few times.\n\n8.  **Game Over:**\n    *   **When to Stop:** Use `if then` to check if the game is over (like if you run out of lives).\n    *   **Stop It:** Use `stop [all v]` (in \"Control\") to end the game.\n\n9.  **Make It Awesome:**\n    *   **Costumes:** Change how your sprites look with \"Looks\"!\n    *   **Messages:** Use `broadcast [message v]` (in \"Events\") to let sprites talk to each other.\n\nStart small and add more cool stuff as you go! Have fun!",
+    "response_verification": {
+      "has_response": true,
+      "response_length": 2192,
+      "is_accurate": true,
+      "accuracy_label": "Accurate",
+      "notes": [
+        "Contains instructional content",
+        "Addresses prompt (2/4 key words match, 50.0%)"
+      ]
+    },
+    "result": {
+      "query": "What are the steps to create a game?",
+      "result": {
+        "formatted_response": "Hey there, future game developer! Let's make a Scratch game together!\n\n1.  **Dream It, Plan It:**\n    *   What kind of game do you want? A jumping game? A puzzle?\n    *   What will players do? What are the rules?\n    *   Draw your game! What will it look like? Who are the characters?\n\n2.  **Set the Stage:**\n    *   **Pick a Backdrop:** Go to \"Looks\" and pick a cool background! Use the `switch backdrop to` block to show it.\n    *   **Add Sprites:** These are your characters and things in the game. You can draw them or pick from Scratch's library!\n\n3.  **Make It Move:**\n    *   **Start Button:** Use `when green flag clicked` (in \"Events\") to start the game.\n    *   **Move Around:** Use \"Motion\" blocks to move your sprites!\n        *   `move [10] steps` makes it move forward.\n        *   `turn right [15] degrees` makes it turn.\n    *   **Use the Keyboard:** Use `when key pressed` (in \"Events\") to move with the arrow keys!\n\n4.  **Make It Interact:**\n    *   **Touching:** Use `touching [object v]` (in \"Sensing\") to see when sprites bump into each other.\n    *   **If...Then:** Use `if then` (in \"Control\") to make things happen when they touch!\n\n5.  **Keep Score:**\n    *   **Make a Variable:** In \"Variables,\" make a box to hold the score.\n    *   **Add Points:** Use `change [score v] by [1]` to add to the score.\n    *   **Show the Score:** Use `show variable [score v]` to show it on the screen.\n\n6.  **Add Sounds:**\n    *   **Pick Sounds:** Go to \"Sound\" and choose fun noises!\n    *   **Play Sounds:** Use `start sound [sound name v]` to play them when things happen.\n\n7.  **Repeat Actions:**\n    *   **Forever:** Use `forever` (in \"Control\") to keep checking things.\n    *   **Repeat:** Use `repeat [10]` to do something a few times.\n\n8.  **Game Over:**\n    *   **When to Stop:** Use `if then` to check if the game is over (like if you run out of lives).\n    *   **Stop It:** Use `stop [all v]` (in \"Control\") to end the game.\n\n9.  **Make It Awesome:**\n    *   **Costumes:** Change how your sprites look with \"Looks\"!\n    *   **Messages:** Use `broadcast [message v]` (in \"Events\") to let sprites talk to each other.\n\nStart small and add more cool stuff as you go! Have fun!"
+      }
+    }
+  },
+  {
+    "prompt": "How do variables work in Scratch?",
+    "expected_route": "give_instructions",
+    "actual_route": "give_instructions",
+    "routing_correct": true,
+    "execution_time": 12.03,
+    "agent_response": "Hey there, Scratch Explorers!\n\nVariables are like special boxes that hold secrets in your Scratch games. Let's learn how to use them!\n\n1.  **Make a Box (Variable):**\n    *   Go to \"Variables\" and click \"Make a Variable.\"\n    *   Give it a cool name like \"score\" or \"speed.\"\n\n2.  **Put Something in the Box:**\n    *   Use \"set variable to\" to give your box a starting value.\n    *   Like, `set [score v] to [0]` to start the score at zero!\n\n3.  **Change What's in the Box:**\n    *   Use \"change variable by\" to add or subtract from the value.\n    *   `change [score v] by [1]` to add one to the score!\n\n4.  **Use the Box's Secret:**\n    *   Drag your variable into other blocks.\n    *   `move [speed v] steps` makes your character move faster or slower.\n    *   `say [join[Score: ][score v]]` to show the score on the screen!\n\n5.  **Show or Hide the Box:**\n    *   Use \"show variable\" and \"hide variable\" to make the value visible or invisible on the stage.\n\n**Example:**\n\n1.  Make a \"score\" variable.\n2.  Set \"score\" to 0 at the start.\n3.  Add 1 to \"score\" when the player gets a point.\n4.  Show the \"score\" on the stage!\n\nVariables help you make awesome, interactive games. Have fun experimenting!",
+    "response_verification": {
+      "has_response": true,
+      "response_length": 1198,
+      "is_accurate": true,
+      "accuracy_label": "Accurate",
+      "notes": [
+        "Contains instructional content",
+        "Addresses prompt (1/3 key words match, 33.3%)"
+      ]
+    },
+    "result": {
+      "query": "How do variables work in Scratch?",
+      "result": {
+        "formatted_response": "Hey there, Scratch Explorers!\n\nVariables are like special boxes that hold secrets in your Scratch games. Let's learn how to use them!\n\n1.  **Make a Box (Variable):**\n    *   Go to \"Variables\" and click \"Make a Variable.\"\n    *   Give it a cool name like \"score\" or \"speed.\"\n\n2.  **Put Something in the Box:**\n    *   Use \"set variable to\" to give your box a starting value.\n    *   Like, `set [score v] to [0]` to start the score at zero!\n\n3.  **Change What's in the Box:**\n    *   Use \"change variable by\" to add or subtract from the value.\n    *   `change [score v] by [1]` to add one to the score!\n\n4.  **Use the Box's Secret:**\n    *   Drag your variable into other blocks.\n    *   `move [speed v] steps` makes your character move faster or slower.\n    *   `say [join[Score: ][score v]]` to show the score on the screen!\n\n5.  **Show or Hide the Box:**\n    *   Use \"show variable\" and \"hide variable\" to make the value visible or invisible on the stage.\n\n**Example:**\n\n1.  Make a \"score\" variable.\n2.  Set \"score\" to 0 at the start.\n3.  Add 1 to \"score\" when the player gets a point.\n4.  Show the \"score\" on the stage!\n\nVariables help you make awesome, interactive games. Have fun experimenting!"
+      }
+    }
+  }
+]

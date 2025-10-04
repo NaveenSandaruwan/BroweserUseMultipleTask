@@ -1,0 +1,24 @@
+{
+  "prompt": "How do I make a sprite move?",
+  "expected_route": "give_instructions",
+  "actual_route": "give_instructions",
+  "routing_correct": true,
+  "execution_time": 14.66,
+  "agent_response": "Hey there, future Scratch superstar! Let's make your characters zoom around the screen!\n\n**1. Simple Steps:**\n\n*   Find the blue \"move steps\" block. It tells your character to walk!\n*   Put it inside an orange \"forever\" block to keep moving.\n*   Add a yellow \"when green flag clicked\" block on top to start when you press the green flag.\n\nLike this:\n\n```scratch\nwhen green flag clicked\nforever\n  move 10 steps\n```\n\nWant to bounce when you hit the edge? Add the \"if on edge, bounce\" block!\n\n```scratch\nwhen green flag clicked\nforever\n  move 10 steps\n  if on edge bounce\n```\n\n**2. Arrow Key Control:**\n\n*   Use the yellow \"when key pressed\" block for each arrow key.\n*   Use the blue \"change x by\" block to move left and right. Positive numbers go right, negative go left!\n*   Use the blue \"change y by\" block to move up and down. Positive numbers go up, negative go down!\n*   Use the blue \"point in direction\" block to make the sprite face the correct direction.\n\n```scratch\nwhen key pressed [right arrow v]\n  change x by 10\n\nwhen key pressed [left arrow v]\n  change x by -10\n\nwhen key pressed [up arrow v]\n  change y by 10\n\nwhen key pressed [down arrow v]\n  change y by -10\n```\n\n**3. Random Fun:**\n\n*   Use the blue \"go to random position\" block.\n*   Put it in a \"forever\" loop to keep moving randomly.\n*   Add a \"wait 1 seconds\" block to slow it down.\n\n```scratch\nwhen green flag clicked\nforever\n  go to random position\n  wait 1 seconds\n```\n\nHave fun making your sprites move! You're doing great!",
+  "response_verification": {
+    "has_response": true,
+    "response_length": 1497,
+    "is_accurate": true,
+    "accuracy_label": "Accurate",
+    "notes": [
+      "Contains instructional content",
+      "Addresses prompt (2/3 key words match, 66.7%)"
+    ]
+  },
+  "result": {
+    "query": "How do I make a sprite move?",
+    "result": {
+      "formatted_response": "Hey there, future Scratch superstar! Let's make your characters zoom around the screen!\n\n**1. Simple Steps:**\n\n*   Find the blue \"move steps\" block. It tells your character to walk!\n*   Put it inside an orange \"forever\" block to keep moving.\n*   Add a yellow \"when green flag clicked\" block on top to start when you press the green flag.\n\nLike this:\n\n```scratch\nwhen green flag clicked\nforever\n  move 10 steps\n```\n\nWant to bounce when you hit the edge? Add the \"if on edge, bounce\" block!\n\n```scratch\nwhen green flag clicked\nforever\n  move 10 steps\n  if on edge bounce\n```\n\n**2. Arrow Key Control:**\n\n*   Use the yellow \"when key pressed\" block for each arrow key.\n*   Use the blue \"change x by\" block to move left and right. Positive numbers go right, negative go left!\n*   Use the blue \"change y by\" block to move up and down. Positive numbers go up, negative go down!\n*   Use the blue \"point in direction\" block to make the sprite face the correct direction.\n\n```scratch\nwhen key pressed [right arrow v]\n  change x by 10\n\nwhen key pressed [left arrow v]\n  change x by -10\n\nwhen key pressed [up arrow v]\n  change y by 10\n\nwhen key pressed [down arrow v]\n  change y by -10\n```\n\n**3. Random Fun:**\n\n*   Use the blue \"go to random position\" block.\n*   Put it in a \"forever\" loop to keep moving randomly.\n*   Add a \"wait 1 seconds\" block to slow it down.\n\n```scratch\nwhen green flag clicked\nforever\n  go to random position\n  wait 1 seconds\n```\n\nHave fun making your sprites move! You're doing great!"
+    }
+  }
+}

@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Agent Test Report</title>
+
+    
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+.container { max-width: 1400px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+h1 { color: #333; border-bottom: 3px solid #4CAF50; padding-bottom: 10px; }
+h2 { color: #555; margin-top: 30px; border-bottom: 2px solid #ddd; padding-bottom: 5px; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+.stat-card { background: #f9f9f9; padding: 15px; border-radius: 5px; border-left: 4px solid #4CAF50; }
+.stat-label { font-size: 12px; color: #666; text-transform: uppercase; }
+.stat-value { font-size: 24px; font-weight: bold; color: #333; }
+.test-item { background: #fafafa; padding: 20px; margin: 15px 0; border-radius: 8px; border-left: 4px solid #ddd; }
+.test-item.correct { border-left-color: #4CAF50; }
+.test-item.incorrect { border-left-color: #f44336; }
+.test-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.test-status { font-size: 24px; }
+.agent-response { background: #fff; padding: 15px; margin: 10px 0; border-radius: 5px; border: 1px solid #ddd; }
+.response-label { font-weight: bold; color: #555; margin-bottom: 5px; }
+.verification { background: #e3f2fd; padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 14px; }
+.screenshot { max-width: 100%; border: 2px solid #ddd; margin: 10px 0; border-radius: 5px; }
+.workspace-state { background: #fff3cd; padding: 15px; font-family: 'Courier New', monospace; font-size: 12px; white-space: pre-wrap; overflow-x: auto; border-radius: 5px; margin: 10px 0; max-height: 300px; overflow-y: auto; }
+.metadata { font-size: 12px; color: #666; margin-top: 10px; }
+.file-link { color: #1976d2; text-decoration: none; }
+.file-link:hover { text-decoration: underline; }
+
+
+@media print {
+    body { 
+        margin: 0; 
+        padding: 0;
+        background: white;
+        font-size: 12px;
+    }
+    
+    .container { 
+        max-width: 100%; 
+        margin: 0;
+        padding: 15px;
+        box-shadow: none;
+    }
+    
+    h1 {
+        font-size: 20px;
+        padding-bottom: 5px;
+    }
+    
+    h2 {
+        font-size: 16px;
+        margin-top: 15px;
+        padding-bottom: 3px;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+    }
+    
+    h3 {
+        font-size: 14px;
+    }
+    
+    /* Each test item on new page */
+    .test-item {
+        page-break-after: always;
+        page-break-inside: avoid;
+        margin: 0;
+        padding: 15px;
+    }
+    
+    .test-item:last-child {
+        page-break-after: auto;
+    }
+    
+    .test-header {
+        page-break-after: avoid;
+    }
+    
+    .agent-response {
+        margin: 5px 0;
+        padding: 10px;
+    }
+    
+    .verification {
+        margin: 5px 0;
+        padding: 8px;
+    }
+    
+    .workspace-state {
+        max-height: 200px;
+        font-size: 10px;
+        padding: 10px;
+    }
+    
+    .screenshot {
+        max-width: 80%;
+        max-height: 300px;
+        object-fit: contain;
+    }
+    
+    .stats-grid {
+        gap: 10px;
+        margin: 10px 0;
+    }
+    
+    .stat-card {
+        padding: 10px;
+    }
+    
+    .metadata {
+        font-size: 9px;
+    }
+    
+    .file-link {
+        font-size: 10px;
+    }
+    
+    /* Start each category on new page */
+    h2:not(:first-of-type) {
+        page-break-before: always;
+    }
+}
+
+
+
+</style></head><body><div class="container">
+<h1>Scratch Agent Test Report</h1>
+<p><strong>Session:</strong> 20251004_171710</p>
+<p><strong>Generated:</strong> 2025-10-04 17:26:50</p>
+
+<h2>Overall Statistics</h2>
+<div class="stats-grid">
+<div class="stat-card">
+<div class="stat-label">Total Tests</div>
+<div class="stat-value">34</div>
+</div>
+<div class="stat-card">
+<div class="stat-label">Routing Accuracy</div>
+<div class="stat-value">94.12%</div>
+</div>
+<div class="stat-card">
+<div class="stat-label">Response Accuracy</div>
+<div class="stat-value">85.29%</div>
+</div>
+<div class="stat-card">
+<div class="stat-label">Avg Execution Time</div>
+<div class="stat-value">11.77s</div>
+</div>
+</div>
+
+<h2>Category Statistics</h2>
+<div class="stats-grid">
+
+<div class="stat-card">
+<div class="stat-label">Make Blocks</div>
+<div class="stat-value">85.71%</div>
+<div class="metadata">
+6/7 routing correct | 
+Response: 85.71% (6/7) | 
+Time: 13.49s
+</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-label">Code Explain</div>
+<div class="stat-value">87.5%</div>
+<div class="metadata">
+7/8 routing correct | 
+Response: 87.5% (7/8) | 
+Time: 11.0s
+</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-label">Code Debugging</div>
+<div class="stat-value">100.0%</div>
+<div class="metadata">
+8/8 routing correct | 
+Response: 25.0% (2/8) | 
+Time: 11.91s
+</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-label">Give Instructions</div>
+<div class="stat-value">100.0%</div>
+<div class="metadata">
+8/8 routing correct | 
+Response: 100.0% (8/8) | 
+Time: 13.07s
+</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-label">General Agent</div>
+<div class="stat-value">100.0%</div>
+<div class="metadata">
+3/3 routing correct | 
+Response: 100.0% (3/3) | 
+Time: 5.97s
+</div>
+</div>
+</div><h2>Make Blocks Tests</h2><div class="test-item correct">
+<div class="test-header">
+<h3>Test 1</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> Create blocks to move the sprite 10 steps when green flag clicked</p>
+<p><strong>Expected Route:</strong> make_blocks | 
+<strong>Actual Route:</strong> make_blocks | 
+<strong>Time:</strong> 13.01s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Okay, I'm ready to turn those techy instructions into super fun and easy steps for kids! Just paste the message here, and I'll make it awesome. ✨</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains block creation instructions, Make_blocks route - lenient accuracy
+</div>
+
+<div>
+<strong>Blocks Test Results:</strong><br>
+Blocks Found: True | 
+Workspace Length: 210 characters<br>
+<a href="workspace_data/make_blocks_test_001_workspace_20251004_171710.txt" class="file-link" target="_blank">View Full Workspace Data</a><br><img src="screenshots/make_blocks_test_001_20251004_171710.png" class="screenshot" alt="Screenshot"><br><div class="workspace-state"> Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. move Code block. Block Coordinates: (X: 350, Y: 175 ) 
+</div></div></div><div class="test-item incorrect">
+<div class="test-header">
+<h3>Test 2</h3>
+<span class="test-status">✗</span>
+</div>
+<p><strong>Prompt:</strong> Show me how to make the sprite say hello</p>
+<p><strong>Expected Route:</strong> make_blocks | 
+<strong>Actual Route:</strong> give_instructions | 
+<strong>Time:</strong> 8.31s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Hey there, Scratch Explorers! Let's make your sprite talk! It's super easy and fun.
+
+1.  **Start with a Green Flag:**
+    *   Go to "Events" (it's in the blocks on the left side of the screen).
+    *   Grab the "when green flag clicked" block. It's like the "go" button for your code!
+
+2.  **Make Your Sprite Say Something:**
+    *   Now, go to "Looks" (also on the left, where the blocks are).
+    *   Find the "say message" block and snap it right under the "when green flag clicked" block.
+    *   See the word "Hello!" in the "say message" block? Click on it and type whatever you want your sprite to say!
+
+It should look like this:
+
+```scratch
+when green flag clicked
+say [Hello!]
+```
+
+Now, click the green flag above the stage. Ta-da! Your sprite will say "Hello!" or whatever cool message you typed in! Isn't that awesome?</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #f44336; color: white; border-radius: 3px; font-weight: bold;">
+Not Accurate
+</span><br>
+<strong>Route Correct:</strong> False<br>
+<strong>Notes:</strong> Wrong route: expected make_blocks, got give_instructions
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 3</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> I want you to make blocks that turn right 15 degrees and move 10 steps</p>
+<p><strong>Expected Route:</strong> make_blocks | 
+<strong>Actual Route:</strong> make_blocks | 
+<strong>Time:</strong> 13.01s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Okay, I'm ready to turn those techy instructions into super fun steps for kids! Let's make Scratch programming easy and exciting! Just give me the message!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains block creation instructions, Make_blocks route - lenient accuracy
+</div>
+
+<div>
+<strong>Blocks Test Results:</strong><br>
+Blocks Found: True | 
+Workspace Length: 269 characters<br>
+<a href="workspace_data/make_blocks_test_003_workspace_20251004_171710.txt" class="file-link" target="_blank">View Full Workspace Data</a><br><img src="screenshots/make_blocks_test_003_20251004_171710.png" class="screenshot" alt="Screenshot"><br><div class="workspace-state"> Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. turn Code block. Block Coordinates: (X: 350, Y: 175 ) 
+ 3. move Code block. Block Coordinates: (X: 350, Y: 208 ) 
+</div></div></div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 4</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> Help me create blocks when the green flag clicked repeatedly move 10 steps while making a sound</p>
+<p><strong>Expected Route:</strong> make_blocks | 
+<strong>Actual Route:</strong> make_blocks | 
+<strong>Time:</strong> 13.62s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Okay, I'm ready to turn those techy instructions into super fun and easy steps for kids! Just paste the message here, and I'll make it awesome!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains block creation instructions, Make_blocks route - lenient accuracy
+</div>
+
+<div>
+<strong>Blocks Test Results:</strong><br>
+Blocks Found: True | 
+Workspace Length: 272 characters<br>
+<a href="workspace_data/make_blocks_test_004_workspace_20251004_171710.txt" class="file-link" target="_blank">View Full Workspace Data</a><br><img src="screenshots/make_blocks_test_004_20251004_171710.png" class="screenshot" alt="Screenshot"><br><div class="workspace-state"> Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. forever Code block. Block Coordinates: (X: 350, Y: 175 ) 
+ 3. move Code block. Block Coordinates: (X: 361, Y: 208 ) 
+</div></div></div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 5</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> Create blocks that say hello for 2 seconds, then hide and show the sprite</p>
+<p><strong>Expected Route:</strong> make_blocks | 
+<strong>Actual Route:</strong> make_blocks | 
+<strong>Time:</strong> 18.17s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Okay, I'm ready to turn techy instructions into super fun and easy steps for kids! Just give me the message, and I'll make it awesome! </p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains block creation instructions, Make_blocks route - lenient accuracy
+</div>
+
+<div>
+<strong>Blocks Test Results:</strong><br>
+Blocks Found: True | 
+Workspace Length: 386 characters<br>
+<a href="workspace_data/make_blocks_test_005_workspace_20251004_171710.txt" class="file-link" target="_blank">View Full Workspace Data</a><br><img src="screenshots/make_blocks_test_005_20251004_171710.png" class="screenshot" alt="Screenshot"><br><div class="workspace-state"> Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. say Code block. Block Coordinates: (X: 350, Y: 175 ) 
+ 3. hide Code block. Block Coordinates: (X: 350, Y: 208 ) 
+ 4. wait Code block. Block Coordinates: (X: 350, Y: 240 ) 
+ 5. show Code block. Block Coordinates: (X: 350, Y: 272 ) 
+</div></div></div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 6</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> Make a program that repeats moving 10 steps three times</p>
+<p><strong>Expected Route:</strong> make_blocks | 
+<strong>Actual Route:</strong> make_blocks | 
+<strong>Time:</strong> 12.78s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Okay, I'm ready to turn those techy instructions into super fun steps for kids! Let's make Scratch programming easy and exciting! ✨</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains block creation instructions, Make_blocks route - lenient accuracy
+</div>
+
+<div>
+<strong>Blocks Test Results:</strong><br>
+Blocks Found: True | 
+Workspace Length: 271 characters<br>
+<a href="workspace_data/make_blocks_test_006_workspace_20251004_171710.txt" class="file-link" target="_blank">View Full Workspace Data</a><br><img src="screenshots/make_blocks_test_006_20251004_171710.png" class="screenshot" alt="Screenshot"><br><div class="workspace-state"> Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. repeat Code block. Block Coordinates: (X: 350, Y: 175 ) 
+ 3. move Code block. Block Coordinates: (X: 361, Y: 208 ) 
+</div></div></div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 7</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> Show me blocks to reset the timer, repeat some actions, and play a sound</p>
+<p><strong>Expected Route:</strong> make_blocks | 
+<strong>Actual Route:</strong> make_blocks | 
+<strong>Time:</strong> 15.55s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Okay, I'm ready to turn those techy instructions into super fun and easy steps for kids! Just paste the message here, and I'll make it awesome!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains block creation instructions, Make_blocks route - lenient accuracy
+</div>
+
+<div>
+<strong>Blocks Test Results:</strong><br>
+Blocks Found: True | 
+Workspace Length: 153 characters<br>
+<a href="workspace_data/make_blocks_test_007_workspace_20251004_171710.txt" class="file-link" target="_blank">View Full Workspace Data</a><br><img src="screenshots/make_blocks_test_007_20251004_171710.png" class="screenshot" alt="Screenshot"><br><div class="workspace-state"> Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. repeat Code block. Block Coordinates: (X: 339, Y: 164 ) 
+</div></div></div><h2>Code Explain Tests</h2><div class="test-item correct">
+<div class="test-header">
+<h3>Test 1</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> What does my current code do?</p>
+<p><strong>Expected Route:</strong> code_explain | 
+<strong>Actual Route:</strong> code_explain | 
+<strong>Time:</strong> 9.67s</p>
+
+
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains code explanation, Addresses prompt (1/4 key words match, 25.0%)
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 2</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> Explain the blocks I've placed in the workspace</p>
+<p><strong>Expected Route:</strong> code_explain | 
+<strong>Actual Route:</strong> code_explain | 
+<strong>Time:</strong> 10.43s</p>
+
+
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains code explanation, Addresses prompt (1/5 key words match, 20.0%)
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 3</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> Can you tell me what my program does?</p>
+<p><strong>Expected Route:</strong> code_explain | 
+<strong>Actual Route:</strong> code_explain | 
+<strong>Time:</strong> 10.55s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Hey there, Scratch superstar! Let's break down your awesome program:
+
+*   **`when [green flag] clicked`:** This block is like the "go" button for your code! When you click the green flag, your program starts running.
+*   **`repeat [10] times`:** This block is like a magic loop! It tells the code inside to do the same thing over and over. In your case, it will repeat 10 times.
+*   **`move [10] steps`:** This block tells your sprite to move forward. You've set it to move 10 steps each time.
+
+**So, what happens when you click the green flag?**
+
+1.  The `repeat` block starts its loop and does everything inside it 10 times.
+2.  Each time through the loop, your sprite moves 10 steps forward.
+
+That means your sprite will move a total of 100 steps (10 steps each time, repeated 10 times). Great job!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains code explanation, Addresses prompt (2/4 key words match, 50.0%)
+</div>
+</div><div class="test-item incorrect">
+<div class="test-header">
+<h3>Test 4</h3>
+<span class="test-status">✗</span>
+</div>
+<p><strong>Prompt:</strong> What's happening in my workspace?</p>
+<p><strong>Expected Route:</strong> code_explain | 
+<strong>Actual Route:</strong> general_agent | 
+<strong>Time:</strong> 7.07s</p>
+
+
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #f44336; color: white; border-radius: 3px; font-weight: bold;">
+Not Accurate
+</span><br>
+<strong>Route Correct:</strong> False<br>
+<strong>Notes:</strong> Wrong route: expected code_explain, got general_agent
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 5</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> Describe my current Scratch project</p>
+<p><strong>Expected Route:</strong> code_explain | 
+<strong>Actual Route:</strong> code_explain | 
+<strong>Time:</strong> 16.04s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Hey there, Scratch superstar! Let's break down your awesome project:
+
+You've got a cool setup where something happens when you tell it to!
+
+1.  **The "When" Block:** This is like the starting gun! It tells your code when to GO! Is it when you click the green flag, press a key, or click on a character?
+
+2.  **The "Repeat" Block:** This is like saying, "Do this a bunch of times!" You can tell it how many times to repeat. If you don't say a number, it will repeat 10 times.
+
+3.  **The "Move" Block:** This tells your character to move! You can tell it how many steps to take. If you don't say a number, it will move 10 steps.
+
+So, your character waits for something to happen, then moves a bit, and does that over and over!
+
+**Want to make it even cooler?**
+
+*   Pick the right "when" block to start your code.
+*   Change the numbers in the "repeat" and "move" blocks to make your character move differently.
+*   Add more blocks to make your character turn, change colors, or make sounds!
+
+Keep experimenting and have fun creating! You're doing great!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains code explanation, Addresses prompt (1/4 key words match, 25.0%)
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 6</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> What blocks am I using right now?</p>
+<p><strong>Expected Route:</strong> code_explain | 
+<strong>Actual Route:</strong> code_explain | 
+<strong>Time:</strong> 10.93s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Hey there, Scratch superstar! Let's look at your awesome code!
+
+You've put some cool blocks in the coding area, which starts around the X: 310, Y: 160 spot.
+
+Here's what those blocks do:
+
+1.  **`when` Block:** This block is like a starting signal. It could be `when green flag clicked`, `when key pressed`, or `when this sprite clicked`. It tells your code when to begin! It's at the top, around X: 342, Y: 124.
+
+2.  **`repeat` Block:** This block is like a magic loop! It repeats the code inside it as many times as you want. Find it around X: 342, Y: 157, right below the `when` block.
+
+3.  **`move` Block:** This block makes your sprite zoom around! It tells your sprite to move a certain number of steps. It's inside the `repeat` block at X: 342, Y: 243, so your sprite will move again and again!
+
+Great job! Your code will make your sprite move repeatedly when the starting signal happens. Keep up the fantastic work!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains code explanation, Addresses prompt (3/5 key words match, 60.0%)
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 7</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> Explain my code to me</p>
+<p><strong>Expected Route:</strong> code_explain | 
+<strong>Actual Route:</strong> code_explain | 
+<strong>Time:</strong> 11.74s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Hey there, Scratch superstar! Let's see what your code does:
+
+1.  **Green Flag Time!** The `when green flag clicked` block is like a starting gun. When you click the green flag, your code comes to life!
+
+2.  **Repeat Magic!** The `repeat [10]` block is like a super cool loop. It tells the code inside to do the same thing ten times!
+
+3.  **Move, Sprite, Move!** The `move [10] steps` block tells your character to walk forward a little bit.
+
+**So, what happens?**
+
+When you click the green flag, your sprite will move forward ten steps. But because of the `repeat` block, it does this ten times! That means your sprite moves a lot – like taking ten little walks all in a row! Great job!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains code explanation, Addresses prompt (1/2 key words match, 50.0%)
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 8</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> Can you walk me through what my blocks do?</p>
+<p><strong>Expected Route:</strong> code_explain | 
+<strong>Actual Route:</strong> code_explain | 
+<strong>Time:</strong> 11.54s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Hey there, Scratch superstar! Let's see what your cool code does!
+
+*   **`when [green flag clicked]`:** This block is like the "go" button for your code! When you click the green flag, your Scratch game starts!
+*   **`repeat [10]`:** This block is like a magic loop! It tells the code inside to do the same thing over and over. The number 10 means it will repeat that code ten times!
+*   **`move [10] steps`:** This block tells your sprite to move! The number 10 means it will move ten steps forward each time.
+
+**How it all works:**
+
+1.  You click the green flag, and the game starts!
+2.  The `repeat` block says, "Okay, let's do this ten times!"
+3.  Each time, the sprite will `move 10 steps`.
+4.  After moving, the loop starts again until it has moved ten times!
+
+**So, when you click the green flag, your sprite will move a lot! It will move 10 steps, ten times, which is 100 steps in total!**</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains code explanation, Addresses prompt (1/4 key words match, 25.0%)
+</div>
+</div><h2>Code Debugging Tests</h2><div class="test-item correct">
+<div class="test-header">
+<h3>Test 1</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> My code isn't working, can you help?</p>
+<p><strong>Expected Route:</strong> code_debugging | 
+<strong>Actual Route:</strong> code_debugging | 
+<strong>Time:</strong> 12.41s</p>
+
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains debugging advice, Addresses prompt (1/4 key words match, 25.0%)
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 2</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> Why isn't my sprite moving?</p>
+<p><strong>Expected Route:</strong> code_debugging | 
+<strong>Actual Route:</strong> code_debugging | 
+<strong>Time:</strong> 11.96s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Hey there, Scratch coder! Let's get your sprite moving!
+
+Here's what I see in your code:
+
+*   The `when green flag clicked` block is like the "go" button for your code!
+*   The `repeat 10` block is like saying, "Do this 10 times!"
+*   The `move 10 steps` block is what tells your sprite to walk.
+
+But, uh-oh! It looks like your sprite isn't listening to you because the `move 10 steps` block isn't *inside* the `repeat 10` block. It's like telling someone to walk, but not telling them *how many times* to walk!
+
+Here's how to fix it:
+
+1.  Drag the `move 10 steps` block *inside* the `repeat 10` block. You'll see the `repeat` block light up when it's ready to "catch" the `move` block.
+
+Now, when you click the green flag, your sprite will move 10 steps, and it will do that 10 times! Yay!
+
+If it *still* doesn't work, don't worry! We'll figure it out together! Just let me know!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains debugging advice
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 3</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> There's something wrong with my program</p>
+<p><strong>Expected Route:</strong> code_debugging | 
+<strong>Actual Route:</strong> code_debugging | 
+<strong>Time:</strong> 10.89s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Hey there, Scratch superstar! I've checked out your awesome project, and it looks like you're about to make something super cool happen!
+
+Here's the lowdown:
+
+*   You've got a "when green flag clicked" block. That's the perfect way to kick off your program when you press the green flag!
+*   You also have a "repeat 10" block. This is like saying, "Do this stuff 10 times!"
+*   And a "move 10 steps" block to make your character move.
+
+**Uh-oh!**
+
+It looks like your "move 10 steps" block isn't quite inside the "repeat 10" block yet. That means your character won't move 10 steps, 10 times.
+
+**Let's fix it!**
+
+Drag the "move 10 steps" block into the "repeat 10" block. It's like giving the "repeat" block a hug!
+
+**Ta-da!**
+
+Now, when you click the green flag, your character will move 10 steps, and it will do it 10 times in a row! How cool is that? You're doing great!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains debugging advice
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 4</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> Help me fix this bug</p>
+<p><strong>Expected Route:</strong> code_debugging | 
+<strong>Actual Route:</strong> code_debugging | 
+<strong>Time:</strong> 10.43s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Hey there, Scratch superstar! I looked at your code, and it's almost perfect!
+
+*   The `when green flag clicked` block is great. It tells your code to start when you click the green flag.
+*   The `repeat 10` block is super cool. It's like saying, "Do this 10 times!"
+*   The `move 10 steps` block makes your character move forward.
+
+Here's a tiny thing to fix:
+
+Right now, the `move 10 steps` block isn't *inside* the `repeat 10` block. That means your character will only move once.
+
+**Here's how to make it awesome:**
+
+Drag the `move 10 steps` block *inside* the `repeat 10` block. It's like putting a toy inside a box. Now, your character will move 10 steps, and it will do that 10 times! Yay!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #f44336; color: white; border-radius: 3px; font-weight: bold;">
+Not Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Missing debugging analysis or solutions, Response doesn't sufficiently address prompt or route requirements
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 5</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> My blocks aren't doing what I expected</p>
+<p><strong>Expected Route:</strong> code_debugging | 
+<strong>Actual Route:</strong> code_debugging | 
+<strong>Time:</strong> 15.7s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Hey there, Scratch superstar! I've looked at your awesome project, and I have a super simple tip to make it even better!
+
+You have a "when green flag clicked" block - that's perfect for starting your code! You also have a "repeat (10)" block, which is great for doing something again and again. And I see a "move (10) steps" block to make your character move.
+
+Here's the trick:
+
+The "move (10) steps" block needs to go INSIDE the "repeat (10)" block. Think of it like putting toys inside a box!
+
+*   Drag the "move (10) steps" block up into the "repeat (10)" block.
+*   You'll see a white line show you where it will go. Let the "move" block go, and it will snap right inside!
+
+Now, when you click the green flag, your character will move ten times! Awesome!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains debugging advice
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 6</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> Debug my Scratch project</p>
+<p><strong>Expected Route:</strong> code_debugging | 
+<strong>Actual Route:</strong> code_debugging | 
+<strong>Time:</strong> 10.61s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Hey there, Scratch superstar!
+
+I looked at your code, and it's almost perfect! Here's a tiny tweak to make it even better:
+
+You have a "when green flag clicked" block—that's great for starting your project! You also have a "repeat 10" block, which is awesome for making things happen again and again. And I see you have a "move 10 steps" block to make your character move.
+
+But, the "move 10 steps" block needs to be *inside* the "repeat 10" block. Think of it like this: the "repeat" block is like a loop, and you want the "move" block to be inside the loop so it happens over and over.
+
+Just drag the "move 10 steps" block into the "repeat 10" block. Now, when you click the green flag, your character will move ten steps, ten times!
+
+Keep up the fantastic work!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #f44336; color: white; border-radius: 3px; font-weight: bold;">
+Not Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Missing debugging analysis or solutions, Response doesn't sufficiently address prompt or route requirements
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 7</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> What's wrong with my code?</p>
+<p><strong>Expected Route:</strong> code_debugging | 
+<strong>Actual Route:</strong> code_debugging | 
+<strong>Time:</strong> 10.33s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Hey there, Scratch superstar! I've checked out your awesome project, and I have a super easy tip to make it even better!
+
+I see you have these blocks:
+
+*   The **`when green flag clicked`** block: This is like the "start" button for your code!
+*   The **`repeat (10)`** block: This block is like saying, "Do this 10 times!"
+*   The **`move (10) steps`** block: This tells your character to move a little bit.
+
+Here's the trick: The `move` block needs to go INSIDE the `repeat` block. It's like putting a toy inside a box!
+
+**Here's how:**
+
+1.  Click and drag the `move (10) steps` block.
+2.  Move it over the `repeat (10)` block. You'll see a white line show you where it will go.
+3.  Let go of the mouse, and *poof*, it's inside!
+
+Now, when you click the green flag, your character will move 10 steps, and it will do that 10 times in a row! Awesome, right? Keep up the fantastic work!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #f44336; color: white; border-radius: 3px; font-weight: bold;">
+Not Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Missing debugging analysis or solutions, Response doesn't sufficiently address prompt or route requirements
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 8</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> My sprite keeps disappearing</p>
+<p><strong>Expected Route:</strong> code_debugging | 
+<strong>Actual Route:</strong> code_debugging | 
+<strong>Time:</strong> 12.97s</p>
+
+
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains debugging advice, Addresses prompt (1/3 key words match, 33.3%)
+</div>
+</div><h2>Give Instructions Tests</h2><div class="test-item correct">
+<div class="test-header">
+<h3>Test 1</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> How do I make a sprite move?</p>
+<p><strong>Expected Route:</strong> give_instructions | 
+<strong>Actual Route:</strong> give_instructions | 
+<strong>Time:</strong> 14.66s</p>
+
+
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains instructional content, Addresses prompt (2/3 key words match, 66.7%)
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 2</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> Teach me how to use repeat blocks</p>
+<p><strong>Expected Route:</strong> give_instructions | 
+<strong>Actual Route:</strong> give_instructions | 
+<strong>Time:</strong> 12.68s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Hey there, Scratch explorer! Let's learn about the "repeat" block. It's like a magic trick to make things happen again and again!
+
+**What it does:** The "repeat" block does the same thing many times.
+
+**How to use it:**
+
+1.  **Find it:** Go to the **Control** blocks. You'll see the "repeat" block.
+2.  **Drag it:** Bring the "repeat" block to your workspace.
+3.  **Set the number:** Type a number in the white box. This tells Scratch how many times to repeat. Like "5" or "10"!
+4.  **Add blocks inside:** Put the blocks you want to repeat *inside* the "repeat" block.
+5.  **Start it:** Use a "when green flag clicked" block from **Events** to start the repeating.
+
+**Example:**
+
+Let's make a sprite move 10 steps forward 5 times.
+
+1.  Get a "when green flag clicked" block.
+2.  Add a "repeat" block and type "5" inside.
+3.  Put a "move 10 steps" block (from **Motion**) *inside* the "repeat" block.
+
+Now, when you click the green flag, your sprite will move 10 steps, then do it again, and again, until it has moved 5 times!
+
+**Another Example: Changing Color**
+
+Let's change the color of a sprite 20 times.
+
+1.  Get a "when green flag clicked" block.
+2.  Add a "repeat" block and type "20" inside.
+3.  Put a "change color effect by 25" block (from **Looks**) *inside* the "repeat" block.
+
+The color will change 20 times.
+
+Have fun repeating!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains instructional content, Addresses prompt (2/3 key words match, 66.7%)
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 3</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> What's the best way to make animations?</p>
+<p><strong>Expected Route:</strong> give_instructions | 
+<strong>Actual Route:</strong> give_instructions | 
+<strong>Time:</strong> 13.93s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Hey there, future animators! Let's learn how to make things move in Scratch!
+
+**1. Costume Magic (Like a Flipbook!):**
+
+*   Imagine you're making a flipbook. You draw the same thing over and over, but change it a little bit each time. In Scratch, we use **costumes** to do the same thing!
+*   **What to use:**
+    *   `next costume`: This block changes your character to the next picture.
+    *   `wait [number] seconds`: This block makes Scratch wait a little bit before changing to the next picture.
+    *   `forever`: This block makes your animation keep going and going!
+*   **Example:**
+
+```scratch
+when green flag clicked
+forever
+  next costume
+  wait 0.1 seconds
+end
+```
+
+**2. Moving Around:**
+
+*   Instead of changing costumes, we can make our character move across the screen!
+*   **What to use:**
+    *   `move [number] steps`: This block makes your character take steps.
+    *   `change x by [number]`: This block moves your character left or right.
+    *   `change y by [number]`: This block moves your character up or down.
+*   **Example:**
+
+```scratch
+when green flag clicked
+forever
+  change x by 10
+  wait 0.05 seconds
+  if <(x position) > (240)> then
+     set x to (-240)
+  end
+end
+```
+
+**3. Super Animation Combo!**
+
+*   Want to be a super animator? Use both costumes and moving around! Imagine a character walking - you'd change their leg costumes *and* move them forward!
+
+**Tips for Awesome Animations:**
+
+*   Start simple!
+*   Plan what you want to make.
+*   Have fun experimenting!
+*   Use more than one character!
+
+You got this! Now go make some amazing animations!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains instructional content, Addresses prompt (1/4 key words match, 25.0%)
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 4</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> How can I make my sprite jump?</p>
+<p><strong>Expected Route:</strong> give_instructions | 
+<strong>Actual Route:</strong> give_instructions | 
+<strong>Time:</strong> 13.13s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Hey there, future game developers! Let's make your Scratch sprite jump! It's super fun!
+
+**First, pick how you want to make your sprite jump:**
+
+*   Press a key? Use the `when key pressed` block. You can find it in the "Events" blocks. Choose your favorite key, like the space bar!
+*   Click the sprite? Use the `when this sprite clicked` block, also in "Events."
+
+**Now, let's make the sprite jump up and down:**
+
+1.  **Jump Up:** Use the `change y by` block from the "Motion" blocks. Put in a positive number, like 50, to make it go up!
+2.  **Wait at the Top:** Add a `wait seconds` block from the "Control" blocks. A short wait, like 0.2 seconds, will do!
+3.  **Come Down:** Use another `change y by` block, but this time with a negative number, like -50. This brings the sprite back down!
+
+**Make it even cooler with a loop!**
+
+1.  Use the `repeat` block from the "Control" blocks.
+2.  Put `change y by (10)` and `wait (0.01) seconds` inside the `repeat` block.
+3.  Repeat with `change y by (-10)` and `wait (0.01) seconds` to come down smoothly.
+
+Try different numbers to make the jump higher or lower. Have fun experimenting!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains instructional content, Addresses prompt (2/3 key words match, 66.7%)
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 5</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> Explain how to use if-then blocks</p>
+<p><strong>Expected Route:</strong> give_instructions | 
+<strong>Actual Route:</strong> give_instructions | 
+<strong>Time:</strong> 11.08s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Hey there, Scratch Explorers!
+
+Want to make your Scratch games super smart? Let's learn about the `if then` block! It's like a brain for your code, helping it make choices.
+
+**What it does:** The `if then` block checks if something is true. If it is, then the code inside the block runs! If not, Scratch skips that code.
+
+**How to use it:**
+
+1.  Find the `if then` block in the "Control" blocks (it's at the bottom of the list). Drag it into your code.
+2.  Now, we need to tell the `if then` block *what* to check. We need to put a condition in the hexagonal space. You can find conditions in "Sensing" or "Operators."
+    *   `touching object`: Is my sprite touching something?
+    *   `key pressed`: Is someone pressing a key?
+    *   `greater than`, `less than`, `equals`: Are two numbers the same?
+3.  Put the code you want to run *inside* the `if then` block. This code will only run if your condition is true!
+
+**Example:**
+
+Let's make a sprite say "Hello!" when you press the space key.
+
+1.  Get a `when key pressed` block from the "Events" blocks. Choose "space."
+2.  Put an `if then` block inside the `when key pressed` block.
+3.  Drag a `key pressed` block from "Sensing" into the `if then` block's hexagon. Choose "space" again.
+4.  Put a `say message` block inside the `if then` block. Change the message to "Hello!".
+
+Now, your sprite will only say "Hello!" when you press the space key! Isn't that cool?
+
+The `if then` block helps you make games that react to what's happening. Have fun experimenting!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains instructional content, Addresses prompt (1/3 key words match, 33.3%)
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 6</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> How do I add sound to my project?</p>
+<p><strong>Expected Route:</strong> give_instructions | 
+<strong>Actual Route:</strong> give_instructions | 
+<strong>Time:</strong> 10.67s</p>
+
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains instructional content, Addresses prompt (1/2 key words match, 50.0%)
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 7</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> What are the steps to create a game?</p>
+<p><strong>Expected Route:</strong> give_instructions | 
+<strong>Actual Route:</strong> give_instructions | 
+<strong>Time:</strong> 16.42s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Hey there, future game developer! Let's make a Scratch game together!
+
+1.  **Dream It, Plan It:**
+    *   What kind of game do you want? A jumping game? A puzzle?
+    *   What will players do? What are the rules?
+    *   Draw your game! What will it look like? Who are the characters?
+
+2.  **Set the Stage:**
+    *   **Pick a Backdrop:** Go to "Looks" and pick a cool background! Use the `switch backdrop to` block to show it.
+    *   **Add Sprites:** These are your characters and things in the game. You can draw them or pick from Scratch's library!
+
+3.  **Make It Move:**
+    *   **Start Button:** Use `when green flag clicked` (in "Events") to start the game.
+    *   **Move Around:** Use "Motion" blocks to move your sprites!
+        *   `move [10] steps` makes it move forward.
+        *   `turn right [15] degrees` makes it turn.
+    *   **Use the Keyboard:** Use `when key pressed` (in "Events") to move with the arrow keys!
+
+4.  **Make It Interact:**
+    *   **Touching:** Use `touching [object v]` (in "Sensing") to see when sprites bump into each other.
+    *   **If...Then:** Use `if then` (in "Control") to make things happen when they touch!
+
+5.  **Keep Score:**
+    *   **Make a Variable:** In "Variables," make a box to hold the score.
+    *   **Add Points:** Use `change [score v] by [1]` to add to the score.
+    *   **Show the Score:** Use `show variable [score v]` to show it on the screen.
+
+6.  **Add Sounds:**
+    *   **Pick Sounds:** Go to "Sound" and choose fun noises!
+    *   **Play Sounds:** Use `start sound [sound name v]` to play them when things happen.
+
+7.  **Repeat Actions:**
+    *   **Forever:** Use `forever` (in "Control") to keep checking things.
+    *   **Repeat:** Use `repeat [10]` to do something a few times.
+
+8.  **Game Over:**
+    *   **When to Stop:** Use `if then` to check if the game is over (like if you run out of lives).
+    *   **Stop It:** Use `stop [all v]` (in "Control") to end the game.
+
+9.  **Make It Awesome:**
+    *   **Costumes:** Change how your sprites look with "Looks"!
+    *   **Messages:** Use `broadcast [message v]` (in "Events") to let sprites talk to each other.
+
+Start small and add more cool stuff as you go! Have fun!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains instructional content, Addresses prompt (2/4 key words match, 50.0%)
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 8</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> How do variables work in Scratch?</p>
+<p><strong>Expected Route:</strong> give_instructions | 
+<strong>Actual Route:</strong> give_instructions | 
+<strong>Time:</strong> 12.03s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Hey there, Scratch Explorers!
+
+Variables are like special boxes that hold secrets in your Scratch games. Let's learn how to use them!
+
+1.  **Make a Box (Variable):**
+    *   Go to "Variables" and click "Make a Variable."
+    *   Give it a cool name like "score" or "speed."
+
+2.  **Put Something in the Box:**
+    *   Use "set variable to" to give your box a starting value.
+    *   Like, `set [score v] to [0]` to start the score at zero!
+
+3.  **Change What's in the Box:**
+    *   Use "change variable by" to add or subtract from the value.
+    *   `change [score v] by [1]` to add one to the score!
+
+4.  **Use the Box's Secret:**
+    *   Drag your variable into other blocks.
+    *   `move [speed v] steps` makes your character move faster or slower.
+    *   `say [join[Score: ][score v]]` to show the score on the screen!
+
+5.  **Show or Hide the Box:**
+    *   Use "show variable" and "hide variable" to make the value visible or invisible on the stage.
+
+**Example:**
+
+1.  Make a "score" variable.
+2.  Set "score" to 0 at the start.
+3.  Add 1 to "score" when the player gets a point.
+4.  Show the "score" on the stage!
+
+Variables help you make awesome, interactive games. Have fun experimenting!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> Contains instructional content, Addresses prompt (1/3 key words match, 33.3%)
+</div>
+</div><h2>General Agent Tests</h2><div class="test-item correct">
+<div class="test-header">
+<h3>Test 1</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> Hello!</p>
+<p><strong>Expected Route:</strong> general_agent | 
+<strong>Actual Route:</strong> general_agent | 
+<strong>Time:</strong> 5.97s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Hello! I'm here to help you learn Scratch in a fun and easy way.
+
+If you have a Scratch project you want to make, or if you're stuck on a step, just tell me. I can help you break it down into simple steps that are easy for kids to follow.
+
+Let's have fun creating with Scratch! What do you want to make today?</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> General response provided, Addresses prompt (1/1 key words match, 100.0%)
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 2</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> Thank you for your help</p>
+<p><strong>Expected Route:</strong> general_agent | 
+<strong>Actual Route:</strong> general_agent | 
+<strong>Time:</strong> 5.45s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Yay! I'm super happy I could help you with your Scratch project! If you need anything else, just ask. Have lots of fun Scratching and creating awesome things! You're doing great!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> General response provided, Addresses prompt (2/3 key words match, 66.7%)
+</div>
+</div><div class="test-item correct">
+<div class="test-header">
+<h3>Test 3</h3>
+<span class="test-status">✓</span>
+</div>
+<p><strong>Prompt:</strong> What is Scratch?</p>
+<p><strong>Expected Route:</strong> general_agent | 
+<strong>Actual Route:</strong> general_agent | 
+<strong>Time:</strong> 6.49s</p>
+
+<div class="agent-response">
+<div class="response-label">Agent Response:</div>
+<p>Hey there, future coder!
+
+Scratch is like a super fun playground where you can make your own games, stories, and cartoons!
+
+Instead of typing complicated code, you get to use colorful blocks that snap together like LEGOs. Each block tells your characters what to do. It's like giving them instructions with puzzle pieces!
+
+You can drag and drop these blocks to make your characters move, talk, and even dance. It's super easy to learn, and you'll be amazed at what you can create.
+
+Once you've made something awesome, you can share it with other kids in the Scratch community. You can also check out their projects and get inspired. It's a great way to learn and make new friends!
+
+So, get ready to unleash your imagination and start creating with Scratch!</p>
+</div>
+
+<div class="verification">
+<strong>Response Verification:</strong>
+<span style="display: inline-block; padding: 5px 10px; background: #4CAF50; color: white; border-radius: 3px; font-weight: bold;">
+Accurate
+</span><br>
+<strong>Route Correct:</strong> True<br>
+<strong>Notes:</strong> General response provided, Addresses prompt (1/2 key words match, 50.0%)
+</div>
+</div>
+<h2>Test Environment</h2>
+<div class="metadata">
+<p><strong>Testing Script:</strong> AgentTesting.py</p>
+<p><strong>Results Directory:</strong> agent_test_results/</p>
+<p><strong>Chrome Debug Port:</strong> 9222</p>
+<p><strong>Stricter Accuracy Criteria:</strong> Wrong route = Not Accurate, Response must match route requirements and prompt context (30%+ keyword overlap)</p>
+</div>
+</div></body></html>

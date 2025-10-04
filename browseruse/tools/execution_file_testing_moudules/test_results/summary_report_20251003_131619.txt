@@ -1,0 +1,244 @@
+======================================================================
+SCRATCH BLOCK EXECUTION TEST REPORT
+======================================================================
+
+Session ID: 20251003_131619
+Total Tests: 10
+Generated: 2025-10-03 13:18:19
+
+Total Execution Time: 89.13 seconds
+Average Time per Test: 8.91 seconds
+
+======================================================================
+TEST RESULTS DETAIL
+======================================================================
+
+
+[Test 1] test_001
+----------------------------------------------------------------------
+Description: Basic event and control flow
+Steps Count: 3
+Execution Time: 7.55s
+Status: ✅ Execution completed.
+Screenshot: test_results/screenshots/test_001_20251003_131619.png
+
+Input Steps:
+  1. Events -> when green flag clicked
+  2. Control -> forever
+  3. Looks -> say message
+
+Workspace State:
+ Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. forever Code block. Block Coordinates: (X: 350, Y: 175 ) 
+ 3. say Code block. Block Coordinates: (X: 361, Y: 208 ) 
+
+
+======================================================================
+
+[Test 2] test_002
+----------------------------------------------------------------------
+Description: Motion blocks sequence
+Steps Count: 3
+Execution Time: 7.57s
+Status: ✅ Execution completed.
+Screenshot: test_results/screenshots/test_002_20251003_131619.png
+
+Input Steps:
+  1. Events -> when green flag clicked
+  2. Motion -> move steps
+  3. Motion -> turn right
+
+Workspace State:
+ Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. move Code block. Block Coordinates: (X: 350, Y: 175 ) 
+ 3. turn Code block. Block Coordinates: (X: 350, Y: 208 ) 
+
+
+======================================================================
+
+[Test 3] test_003
+----------------------------------------------------------------------
+Description: Looks blocks with speech
+Steps Count: 4
+Execution Time: 11.24s
+Status: ✅ Execution completed.
+Screenshot: test_results/screenshots/test_003_20251003_131619.png
+
+Input Steps:
+  1. Events -> when green flag clicked
+  2. Looks -> say message for seconds
+  3. Looks -> hide
+  4. Looks -> show
+
+Workspace State:
+ Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. move Code block. Block Coordinates: (X: 350, Y: 175 ) 
+ 3. turn Code block. Block Coordinates: (X: 350, Y: 208 ) 
+
+
+======================================================================
+
+[Test 4] test_004
+----------------------------------------------------------------------
+Description: Control structures with repeat
+Steps Count: 3
+Execution Time: 7.53s
+Status: ✅ Execution completed.
+Screenshot: test_results/screenshots/test_004_20251003_131619.png
+
+Input Steps:
+  1. Events -> when green flag clicked
+  2. Control -> repeat times
+  3. Motion -> move steps
+
+Workspace State:
+ Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. repeat Code block. Block Coordinates: (X: 350, Y: 175 ) 
+ 3. move Code block. Block Coordinates: (X: 361, Y: 208 ) 
+
+
+======================================================================
+
+[Test 5] test_005
+----------------------------------------------------------------------
+Description: Timer operations
+Steps Count: 4
+Execution Time: 9.93s
+Status: ✅ Execution completed.
+Screenshot: test_results/screenshots/test_005_20251003_131619.png
+
+Input Steps:
+  1. Events -> when green flag clicked
+  2. Sensing -> reset timer
+  3. Control -> repeat 
+  4. Sound -> start sound
+
+Workspace State:
+ Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. repeat Code block. Block Coordinates: (X: 350, Y: 208 ) 
+
+
+======================================================================
+
+[Test 6] test_006
+----------------------------------------------------------------------
+Description: Mouse following behavior
+Steps Count: 4
+Execution Time: 8.84s
+Status: ✅ Execution completed.
+Screenshot: test_results/screenshots/test_006_20251003_131619.png
+
+Input Steps:
+  1. Events -> when green flag clicked
+  2. Control -> forever
+  3. Motion -> point towards
+  4. Motion -> move steps
+
+Workspace State:
+ Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. forever Code block. Block Coordinates: (X: 350, Y: 175 ) 
+ 3. move Code block. Block Coordinates: (X: 361, Y: 240 ) 
+
+
+======================================================================
+
+[Test 7] test_007
+----------------------------------------------------------------------
+Description: Complex animation loop
+Steps Count: 5
+Execution Time: 10.11s
+Status: ✅ Execution completed.
+Screenshot: test_results/screenshots/test_007_20251003_131619.png
+
+Input Steps:
+  1. Events -> when green flag clicked
+  2. Control -> forever
+  3. Motion -> go to random position
+  4. Looks -> change graphic effect
+  5. Control -> wait seconds
+
+Workspace State:
+ Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. forever Code block. Block Coordinates: (X: 350, Y: 175 ) 
+ 3. go to Code block. Block Coordinates: (X: 361, Y: 208 ) 
+ 4. change Code block. Block Coordinates: (X: 361, Y: 240 ) 
+ 5. wait Code block. Block Coordinates: (X: 361, Y: 272 ) 
+
+
+======================================================================
+
+[Test 8] test_008
+----------------------------------------------------------------------
+Description: Sprite positioning sequence
+Steps Count: 4
+Execution Time: 8.82s
+Status: ✅ Execution completed.
+Screenshot: test_results/screenshots/test_008_20251003_131619.png
+
+Input Steps:
+  1. Events -> when green flag clicked
+  2. Motion -> go to position
+  3. Motion -> point in direction
+  4. Motion -> glide
+
+Workspace State:
+ Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. go to x: Code block. Block Coordinates: (X: 350, Y: 175 ) 
+ 3. glide Code block. Block Coordinates: (X: 350, Y: 240 ) 
+ 4. secs to x: Code block. Block Coordinates: (X: 413, Y: 240 ) 
+
+
+======================================================================
+
+[Test 9] test_009
+----------------------------------------------------------------------
+Description: Backdrop switching
+Steps Count: 4
+Execution Time: 7.55s
+Status: ✅ Execution completed.
+Screenshot: test_results/screenshots/test_009_20251003_131619.png
+
+Input Steps:
+  1. Events -> when green flag clicked
+  2. Looks -> switch backdrop
+  3. Control -> wait seconds
+  4. Looks -> next backdrop
+
+Workspace State:
+ Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. wait Code block. Block Coordinates: (X: 350, Y: 175 ) 
+
+
+======================================================================
+
+[Test 10] test_010
+----------------------------------------------------------------------
+Description: Edge detection and bounce
+Steps Count: 4
+Execution Time: 9.99s
+Status: ✅ Execution completed.
+Screenshot: test_results/screenshots/test_010_20251003_131619.png
+
+Input Steps:
+  1. Events -> when green flag clicked
+  2. Control -> forever
+  3. Motion -> move steps
+  4. Motion -> if on edge bounce
+
+Workspace State:
+ Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:
+ 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) 
+ 2. forever Code block. Block Coordinates: (X: 350, Y: 175 ) 
+ 3. move Code block. Block Coordinates: (X: 361, Y: 208 ) 
+
+
+======================================================================

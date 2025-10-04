@@ -1,0 +1,24 @@
+{
+  "prompt": "How do I add sound to my project?",
+  "expected_route": "give_instructions",
+  "actual_route": "give_instructions",
+  "routing_correct": true,
+  "execution_time": 10.67,
+  "agent_response": "Hey there, future sound designers! Let's add some awesome sounds to your Scratch project!\n\n1.  **Find the Sound Blocks:** Look on the left side of your screen for the \"Sound\" button. Click it, and you'll see all the sound blocks you can use!\n\n2.  **Pick a Sound Block:**\n\n    *   `play sound until done`: This block plays the whole sound before moving on.\n    *   `start sound`: This block starts the sound, but keeps going with the code right away. Great for background music!\n    *   `stop all sounds`: This block stops all the sounds.\n\n3.  **Choose When to Play the Sound:**\n\n    *   `when green flag clicked`: The sound plays when you start the project.\n    *   `when key pressed`: The sound plays when you press a key.\n    *   `when this sprite clicked`: The sound plays when you click on a sprite.\n\n4.  **Put the Blocks Together:** Drag the \"when\" block to the middle. Then, drag your sound block and snap it under the \"when\" block.\n\n5.  **Pick Your Sound:** Click the little arrow on the sound block to pick a sound. Scratch has lots of sounds to choose from! You can even add your own sound by clicking \"Choose a Sound\" in the \"Sounds\" tab!\n\n**Example:**\n\nTo play a sound when the green flag is clicked:\n\n*   Use `when green flag clicked`\n*   Use `play sound until done`\n\nSnap them together and pick your sound. Now, click the green flag and hear your sound play! You did it!",
+  "response_verification": {
+    "has_response": true,
+    "response_length": 1383,
+    "is_accurate": true,
+    "accuracy_label": "Accurate",
+    "notes": [
+      "Contains instructional content",
+      "Addresses prompt (1/2 key words match, 50.0%)"
+    ]
+  },
+  "result": {
+    "query": "How do I add sound to my project?",
+    "result": {
+      "formatted_response": "Hey there, future sound designers! Let's add some awesome sounds to your Scratch project!\n\n1.  **Find the Sound Blocks:** Look on the left side of your screen for the \"Sound\" button. Click it, and you'll see all the sound blocks you can use!\n\n2.  **Pick a Sound Block:**\n\n    *   `play sound until done`: This block plays the whole sound before moving on.\n    *   `start sound`: This block starts the sound, but keeps going with the code right away. Great for background music!\n    *   `stop all sounds`: This block stops all the sounds.\n\n3.  **Choose When to Play the Sound:**\n\n    *   `when green flag clicked`: The sound plays when you start the project.\n    *   `when key pressed`: The sound plays when you press a key.\n    *   `when this sprite clicked`: The sound plays when you click on a sprite.\n\n4.  **Put the Blocks Together:** Drag the \"when\" block to the middle. Then, drag your sound block and snap it under the \"when\" block.\n\n5.  **Pick Your Sound:** Click the little arrow on the sound block to pick a sound. Scratch has lots of sounds to choose from! You can even add your own sound by clicking \"Choose a Sound\" in the \"Sounds\" tab!\n\n**Example:**\n\nTo play a sound when the green flag is clicked:\n\n*   Use `when green flag clicked`\n*   Use `play sound until done`\n\nSnap them together and pick your sound. Now, click the green flag and hear your sound play! You did it!"
+    }
+  }
+}

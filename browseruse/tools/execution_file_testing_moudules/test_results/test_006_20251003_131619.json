@@ -1,0 +1,34 @@
+{
+  "test_id": "test_006",
+  "description": "Mouse following behavior",
+  "timestamp": "2025-10-03T13:17:30.707487",
+  "execution_time_seconds": 8.84,
+  "steps_count": 4,
+  "input_plan": {
+    "steps": [
+      {
+        "step": 1,
+        "category": "Events",
+        "block": "when green flag clicked"
+      },
+      {
+        "step": 2,
+        "category": "Control",
+        "block": "forever"
+      },
+      {
+        "step": 3,
+        "category": "Motion",
+        "block": "point towards"
+      },
+      {
+        "step": 4,
+        "category": "Motion",
+        "block": "move steps"
+      }
+    ]
+  },
+  "execution_status": "✅ Execution completed.",
+  "workspace_state": " Code space start from coordinates (X: 310, Y: 160). List of used blocks in the code space:\n 1. when Code block. Block Coordinates: (X: 350, Y: 143 ) \n 2. forever Code block. Block Coordinates: (X: 350, Y: 175 ) \n 3. move Code block. Block Coordinates: (X: 361, Y: 240 ) \n",
+  "screenshot_path": "test_results/screenshots/test_006_20251003_131619.png"
+}

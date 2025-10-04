@@ -1,0 +1,74 @@
+[
+  {
+    "prompt": "Hello!",
+    "expected_route": "general_agent",
+    "actual_route": "general_agent",
+    "routing_correct": true,
+    "execution_time": 5.97,
+    "agent_response": "Hello! I'm here to help you learn Scratch in a fun and easy way.\n\nIf you have a Scratch project you want to make, or if you're stuck on a step, just tell me. I can help you break it down into simple steps that are easy for kids to follow.\n\nLet's have fun creating with Scratch! What do you want to make today?",
+    "response_verification": {
+      "has_response": true,
+      "response_length": 309,
+      "is_accurate": true,
+      "accuracy_label": "Accurate",
+      "notes": [
+        "General response provided",
+        "Addresses prompt (1/1 key words match, 100.0%)"
+      ]
+    },
+    "result": {
+      "query": "Hello!",
+      "result": {
+        "formatted_response": "Hello! I'm here to help you learn Scratch in a fun and easy way.\n\nIf you have a Scratch project you want to make, or if you're stuck on a step, just tell me. I can help you break it down into simple steps that are easy for kids to follow.\n\nLet's have fun creating with Scratch! What do you want to make today?"
+      }
+    }
+  },
+  {
+    "prompt": "Thank you for your help",
+    "expected_route": "general_agent",
+    "actual_route": "general_agent",
+    "routing_correct": true,
+    "execution_time": 5.45,
+    "agent_response": "Yay! I'm super happy I could help you with your Scratch project! If you need anything else, just ask. Have lots of fun Scratching and creating awesome things! You're doing great!",
+    "response_verification": {
+      "has_response": true,
+      "response_length": 178,
+      "is_accurate": true,
+      "accuracy_label": "Accurate",
+      "notes": [
+        "General response provided",
+        "Addresses prompt (2/3 key words match, 66.7%)"
+      ]
+    },
+    "result": {
+      "query": "Thank you for your help",
+      "result": {
+        "formatted_response": "Yay! I'm super happy I could help you with your Scratch project! If you need anything else, just ask. Have lots of fun Scratching and creating awesome things! You're doing great!"
+      }
+    }
+  },
+  {
+    "prompt": "What is Scratch?",
+    "expected_route": "general_agent",
+    "actual_route": "general_agent",
+    "routing_correct": true,
+    "execution_time": 6.49,
+    "agent_response": "Hey there, future coder!\n\nScratch is like a super fun playground where you can make your own games, stories, and cartoons!\n\nInstead of typing complicated code, you get to use colorful blocks that snap together like LEGOs. Each block tells your characters what to do. It's like giving them instructions with puzzle pieces!\n\nYou can drag and drop these blocks to make your characters move, talk, and even dance. It's super easy to learn, and you'll be amazed at what you can create.\n\nOnce you've made something awesome, you can share it with other kids in the Scratch community. You can also check out their projects and get inspired. It's a great way to learn and make new friends!\n\nSo, get ready to unleash your imagination and start creating with Scratch!",
+    "response_verification": {
+      "has_response": true,
+      "response_length": 756,
+      "is_accurate": true,
+      "accuracy_label": "Accurate",
+      "notes": [
+        "General response provided",
+        "Addresses prompt (1/2 key words match, 50.0%)"
+      ]
+    },
+    "result": {
+      "query": "What is Scratch?",
+      "result": {
+        "formatted_response": "Hey there, future coder!\n\nScratch is like a super fun playground where you can make your own games, stories, and cartoons!\n\nInstead of typing complicated code, you get to use colorful blocks that snap together like LEGOs. Each block tells your characters what to do. It's like giving them instructions with puzzle pieces!\n\nYou can drag and drop these blocks to make your characters move, talk, and even dance. It's super easy to learn, and you'll be amazed at what you can create.\n\nOnce you've made something awesome, you can share it with other kids in the Scratch community. You can also check out their projects and get inspired. It's a great way to learn and make new friends!\n\nSo, get ready to unleash your imagination and start creating with Scratch!"
+      }
+    }
+  }
+]

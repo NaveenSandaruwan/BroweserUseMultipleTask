@@ -1,0 +1,41 @@
+================================================================================
+SCRATCH AGENT TESTING REPORT
+================================================================================
+
+Session: 20251004_171710
+Generated: 2025-10-04 17:26:50
+
+OVERALL STATISTICS
+--------------------------------------------------------------------------------
+Total Tests: 34
+Routing Accuracy: 94.12%
+Response Accuracy: 76.47%
+Average Execution Time: 11.77s
+
+CATEGORY BREAKDOWN
+--------------------------------------------------------------------------------
+
+MAKE_BLOCKS:
+  Routing Accuracy: 85.71% (6/7)
+  Response Accuracy: 85.71% (6/7)
+  Avg Time: 13.49s
+
+CODE_EXPLAIN:
+  Routing Accuracy: 87.5% (7/8)
+  Response Accuracy: 87.5% (7/8)
+  Avg Time: 11.0s
+
+CODE_DEBUGGING:
+  Routing Accuracy: 100.0% (8/8)
+  Response Accuracy: 25.0% (2/8)
+  Avg Time: 11.91s
+
+GIVE_INSTRUCTIONS:
+  Routing Accuracy: 100.0% (8/8)
+  Response Accuracy: 100.0% (8/8)
+  Avg Time: 13.07s
+
+GENERAL_AGENT:
+  Routing Accuracy: 100.0% (3/3)
+  Response Accuracy: 100.0% (3/3)
+  Avg Time: 5.97s
