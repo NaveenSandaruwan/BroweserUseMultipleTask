@@ -20,3 +20,4 @@ element_data/elements.json
 test-profile/
 test-profile-persistent/
 manual-test-profile
+.pytest_cache

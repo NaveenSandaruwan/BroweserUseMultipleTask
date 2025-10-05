@@ -12,8 +12,8 @@ _file_ = os.path.abspath(__file__)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), '../..')))
 
-from execution import Executor
-from filter import get_list_of_used_blocks
+from tools.execution import Executor
+from tools.filter import get_list_of_used_blocks
 from dotenv import load_dotenv
 import pychrome
 from tools.browserUseClient import send_task

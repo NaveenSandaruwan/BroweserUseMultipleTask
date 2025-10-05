@@ -13,8 +13,8 @@ _file_ = os.path.abspath(__file__)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), '../..')))
 
-from agent import chat
-from nodes import llm_router
+from Agent.agent import chat
+from Agent.nodes import llm_router
 from tools.filter import get_list_of_used_blocks
 from tools.browserUseClient import send_task
 import pychrome
