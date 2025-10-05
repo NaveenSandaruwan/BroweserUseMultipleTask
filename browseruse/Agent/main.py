@@ -16,11 +16,11 @@ from emotion import EmotionIdentifier
 load_dotenv()
 
 BACKEND_PORT = 5000  # choose your port
-
+#allow this url origin for CORS https://scratch.mit.edu/projects/editor/?tutorial=getStarted
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://scratch.mit.edu"],
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True,
@@ -65,6 +65,9 @@ async def emotion_endpoint(request: EmotionRequest):
     emotion = detector.identify_emotion(request.text, history=history_text)
     return {"emotion": emotion}
 
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "message": "Server is healthy"}
 
 if __name__ == "__main__":
     import uvicorn
