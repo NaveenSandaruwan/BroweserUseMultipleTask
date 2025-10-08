@@ -39,6 +39,57 @@ class Executor:
         self.tab = self.browser.list_tab()[tab_index]
         self.tab.start()
 
+
+    @staticmethod
+    def clean_workspace():
+        """
+        Clean the workspace by dragging all used blocks back to the palette.
+        Uses get_list_of_used_blocks() to find blocks and their coordinates.
+        """
+        from tools.filter import find_used_blocks
+        
+        print("🧹 Cleaning workspace...")
+        
+        # Get all blocks currently in workspace
+        used_blocks = find_used_blocks()
+        
+        if not used_blocks or len(used_blocks) == 0:
+            print("✓ Workspace is already empty")
+            return True
+        
+        print(f"Found {len(used_blocks)} blocks to remove")
+        
+        # Drag each block back to the palette (reverse operation)
+        for i, block in enumerate(used_blocks, 1):
+            try:
+                # Current position in workspace
+                x_current = block["x"]
+                y_current = block["y"]
+                
+                # Target position (back to palette area - left side of screen)
+                # We drag them to a safe area outside the workspace
+                x_target = 100  # Left side (palette area)
+                y_target = 300  # Middle height
+                
+                print(f"  Removing block {i}/{len(used_blocks)}: '{block['text_content']}'")
+                print(f"    From workspace ({x_current}, {y_current}) → To palette ({x_target}, {y_target})")
+                
+                # Perform reverse drag
+                drag_tool.drag_and_drop(
+                    x_start=x_current,
+                    y_start=y_current,
+                    x_end=x_target,
+                    y_end=y_target
+                )
+                
+                time.sleep(0.3)  # Small delay between removals
+                
+            except Exception as e:
+                print(f"  ⚠ Error removing block: {e}")
+                continue
+        
+        print("✓ Workspace cleaned successfully")
+        return True
     @staticmethod
     def find_closest_block(category: str, block_query: str) -> dict:
         """
@@ -184,7 +235,54 @@ class Executor:
             scroll = False
         return "✅ Execution completed."
 
-
+    @staticmethod
+    def clean_and_execute_tool(json_plan: str, delay=0.5):
+        """
+        NEW TOOL: Cleans workspace first, then executes the new block sequence.
+        This is specifically for CODE FIXING operations.
+        
+        Steps:
+        1. Get all blocks currently in workspace using get_list_of_used_blocks()
+        2. Drag each block FROM workspace coordinates BACK to palette (reverse drag)
+        3. Execute the new correct sequence of blocks
+        
+        Arguments:
+            - json_plan (str): JSON string with steps to execute
+            - delay (float): Delay between operations
+            
+        Returns:
+            str: Success or error message
+        """
+        print("\n" + "="*60)
+        print("🔧 CLEAN & EXECUTE TOOL")
+        print("="*60)
+        
+        # STEP 1: Clean the workspace
+        print("\n[STEP 1] Cleaning existing workspace...")
+        try:
+            Executor.clean_workspace()
+            time.sleep(1)  # Wait for cleanup to complete
+        except Exception as e:
+            print(f"⚠ Error during cleanup: {e}")
+            print("Continuing with execution anyway...")
+        
+        # STEP 2: Refresh to update DOM
+        print("\n[STEP 2] Refreshing workspace state...")
+        try:
+            send_task("refresh")
+            time.sleep(2)
+        except Exception as e:
+            print(f"⚠ Error refreshing: {e}")
+        
+        # STEP 3: Execute new blocks
+        print("\n[STEP 3] Executing new block sequence...")
+        result = Executor.executor_tool(json_plan, delay)
+        
+        print("\n" + "="*60)
+        print("✅ CLEAN & EXECUTE COMPLETED")
+        print("="*60)
+        
+        return result
 
 # if __name__ == "__main__":
 #     # Example JSON plan
