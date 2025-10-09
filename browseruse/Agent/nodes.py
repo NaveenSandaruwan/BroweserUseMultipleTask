@@ -14,7 +14,7 @@ from tools.execution import Executor
 from langchain_core.messages import HumanMessage
 
 from langchain_core.tools import tool
-
+from pathlib import Path
 
 load_dotenv()
 
@@ -31,7 +31,25 @@ from browseruse.Agent.reactAgents import command_agent,explaining_agent,debuggin
 from browseruse.Agent.utils.state import State
 from browseruse.Agent.utils.tool import make_blocks, clean_and_make_blocks
 
-GEMINIAPI = os.getenv("GOOGLE_API_KEY")
+def get_base_path():
+    """Return folder where exe/script is located (for reading/writing files)."""
+    if getattr(sys, "frozen", False):
+        # Running as PyInstaller exe
+        return Path(sys.executable).parent
+    else:
+        # Running as Python script
+        return Path(__file__).parent.parent.parent
+
+BASE_DIR = get_base_path()
+USER_DATA_DIR = BASE_DIR / "userdata" / "user_data.json"
+
+# Load user data from JSON file
+with open(USER_DATA_DIR, "r", encoding="utf-8") as f:
+    user_data = json.load(f)
+
+
+
+GEMINIAPI = user_data['gemini_api_key']
 model = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash",
     google_api_key=GEMINIAPI,

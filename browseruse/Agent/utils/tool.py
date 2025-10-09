@@ -52,3 +52,46 @@ def make_blocks(json_string: str) -> str:
     except json.JSONDecodeError:
         print("Invalid JSON format")
         return "false"
+
+
+
+@tool
+def clean_and_make_blocks(json_string: str) -> str:
+    """
+    Cleans the workspace by removing existing blocks, then executes new block sequence.
+    This tool is specifically for CODE FIXING operations where we need to replace
+    incorrect code with correct code.
+    
+    Steps:
+    1. Finds all blocks currently in workspace using get_list_of_used_blocks()
+    2. Drags each block FROM workspace (current coordinates) BACK to palette (reverse drag)
+    3. Executes the new correct sequence of blocks
+    
+    Arguments:
+        - json_string (str): A JSON string containing steps to execute
+        
+    Example json_string:
+    {
+      "steps": [
+        {"step": 1, "category": "Events", "block": "when green flag clicked"},
+        {"step": 2, "category": "Control", "block": "repeat 10"},
+        {"step": 3, "category": "Looks", "block": "say Meow for 2 seconds"}
+      ]
+    }
+    
+    Returns:
+        str: "true" if successful, "false" if error
+    """
+    if len(json_string.strip()) == 0:
+        print("Empty JSON string provided.")
+        return "false"
+    
+    try:
+        result = executor.clean_and_execute_tool(json_string)
+        return "true" if "completed" in result.lower() else "false"
+    except json.JSONDecodeError:
+        print("Invalid JSON format")
+        return "false"
+    except Exception as e:
+        print(f"Error in clean_and_make_blocks: {e}")
+        return "false"
