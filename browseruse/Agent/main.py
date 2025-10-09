@@ -1,75 +1,162 @@
 # main.py
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from dotenv import load_dotenv
 import os
 import sys
-import uvicorn
+import traceback
+from typing import Dict, Optional
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-from browseruse.Agent.agent import chat
-from browseruse.tools.browserUseClient import send_task
+from agent import chat
+from emotion import EmotionIdentifier
 
-from browseruse.Agent.emotion import EmotionIdentifier
+BACKEND_PORT = 5000  # your port
+chat_history = []
+detector = EmotionIdentifier()
 
-load_dotenv()
-
-BACKEND_PORT = 5000  # choose your port
+# Store recent emotions to avoid duplicating work
+recent_emotions: Dict[str, str] = {}
 
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # allow all origins
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True,
 )
 
-class ChatRequest(BaseModel):
-    message: str
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    """
+    WebSocket endpoint for chat and emotion detection.
+    Expects JSON: {"type": "chat|emotion", "message": "..."}
+    Sends JSON: {"reply": "...", "emotion": "..."} or {"emotion": "..."}
+    """
+    await websocket.accept()
+    try:
+        while True:
+            # Receive and parse the WebSocket message
+            data = await websocket.receive_json()
+            request_type = data.get("type", "chat")  # Default to chat if type not specified
+            user_message = data.get("message", "")
+            
+            # Validate the message
+            if not user_message:
+                await websocket.send_json({
+                    "type": "error",
+                    "error": "No message provided"
+                })
+                continue
 
-class ChatResponse(BaseModel):
-    reply: str
+            print(f"[WebSocket] Received {request_type} request: '{user_message[:30]}...'")
+
+            try:
+                if request_type == "chat":
+                    # Check if we have already detected the emotion for this message
+                    emotion = recent_emotions.get(user_message, None)
+                    
+                    # If emotion was not previously detected, get it now
+                    if emotion is None:
+                        emotion = detector.identify_emotion(user_message)
+                        print(f"[WebSocket] Chat: Detected new emotion: {emotion}")
+                    else:
+                        print(f"[WebSocket] Chat: Using cached emotion: {emotion}")
+                        # Remove from cache after use
+                        del recent_emotions[user_message]
+                    
+                    # Now get the chat reply using the agent (which takes longer)
+                    chat_result = chat.invoke({"query": user_message})
+                    reply_text = chat_result['result']['formatted_response']
+
+                    # Send combined response with both reply and emotion
+                    await websocket.send_json({
+                        "type": "chat",
+                        "reply": reply_text,
+                        "emotion": emotion
+                    })
+                    print(f"[WebSocket] Chat: Sent reply with emotion: {emotion}")
+                
+                elif request_type == "emotion":
+                    # Handle emotion-only request
+                    emotion = detector.identify_emotion(user_message)
+                    
+                    # Cache the emotion for later use
+                    recent_emotions[user_message] = emotion
+                    
+                    # Send emotion-only response
+                    await websocket.send_json({
+                        "type": "emotion",
+                        "emotion": emotion
+                    })
+                    print(f"[WebSocket] Emotion: Detected '{emotion}' for message")
+                    
+                    # Clean cache after 5 minutes (not implemented for simplicity)
+                    # In a production environment, you'd want to implement a timeout mechanism
+                
+                else:
+                    # Unknown request type
+                    await websocket.send_json({
+                        "type": "error",
+                        "error": f"Unknown request type: {request_type}"
+                    })
+                    print(f"[WebSocket] Error: Unknown request type: {request_type}")
+            
+            except Exception as e:
+                # Handle errors in processing
+                error_message = f"Error processing {request_type} request: {str(e)}"
+                traceback_str = traceback.format_exc()
+                print(f"[WebSocket] {error_message}\n{traceback_str}")
+                
+                await websocket.send_json({
+                    "type": "error",
+                    "error": error_message
+                })
+
+    except WebSocketDisconnect:
+        print("[WebSocket] Client disconnected")
 
 
-chat_history = []
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "message": "Server is healthy"}
 
-@app.post("/speak", response_model=ChatResponse)
-def speak(req: ChatRequest):
-    send_task("refresh")
-    result = chat.invoke({
-            "query": chat_history + [{"role": "user", "content": req.message}]
-        })
-    reply=result['result']['formatted_response']
-    return ChatResponse(reply=reply)
 
-class EmotionRequest(BaseModel):
-    text: str
-detector = EmotionIdentifier()
+if __name__ == "__main__":
+    try:
+        import uvicorn
+    except ImportError:
+        print("uvicorn not found. Please install it with: pip install uvicorn")
+        print("Or: pip install -r requirements.txt")
+        import sys
+        sys.exit(1)
 
-@app.post("/emotion")
-async def emotion_endpoint(request: EmotionRequest):
-    # Format chat history if needed
-    history_text = ""
-    if  chat_history:
-        # Use only the last 3 entries if history is longer than 3
-        history_to_use = chat_history[-3:] if len(chat_history) > 3 else chat_history
-        
-        # Convert chat history to a readable format
-        history_text = "\n".join([
-            f"{'User' if getattr(msg, 'type', None) == 'human' else 'Assistant'}: {getattr(msg, 'content', '')}"
-            for msg in history_to_use if hasattr(msg, 'content')
-        ])
-        print(f"Formatted history for emotion detection:\n{history_text}")
-    # Pass the formatted history to the emotion identifier
-    emotion = detector.identify_emotion(request.text, history=history_text)
-    return {"emotion": emotion}
+    print(f"[Server] Starting backend on ws://127.0.0.1:{BACKEND_PORT} ...")
+    uvicorn.run(
+        "main:app",
+        host="127.0.0.1",
+        port=BACKEND_PORT,
+        reload=True
+    )
+
 
 def start_agent_server():
-    print(f"[Server] Starting backend on port {BACKEND_PORT}...")
-    uvicorn.run("browseruse.Agent.main:app", host="127.0.0.1", port=BACKEND_PORT, reload=True)
+    try:
+        import uvicorn
+    except ImportError:
+        print("uvicorn not found. Please install it with: pip install uvicorn")
+        print("Or: pip install -r requirements.txt")
+        import sys
+        sys.exit(1)
 
+    print(f"[Server] Starting backend on ws://127.0.0.1:{BACKEND_PORT} ...")
+    uvicorn.run(
+        "main:app",
+        host="127.0.0.1",
+        port=BACKEND_PORT,
+        reload=True
+    )
 # if __name__ == "__main__":
 #     start_agent_server()
