@@ -8,7 +8,7 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 from agent import chat
 
 from emotion import EmotionIdentifier
@@ -20,7 +20,7 @@ BACKEND_PORT = 5000  # choose your port
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://scratch.mit.edu"],
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True,
@@ -71,6 +71,12 @@ def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-
-    print(f"[Server] Starting backend on port {BACKEND_PORT}...")
-    uvicorn.run("main:app", host="127.0.0.1", port=BACKEND_PORT, reload=True)
+    print(f"[Server] Starting backend on https://127.0.0.1:{BACKEND_PORT} ...")
+    uvicorn.run(
+        "main:app",
+        host="127.0.0.1",
+        port=BACKEND_PORT,
+        reload=True,
+        ssl_keyfile="E:\\VS CODE\\Agentic AI\\BrowserUse\\key.pem",
+        ssl_certfile="E:\\VS CODE\\Agentic AI\\BrowserUse\\cert.pem"
+    )
