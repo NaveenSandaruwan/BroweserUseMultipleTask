@@ -9,8 +9,8 @@ from typing import Dict, Optional
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-from agent import chat
-from emotion import EmotionIdentifier
+from browseruse.Agent.agent import chat
+from browseruse.Agent.emotion import EmotionIdentifier
 
 BACKEND_PORT = 5000  # your port
 chat_history = []
@@ -124,22 +124,22 @@ def health_check():
     return {"status": "ok", "message": "Server is healthy"}
 
 
-if __name__ == "__main__":
-    try:
-        import uvicorn
-    except ImportError:
-        print("uvicorn not found. Please install it with: pip install uvicorn")
-        print("Or: pip install -r requirements.txt")
-        import sys
-        sys.exit(1)
+# if __name__ == "__main__":
+#     try:
+#         import uvicorn
+#     except ImportError:
+#         print("uvicorn not found. Please install it with: pip install uvicorn")
+#         print("Or: pip install -r requirements.txt")
+#         import sys
+#         sys.exit(1)
 
-    print(f"[Server] Starting backend on ws://127.0.0.1:{BACKEND_PORT} ...")
-    uvicorn.run(
-        "main:app",
-        host="127.0.0.1",
-        port=BACKEND_PORT,
-        reload=True
-    )
+#     print(f"[Server] Starting backend on ws://127.0.0.1:{BACKEND_PORT} ...")
+#     uvicorn.run(
+#         "main:app",
+#         host="127.0.0.1",
+#         port=BACKEND_PORT,
+#         reload=True
+#     )
 
 
 def start_agent_server():

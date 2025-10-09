@@ -201,6 +201,8 @@ def main():
         from browseruse.Agent.main import start_agent_server
         agent_server_process = multiprocessing.Process(target=start_agent_server)
         agent_server_process.start()
+        time.sleep(2)  # Give agent server time to start
+        print("✅ Agent server started")
 
     # Keep alive until processes finish
     try:
