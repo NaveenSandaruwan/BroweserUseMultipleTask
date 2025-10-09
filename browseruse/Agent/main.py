@@ -153,10 +153,10 @@ def start_agent_server():
 
     print(f"[Server] Starting backend on ws://127.0.0.1:{BACKEND_PORT} ...")
     uvicorn.run(
-        "main:app",
+        app,  # Pass the app object directly
         host="127.0.0.1",
         port=BACKEND_PORT,
-        reload=True
+        reload=False  # Disable reload for compiled executables
     )
 # if __name__ == "__main__":
 #     start_agent_server()

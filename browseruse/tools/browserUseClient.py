@@ -9,6 +9,7 @@ def send_task(task: str):
 
     host = "127.0.0.1"
     port = 65432
+    n = 0
     while True:
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -21,6 +22,10 @@ def send_task(task: str):
         except Exception as e:
             print("❌ Error occurred:", e)
             time.sleep(2)  
+            n += 1
+            if n >= 5:
+                print("❌ Max retries reached. Giving up.")
+                return False
             continue
 
 

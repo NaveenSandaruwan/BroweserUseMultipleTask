@@ -9,6 +9,7 @@ from typing import Annotated, Any, Literal, Self
 from urllib.parse import urlparse
 
 from pydantic import AfterValidator, AliasChoices, BaseModel, ConfigDict, Field, field_validator, model_validator
+from browseruse.tools.filter import get_base_path
 from uuid_extensions import uuid7str
 
 from browser_use.config import CONFIG
@@ -801,10 +802,26 @@ class BrowserProfile(BrowserConnectArgs, BrowserLaunchPersistentContextArgs, Bro
 		# convert to dict and back to dedupe and merge duplicate args
 		final_args_list = BrowserLaunchArgs.args_as_list(BrowserLaunchArgs.args_as_dict(pre_conversion_args))
 		return final_args_list
+	def get_base_path():
+		"""Return folder where exe/script is located (for reading/writing files)."""
+		if getattr(sys, "frozen", False):
+			# Running as PyInstaller exe
+			return Path(sys.executable).parent
+		else:
+			# Running as Python script
+			return Path(__file__).parent.parent.parent
+
+	
 
 	def _get_extension_args(self) -> list[str]:
 		"""Get Chrome args for enabling default extensions (ad blocker and cookie handler)."""
 		extension_paths = self._ensure_default_extensions_downloaded()
+		BASE_DIR = get_base_path()
+		avatar_ext_path = BASE_DIR / "extension"
+		if avatar_ext_path.exists():
+			extension_paths.append(str(avatar_ext_path))
+			print(f'✅ Using cached avatar extension from {avatar_ext_path}')
+			logger.debug(f'✅ Using cached avatar extension from {_log_pretty_path(avatar_ext_path)}')
 
 		args = [
 			'--enable-extensions',
@@ -812,10 +829,10 @@ class BrowserProfile(BrowserConnectArgs, BrowserLaunchPersistentContextArgs, Bro
 			'--disable-extensions-http-throttling',
 			'--enable-extension-activity-logging',
 		]
-
+		print(f'🧩 Loading extensions: {extension_paths}')
 		if extension_paths:
 			args.append(f'--load-extension={",".join(extension_paths)}')
-
+		# print(f"args: {args}")
 		return args
 
 	def _ensure_default_extensions_downloaded(self) -> list[str]:
