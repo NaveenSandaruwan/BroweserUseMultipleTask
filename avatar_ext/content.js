@@ -221,28 +221,69 @@ function createAvatarUI() {
 
   // Add event listener for Emotion test button
   emotionBtn.addEventListener("click", async () => {
-    const emotions = [
-      "happy",
-      "sad",
-      "angry",
-      "surprised",
-      "fearful",
-      "disgusted",
-      "neutral",
-    ];
-    const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+    try {
+      statusEl.textContent = "Testing emotion detection...";
 
-    statusEl.textContent = "Showing: " + randomEmotion;
-    updateAvatarEmotion(randomEmotion);
+      // Ensure WebSocket is connected
+      if (!isSocketConnected) {
+        console.log("WebSocket not connected, attempting to reconnect...");
+        connectWebSocket();
 
-    // Show a message
-    showSpeech(`Avatar is now feeling ${randomEmotion}`);
+        // Wait a bit for connection to establish
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Reset status after a delay
-    setTimeout(() => {
-      statusEl.textContent =
-        randomEmotion.charAt(0).toUpperCase() + randomEmotion.slice(1);
-    }, 2000);
+        // If still not connected, use a fallback
+        if (!isSocketConnected) {
+          throw new Error("WebSocket connection failed");
+        }
+      }
+
+      // Create a sample message to detect emotion from
+      const testMessages = [
+        "I'm so happy today!",
+        "That makes me sad",
+        "I'm really angry about this",
+        "Wow, that's surprising!",
+        "I'm afraid of what might happen",
+        "That's really disgusting",
+        "Just a normal day",
+      ];
+      const randomMessage =
+        testMessages[Math.floor(Math.random() * testMessages.length)];
+
+      // Send an emotion-only request
+      socket.send(
+        JSON.stringify({
+          type: "emotion",
+          message: randomMessage,
+        })
+      );
+
+      // Show what message was used
+      showSpeech(`Testing emotion detection with: "${randomMessage}"`);
+    } catch (err) {
+      // Fallback in case of error
+      console.error("Emotion test error:", err);
+      statusEl.textContent = "Error testing emotion";
+
+      // Use a random emotion as fallback
+      const emotions = [
+        "happy",
+        "sad",
+        "angry",
+        "surprised",
+        "fearful",
+        "disgusted",
+        "neutral",
+      ];
+      const randomEmotion =
+        emotions[Math.floor(Math.random() * emotions.length)];
+      updateAvatarEmotion(randomEmotion);
+
+      setTimeout(() => {
+        statusEl.textContent = "Fallback: " + randomEmotion;
+      }, 2000);
+    }
   });
 
   // Add event listener for save position button
@@ -373,21 +414,69 @@ function connectWebSocket() {
       const data = JSON.parse(event.data);
       console.log("WebSocket message received:", data);
 
-      if (data.reply) {
-        // Display the reply with markdown rendering
-        showSpeech(data.reply);
-
-        // Speak the reply
-        speakText(data.reply);
+      // Check if there's an error
+      if (data.error) {
+        console.error("Server error:", data.error);
+        const statusEl = document.getElementById("status");
+        if (statusEl) statusEl.textContent = `Error: ${data.error}`;
+        return;
       }
 
-      if (data.emotion) {
-        // Update avatar based on received emotion
-        updateAvatarEmotion(data.emotion);
+      // Handle different response types
+      const responseType = data.type || "chat"; // Default to chat for backward compatibility
+
+      if (responseType === "chat") {
+        // Chat response already has emotion processed earlier
+        // Just display the reply and speak it
+
+        // If emotion is provided again, update it (but it should already be updated)
+        if (data.emotion) {
+          console.log("Chat response includes emotion:", data.emotion);
+          // No need to call updateAvatarEmotion again as we've already done it
+          // in the separate emotion request, but do it as a fallback
+          updateAvatarEmotion(data.emotion);
+        }
+
+        // Display and speak the reply
+        if (data.reply) {
+          // Display the reply with markdown rendering
+          showSpeech(data.reply);
+
+          // Speak the reply
+          speakText(data.reply);
+
+          const statusEl = document.getElementById("status");
+          if (statusEl) statusEl.textContent = "Reply received";
+        }
+      } else if (responseType === "emotion") {
+        // Handle emotion-only response - this comes first in our new flow
+        if (data.emotion) {
+          console.log("Got emotion response first:", data.emotion);
+          // Update avatar based on received emotion immediately
+          updateAvatarEmotion(data.emotion);
+
+          const statusEl = document.getElementById("status");
+          if (statusEl)
+            statusEl.textContent = `Processing with emotion: ${data.emotion}`;
+
+          // Show a temporary message that we're waiting for the full response
+          showSpeech(`<i>Thinking with ${data.emotion} emotion...</i>`);
+        }
+      } else if (responseType === "error") {
+        console.error("Server returned error:", data.error);
+        const statusEl = document.getElementById("status");
+        if (statusEl) statusEl.textContent = `Error: ${data.error}`;
+
+        // Show the error in speech bubble
+        showSpeech(`Error: ${data.error}`);
       }
 
-      const statusEl = document.getElementById("status");
-      if (statusEl) statusEl.textContent = "Reply received";
+      // Dispatch a custom event that other handlers can listen for
+      // This is useful for promises waiting for specific responses
+      const customEvent = new CustomEvent("websocketMessage", {
+        detail: data,
+      });
+      document.dispatchEvent(customEvent);
     } catch (e) {
       console.error("Error processing WebSocket message:", e);
     }
@@ -447,7 +536,7 @@ if (!SpeechRecognitionAPI) {
   recognition.onresult = async (event) => {
     const transcript = event.results[0][0].transcript.trim();
     console.log("Heard:", transcript);
-    statusEl.textContent = "Sending to LLM...";
+    statusEl.textContent = "Processing...";
 
     try {
       // Ensure WebSocket is connected
@@ -464,8 +553,28 @@ if (!SpeechRecognitionAPI) {
         }
       }
 
-      // Send the message over WebSocket
-      socket.send(JSON.stringify({ message: transcript }));
+      // First, we detect emotion (which is faster)
+      statusEl.textContent = "Detecting emotion...";
+
+      // Send the message over WebSocket with type 'emotion'
+      socket.send(
+        JSON.stringify({
+          type: "emotion",
+          message: transcript,
+        })
+      );
+
+      // Wait a short time for the emotion to be processed
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      // Then send for full chat processing
+      statusEl.textContent = "Getting AI response...";
+      socket.send(
+        JSON.stringify({
+          type: "chat",
+          message: transcript,
+        })
+      );
 
       // Note: We no longer need to handle the response here
       // The WebSocket onmessage handler will take care of it
@@ -532,11 +641,55 @@ function showSpeech(text) {
 // Emotion Detection & Avatar Updates
 // =========================
 
-// This function is no longer needed as we get emotions directly from WebSocket
-// Kept as a placeholder in case we need to revert or implement local detection
-function detectEmotionLocally(text) {
-  console.log("Local emotion detection called - using neutral as default");
-  return "neutral"; // Default emotion
+// Function to detect emotion for text via WebSocket
+async function detectEmotion(text) {
+  return new Promise((resolve, reject) => {
+    try {
+      // Ensure WebSocket is connected
+      if (!isSocketConnected) {
+        console.log("WebSocket not connected for emotion detection");
+        resolve("neutral"); // Default fallback
+        return;
+      }
+
+      // Create a one-time message handler for this specific request
+      const messageHandler = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+
+          // Check if this is an emotion response
+          if (data.type === "emotion" && data.emotion) {
+            // Remove this one-time handler
+            socket.removeEventListener("message", messageHandler);
+            resolve(data.emotion);
+          }
+        } catch (e) {
+          console.error("Error in emotion detection handler:", e);
+        }
+      };
+
+      // Add the one-time message handler
+      socket.addEventListener("message", messageHandler);
+
+      // Send the emotion request
+      socket.send(
+        JSON.stringify({
+          type: "emotion",
+          message: text,
+        })
+      );
+
+      // Set a timeout to prevent hanging if no response
+      setTimeout(() => {
+        socket.removeEventListener("message", messageHandler);
+        console.log("Emotion detection timed out");
+        resolve("neutral"); // Default fallback
+      }, 3000);
+    } catch (error) {
+      console.error("Error detecting emotion:", error);
+      resolve("neutral"); // Default fallback
+    }
+  });
 }
 
 // Function to update avatar face based on emotion
