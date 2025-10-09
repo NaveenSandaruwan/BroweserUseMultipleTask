@@ -121,11 +121,11 @@ function initializeStyles() {
       text-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
   `;
-  
+
   document.head.appendChild(avatarStyles);
 }
 
 // Export functions
 window.AvatarStyles = {
-  initializeStyles
+  initializeStyles,
 };

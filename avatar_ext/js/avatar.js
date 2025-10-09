@@ -97,35 +97,35 @@ function updateAvatarEmotion(emotion) {
 function startThinkingAnimation() {
   const avatar = document.getElementById("python-avatar");
   const speechBubble = document.getElementById("python-avatar-speech");
-  
+
   if (!avatar) return;
-  
+
   // Hide speech bubble during thinking
   if (speechBubble) {
     speechBubble.style.opacity = 0;
   }
-  
+
   // Add thinking class to avatar for glow effect
   avatar.classList.add("avatar-thinking");
-  
+
   // Create thinking dots if they don't exist
   let thinkingDots = document.getElementById("thinking-dots");
   if (!thinkingDots) {
     thinkingDots = document.createElement("div");
     thinkingDots.id = "thinking-dots";
     thinkingDots.className = "thinking-dots";
-    
+
     // Create three dots
     for (let i = 0; i < 3; i++) {
       const dot = document.createElement("div");
       dot.className = "thinking-dot";
       thinkingDots.appendChild(dot);
     }
-    
+
     // Add to avatar container
     avatar.appendChild(thinkingDots);
   }
-  
+
   // Make dots visible
   thinkingDots.style.display = "flex";
 }
@@ -136,12 +136,12 @@ function startThinkingAnimation() {
 function stopThinkingAnimation() {
   const avatar = document.getElementById("python-avatar");
   const thinkingDots = document.getElementById("thinking-dots");
-  
+
   if (avatar) {
     // Remove thinking class from avatar
     avatar.classList.remove("avatar-thinking");
   }
-  
+
   if (thinkingDots) {
     // Hide thinking dots
     thinkingDots.style.display = "none";
@@ -171,7 +171,10 @@ async function detectEmotion(text) {
           // Check if this is an emotion response
           if (data.type === "emotion" && data.emotion) {
             // Remove this one-time handler
-            window.AvatarWebSocket.getSocket().removeEventListener("message", messageHandler);
+            window.AvatarWebSocket.getSocket().removeEventListener(
+              "message",
+              messageHandler
+            );
             resolve(data.emotion);
           }
         } catch (e) {
@@ -180,7 +183,10 @@ async function detectEmotion(text) {
       };
 
       // Add the one-time message handler
-      window.AvatarWebSocket.getSocket().addEventListener("message", messageHandler);
+      window.AvatarWebSocket.getSocket().addEventListener(
+        "message",
+        messageHandler
+      );
 
       // Send the emotion request
       window.AvatarWebSocket.send({
@@ -190,7 +196,10 @@ async function detectEmotion(text) {
 
       // Set a timeout to prevent hanging if no response
       setTimeout(() => {
-        window.AvatarWebSocket.getSocket().removeEventListener("message", messageHandler);
+        window.AvatarWebSocket.getSocket().removeEventListener(
+          "message",
+          messageHandler
+        );
         console.log("Emotion detection timed out");
         resolve("neutral"); // Default fallback
       }, 3000);
@@ -206,5 +215,5 @@ window.AvatarAnimations = {
   updateAvatarEmotion,
   startThinkingAnimation,
   stopThinkingAnimation,
-  detectEmotion
+  detectEmotion,
 };

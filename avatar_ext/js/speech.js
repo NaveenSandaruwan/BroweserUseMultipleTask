@@ -88,7 +88,7 @@ function setupSpeechRecognition(micBtn, statusEl) {
       // Start thinking animation and send for full chat processing
       statusEl.textContent = "Getting AI response...";
       window.AvatarAnimations.startThinkingAnimation();
-      
+
       window.AvatarWebSocket.sendMessage({
         type: "chat",
         message: transcript,
@@ -98,10 +98,10 @@ function setupSpeechRecognition(micBtn, statusEl) {
       // The WebSocket onmessage handler will take care of it
     } catch (err) {
       console.error("Error:", err);
-      
+
       // Stop thinking animation on error
       window.AvatarAnimations.stopThinkingAnimation();
-      
+
       statusEl.textContent = "Error! Check console.";
       const fallbackReply = `AI says: 'I heard '${transcript}', but there was an error connecting to the backend.'`;
       window.AvatarUI.showSpeech(fallbackReply);
@@ -174,5 +174,5 @@ window.AvatarSpeech = {
   initializeSpeechRecognition,
   setupSpeechRecognition,
   speakText,
-  testTTS
+  testTTS,
 };

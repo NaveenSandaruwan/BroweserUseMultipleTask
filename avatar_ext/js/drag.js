@@ -125,5 +125,5 @@ function makeDraggable(container) {
 
 // Export functions
 window.AvatarDrag = {
-  makeDraggable
+  makeDraggable,
 };

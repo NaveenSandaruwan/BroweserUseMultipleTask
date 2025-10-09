@@ -406,5 +406,5 @@ window.AvatarUI = {
   showSpeech,
   saveAvatarPosition,
   restoreAvatarPosition,
-  toggleAvatarUI
+  toggleAvatarUI,
 };

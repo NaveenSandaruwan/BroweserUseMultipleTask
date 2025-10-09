@@ -61,7 +61,7 @@ function connectWebSocket() {
       if (responseType === "chat") {
         // Stop thinking animation when we get the response
         window.AvatarAnimations.stopThinkingAnimation();
-        
+
         // Chat response already has emotion processed earlier
         // Just display the reply and speak it
 
@@ -101,7 +101,7 @@ function connectWebSocket() {
       } else if (responseType === "error") {
         // Stop thinking animation on error
         window.AvatarAnimations.stopThinkingAnimation();
-        
+
         console.error("Server returned error:", data.error);
         const statusEl = document.getElementById("status");
         if (statusEl) statusEl.textContent = `Error: ${data.error}`;
@@ -157,5 +157,5 @@ window.AvatarWebSocket = {
   connectWebSocket,
   sendMessage: sendMessage,
   isSocketConnected: isConnected,
-  getSocket
+  getSocket,
 };

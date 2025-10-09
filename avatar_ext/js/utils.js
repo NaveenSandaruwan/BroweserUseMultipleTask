@@ -32,5 +32,5 @@ function simpleMarkdownToHtml(markdownText) {
 
 // Export for use in other modules
 window.AvatarUtils = {
-  simpleMarkdownToHtml
+  simpleMarkdownToHtml,
 };

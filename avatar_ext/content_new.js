@@ -22,7 +22,8 @@ function initializeAvatarExtension() {
   }
 
   // 3. Create the UI
-  const { micBtn, statusEl, ttsBtn, emotionBtn } = window.AvatarUI.createAvatarUI();
+  const { micBtn, statusEl, ttsBtn, emotionBtn } =
+    window.AvatarUI.createAvatarUI();
 
   // 4. Setup speech recognition with UI elements
   window.AvatarSpeech.setupSpeechRecognition(micBtn, statusEl);
@@ -72,8 +73,8 @@ function setupMessageListeners() {
 // =========================
 
 // Initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => {
     setupMessageListeners();
     initializeAvatarExtension();
   });
