@@ -426,6 +426,9 @@ function connectWebSocket() {
       const responseType = data.type || "chat"; // Default to chat for backward compatibility
 
       if (responseType === "chat") {
+        // Stop thinking animation when we get the response
+        stopThinkingAnimation();
+
         // Chat response already has emotion processed earlier
         // Just display the reply and speak it
 
@@ -459,10 +462,13 @@ function connectWebSocket() {
           if (statusEl)
             statusEl.textContent = `Processing with emotion: ${data.emotion}`;
 
-          // Show a temporary message that we're waiting for the full response
-          showSpeech(`<i>Thinking with ${data.emotion} emotion...</i>`);
+          // Start thinking animation instead of showing text
+          startThinkingAnimation();
         }
       } else if (responseType === "error") {
+        // Stop thinking animation on error
+        stopThinkingAnimation();
+
         console.error("Server returned error:", data.error);
         const statusEl = document.getElementById("status");
         if (statusEl) statusEl.textContent = `Error: ${data.error}`;
@@ -567,8 +573,10 @@ if (!SpeechRecognitionAPI) {
       // Wait a short time for the emotion to be processed
       await new Promise((resolve) => setTimeout(resolve, 200));
 
-      // Then send for full chat processing
+      // Start thinking animation and send for full chat processing
       statusEl.textContent = "Getting AI response...";
+      startThinkingAnimation();
+
       socket.send(
         JSON.stringify({
           type: "chat",
@@ -580,6 +588,10 @@ if (!SpeechRecognitionAPI) {
       // The WebSocket onmessage handler will take care of it
     } catch (err) {
       console.error("Error:", err);
+
+      // Stop thinking animation on error
+      stopThinkingAnimation();
+
       statusEl.textContent = "Error! Check console.";
       const fallbackReply = `AI says: 'I heard '${transcript}', but there was an error connecting to the backend.'`;
       showSpeech(fallbackReply);
@@ -846,8 +858,109 @@ avatarStyles.textContent = `
     transform-origin: center;
     animation: blink 4s infinite;
   }
+  
+  /* Thinking animation styles */
+  .thinking-dots {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    display: flex;
+    gap: 3px;
+  }
+  
+  .thinking-dot {
+    width: 6px;
+    height: 6px;
+    background: #3776AB;
+    border-radius: 50%;
+    animation: thinkingPulse 1.4s ease-in-out infinite both;
+  }
+  
+  .thinking-dot:nth-child(1) { animation-delay: -0.32s; }
+  .thinking-dot:nth-child(2) { animation-delay: -0.16s; }
+  .thinking-dot:nth-child(3) { animation-delay: 0; }
+  
+  @keyframes thinkingPulse {
+    0%, 80%, 100% {
+      transform: scale(0.8);
+      opacity: 0.5;
+    }
+    40% {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+  }
+  
+  /* Avatar thinking glow effect */
+  .avatar-thinking {
+    box-shadow: 0 0 20px rgba(55, 118, 171, 0.6) !important;
+    animation: thinkingGlow 2s ease-in-out infinite alternate !important;
+  }
+  
+  @keyframes thinkingGlow {
+    from {
+      box-shadow: 0 0 15px rgba(55, 118, 171, 0.4);
+    }
+    to {
+      box-shadow: 0 0 25px rgba(55, 118, 171, 0.8);
+    }
+  }
 `;
 document.head.appendChild(avatarStyles);
+
+// =========================
+// Thinking Animation Functions
+// =========================
+function startThinkingAnimation() {
+  const avatar = document.getElementById("python-avatar");
+  const speechBubble = document.getElementById("python-avatar-speech");
+
+  if (!avatar) return;
+
+  // Hide speech bubble during thinking
+  if (speechBubble) {
+    speechBubble.style.opacity = 0;
+  }
+
+  // Add thinking class to avatar for glow effect
+  avatar.classList.add("avatar-thinking");
+
+  // Create thinking dots if they don't exist
+  let thinkingDots = document.getElementById("thinking-dots");
+  if (!thinkingDots) {
+    thinkingDots = document.createElement("div");
+    thinkingDots.id = "thinking-dots";
+    thinkingDots.className = "thinking-dots";
+
+    // Create three dots
+    for (let i = 0; i < 3; i++) {
+      const dot = document.createElement("div");
+      dot.className = "thinking-dot";
+      thinkingDots.appendChild(dot);
+    }
+
+    // Add to avatar container
+    avatar.appendChild(thinkingDots);
+  }
+
+  // Make dots visible
+  thinkingDots.style.display = "flex";
+}
+
+function stopThinkingAnimation() {
+  const avatar = document.getElementById("python-avatar");
+  const thinkingDots = document.getElementById("thinking-dots");
+
+  if (avatar) {
+    // Remove thinking class from avatar
+    avatar.classList.remove("avatar-thinking");
+  }
+
+  if (thinkingDots) {
+    // Hide thinking dots
+    thinkingDots.style.display = "none";
+  }
+}
 
 // =========================
 // Drag Functionality
