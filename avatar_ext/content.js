@@ -34,7 +34,7 @@ function createAvatarUI() {
     return getUIElements();
   }
 
-  // --- Main Container (Position: Top Right) ---
+  // --- Main Container (Position: Top Right, Draggable) ---
   const container = document.createElement("div");
   container.id = "avatar-extension-container";
   container.style.cssText = `
@@ -45,9 +45,10 @@ function createAvatarUI() {
         display: flex;
         flex-direction: column;
         align-items: flex-end; /* Align avatar/mic button to the right */
+        cursor: move; /* Show move cursor */
     `;
 
-  // --- Avatar Graphic Element ---
+  // --- Avatar Graphic Element with drag handle ---
   const avatar = document.createElement("div");
   avatar.id = "python-avatar";
   avatar.innerHTML = `
@@ -84,6 +85,7 @@ function createAvatarUI() {
         margin-bottom: 15px; 
         box-shadow: 0 3px 10px rgba(0,0,0,0.3);
         position: relative;
+        cursor: grab; /* Show grab cursor */
     `;
 
   // --- Speech Bubble (Scrollable and fixed height/width) ---
@@ -102,7 +104,7 @@ function createAvatarUI() {
         transition: opacity 0.3s ease;
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         
-        /* Positioning to the left of the avatar (since we're on right side of window) */
+        /* Positioning to the left of the avatar */
         position: absolute;
         top: 0;
         right: 90px; /* Position to the left of the avatar */
@@ -173,6 +175,24 @@ function createAvatarUI() {
         color: #333;
     `;
 
+  // Save position button
+  const savePositionBtn = document.createElement("button");
+  savePositionBtn.id = "save-position";
+  savePositionBtn.innerHTML = "📌";
+  savePositionBtn.title = "Save current position";
+  savePositionBtn.style.cssText = `
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #4285f4;
+        color: white;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        margin-right: 5px;
+    `;
+
   // Create a button container for all the small buttons
   const buttonContainer = document.createElement("div");
   buttonContainer.style.cssText = `
@@ -182,6 +202,7 @@ function createAvatarUI() {
     `;
   buttonContainer.appendChild(ttsBtn);
   buttonContainer.appendChild(emotionBtn);
+  buttonContainer.appendChild(savePositionBtn);
 
   // Append elements to container
   container.appendChild(avatar);
@@ -224,6 +245,11 @@ function createAvatarUI() {
     }, 2000);
   });
 
+  // Add event listener for save position button
+  savePositionBtn.addEventListener("click", () => {
+    saveAvatarPosition(true); // Show notification when button is clicked
+  });
+
   return { micBtn, statusEl, ttsBtn, emotionBtn };
 }
 
@@ -237,6 +263,49 @@ function getUIElements() {
   };
 }
 
+// Save avatar position to local storage
+function saveAvatarPosition(showNotification = false) {
+  const container = document.getElementById("avatar-extension-container");
+  if (container) {
+    const position = {
+      left: container.style.left,
+      top: container.style.top,
+      right: container.style.right,
+    };
+    localStorage.setItem("avatar-position", JSON.stringify(position));
+
+    // Show saved confirmation only if explicitly requested
+    if (showNotification) {
+      const statusEl = document.getElementById("status");
+      if (statusEl) {
+        statusEl.textContent = "Position saved!";
+        setTimeout(() => {
+          statusEl.textContent = "";
+        }, 2000);
+      }
+    }
+  }
+}
+
+// Restore avatar position from local storage
+function restoreAvatarPosition() {
+  try {
+    const savedPosition = localStorage.getItem("avatar-position");
+    if (savedPosition) {
+      const position = JSON.parse(savedPosition);
+      const container = document.getElementById("avatar-extension-container");
+      if (container) {
+        if (position.left) container.style.left = position.left;
+        if (position.top) container.style.top = position.top;
+        if (position.right && !position.left)
+          container.style.right = position.right;
+      }
+    }
+  } catch (e) {
+    console.error("Error restoring avatar position:", e);
+  }
+}
+
 // Function to toggle avatar UI visibility
 function toggleAvatarUI() {
   const container = document.getElementById("avatar-extension-container");
@@ -245,6 +314,7 @@ function toggleAvatarUI() {
       container.style.display === "none" ? "flex" : "none";
   } else {
     createAvatarUI();
+    restoreAvatarPosition();
   }
 }
 
@@ -626,5 +696,132 @@ avatarStyles.textContent = `
 `;
 document.head.appendChild(avatarStyles);
 
+// =========================
+// Drag Functionality
+// =========================
+function makeDraggable(container) {
+  let offsetX, offsetY;
+  let isDragging = false;
+
+  // Function to handle starting drag
+  function dragStart(e) {
+    // Check if we're clicking on a button or interactive element
+    if (e.target.tagName === "BUTTON") {
+      return; // Don't start dragging if clicking buttons
+    }
+
+    // Prevent default only for mouse events, not for touch events
+    if (e.type !== "touchstart") {
+      e.preventDefault();
+    }
+
+    // Get the initial position
+    const boundingRect = container.getBoundingClientRect();
+
+    // Use pageX/pageY for accurate positioning with scroll
+    const pageX = e.pageX || e.touches[0].pageX;
+    const pageY = e.pageY || e.touches[0].pageY;
+
+    // Calculate the offset of the mouse pointer from the top-left corner of the container
+    offsetX = pageX - boundingRect.left;
+    offsetY = pageY - boundingRect.top;
+
+    isDragging = true;
+
+    // Change cursor style
+    container.style.cursor = "grabbing";
+
+    // Add event listeners for drag and end
+    if (e.type === "mousedown") {
+      document.addEventListener("mousemove", dragMove);
+      document.addEventListener("mouseup", dragEnd);
+    } else if (e.type === "touchstart") {
+      document.addEventListener("touchmove", dragMove, { passive: false });
+      document.addEventListener("touchend", dragEnd);
+    }
+  }
+
+  // Function to handle drag movement
+  function dragMove(e) {
+    if (!isDragging) return;
+
+    // Prevent default to stop text selection during drag
+    e.preventDefault();
+
+    // Get current pointer position
+    const pageX = e.pageX || e.touches[0].pageX;
+    const pageY = e.pageY || e.touches[0].pageY;
+
+    // Calculate new position (with bounds checking)
+    const newLeft = pageX - offsetX;
+    const newTop = pageY - offsetY;
+
+    // Get viewport dimensions
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Get container dimensions
+    const containerWidth = container.offsetWidth;
+    const containerHeight = container.offsetHeight;
+
+    // Keep the avatar within the viewport
+    const boundedLeft = Math.max(
+      0,
+      Math.min(newLeft, viewportWidth - containerWidth)
+    );
+    const boundedTop = Math.max(
+      0,
+      Math.min(newTop, viewportHeight - containerHeight)
+    );
+
+    // Convert from absolute position to fixed position
+    container.style.left = boundedLeft + "px";
+    container.style.top = boundedTop + "px";
+    container.style.right = "auto"; // Clear the right position
+  }
+
+  // Function to handle end of drag
+  function dragEnd() {
+    isDragging = false;
+
+    // Change cursor back
+    container.style.cursor = "move";
+
+    // Remove event listeners
+    document.removeEventListener("mousemove", dragMove);
+    document.removeEventListener("mouseup", dragEnd);
+    document.removeEventListener("touchmove", dragMove);
+    document.removeEventListener("touchend", dragEnd);
+
+    // Automatically save the position when drag ends
+    saveAvatarPosition();
+
+    // Show subtle visual feedback that position was saved
+    const saveBtn = document.getElementById("save-position");
+    if (saveBtn) {
+      // Flash the save button briefly
+      const originalColor = saveBtn.style.backgroundColor;
+      saveBtn.style.backgroundColor = "#34A853"; // Green flash
+      setTimeout(() => {
+        saveBtn.style.backgroundColor = originalColor;
+      }, 300);
+    }
+  }
+
+  // Add event listeners for drag start
+  container.addEventListener("mousedown", dragStart);
+  container.addEventListener("touchstart", dragStart, { passive: true });
+
+  return container;
+}
+
 // Start the process of creating the UI when the script loads.
-createAvatarUI();
+const avatarUI = createAvatarUI();
+
+// Make the avatar container draggable
+const container = document.getElementById("avatar-extension-container");
+if (container) {
+  makeDraggable(container);
+  // Restore saved position if available
+  restoreAvatarPosition();
+}

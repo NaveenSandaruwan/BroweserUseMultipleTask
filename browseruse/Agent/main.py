@@ -37,19 +37,19 @@ async def websocket_endpoint(websocket: WebSocket):
             user_message = data.get("message", "")
 
             # Update chat history
-            chat_history.append({"role": "user", "content": user_message})
+            # chat_history.append({"role": "user", "content": user_message})
 
             # Chat reply
-            chat_result = chat.invoke({"query": chat_history})
+            chat_result = chat.invoke({"query": user_message})
             reply_text = chat_result['result']['formatted_response']
 
             # Emotion detection (using last 3 messages)
-            history_to_use = chat_history[-3:] if len(chat_history) > 3 else chat_history
-            history_text = "\n".join([
-                f"{'User' if msg.get('role') == 'user' else 'Assistant'}: {msg.get('content', '')}"
-                for msg in history_to_use
-            ])
-            emotion = detector.identify_emotion(user_message, history=history_text)
+            # history_to_use = chat_history[-3:] if len(chat_history) > 3 else chat_history
+            # history_text = "\n".join([
+            #     f"{'User' if msg.get('role') == 'user' else 'Assistant'}: {msg.get('content', '')}"
+            #     for msg in history_to_use
+            # ])
+            emotion = detector.identify_emotion(user_message)
 
             # Send combined response
             await websocket.send_json({
