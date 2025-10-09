@@ -256,10 +256,75 @@ chrome.runtime.onMessage.addListener((message) => {
 });
 
 // =========================
-// Speech Recognition
+// Speech Recognition & WebSocket Connection
 // =========================
 const SpeechRecognitionAPI =
   window.SpeechRecognition || window.webkitSpeechRecognition;
+
+// WebSocket connection variables
+let socket;
+let isSocketConnected = false;
+
+// Function to establish WebSocket connection
+function connectWebSocket() {
+  if (
+    socket &&
+    (socket.readyState === WebSocket.OPEN ||
+      socket.readyState === WebSocket.CONNECTING)
+  ) {
+    console.log("WebSocket already connected or connecting");
+    return socket;
+  }
+
+  socket = new WebSocket("ws://127.0.0.1:5000/ws");
+
+  socket.onopen = () => {
+    console.log("WebSocket connection established");
+    isSocketConnected = true;
+    const statusEl = document.getElementById("status");
+    if (statusEl) statusEl.textContent = "Connected to AI";
+  };
+
+  socket.onclose = () => {
+    console.log("WebSocket connection closed");
+    isSocketConnected = false;
+    const statusEl = document.getElementById("status");
+    if (statusEl) statusEl.textContent = "Disconnected";
+    setTimeout(connectWebSocket, 3000); // Try to reconnect after 3 seconds
+  };
+
+  socket.onerror = (error) => {
+    console.error("WebSocket error:", error);
+    isSocketConnected = false;
+  };
+
+  socket.onmessage = (event) => {
+    try {
+      const data = JSON.parse(event.data);
+      console.log("WebSocket message received:", data);
+
+      if (data.reply) {
+        // Display the reply with markdown rendering
+        showSpeech(data.reply);
+
+        // Speak the reply
+        speakText(data.reply);
+      }
+
+      if (data.emotion) {
+        // Update avatar based on received emotion
+        updateAvatarEmotion(data.emotion);
+      }
+
+      const statusEl = document.getElementById("status");
+      if (statusEl) statusEl.textContent = "Reply received";
+    } catch (e) {
+      console.error("Error processing WebSocket message:", e);
+    }
+  };
+
+  return socket;
+}
 
 if (!SpeechRecognitionAPI) {
   alert("Speech recognition not supported in this browser");
@@ -280,6 +345,9 @@ if (!SpeechRecognitionAPI) {
       }
     });
   }, 1000);
+
+  // Initialize WebSocket connection
+  connectWebSocket();
 
   const recognition = new SpeechRecognitionAPI();
   recognition.continuous = false;
@@ -312,30 +380,25 @@ if (!SpeechRecognitionAPI) {
     statusEl.textContent = "Sending to LLM...";
 
     try {
-      // First, detect emotion from user input
-      const emotion = await detectEmotion(transcript);
+      // Ensure WebSocket is connected
+      if (!isSocketConnected) {
+        console.log("WebSocket not connected, attempting to reconnect...");
+        connectWebSocket();
 
-      // Update avatar based on detected emotion
-      updateAvatarEmotion(emotion);
+        // Wait a bit for connection to establish
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Now send the message to the LLM for response
-      const response = await fetch("http://127.0.0.1:5000/speak", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: transcript }),
-      });
+        // If still not connected, throw error
+        if (!isSocketConnected) {
+          throw new Error("WebSocket connection failed");
+        }
+      }
 
-      if (!response.ok) throw new Error("Network response not OK");
+      // Send the message over WebSocket
+      socket.send(JSON.stringify({ message: transcript }));
 
-      const data = await response.json();
-      console.log("Backend reply:", data);
-      statusEl.textContent = "Reply received.";
-
-      // Display the reply with markdown rendering
-      showSpeech(data.reply);
-
-      // Speak the reply
-      speakText(data.reply);
+      // Note: We no longer need to handle the response here
+      // The WebSocket onmessage handler will take care of it
     } catch (err) {
       console.error("Error:", err);
       statusEl.textContent = "Error! Check console.";
@@ -399,29 +462,11 @@ function showSpeech(text) {
 // Emotion Detection & Avatar Updates
 // =========================
 
-// Function to detect emotion from text
-async function detectEmotion(text) {
-  try {
-    const response = await fetch("http://127.0.0.1:5000/emotion", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        text: text,
-        include_history: true,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Emotion detection failed: ${response.status}`);
-    }
-
-    const data = await response.json();
-    console.log("Emotion detected:", data.emotion);
-    return data.emotion;
-  } catch (error) {
-    console.error("Emotion detection error:", error);
-    return "neutral"; // Default fallback
-  }
+// This function is no longer needed as we get emotions directly from WebSocket
+// Kept as a placeholder in case we need to revert or implement local detection
+function detectEmotionLocally(text) {
+  console.log("Local emotion detection called - using neutral as default");
+  return "neutral"; // Default emotion
 }
 
 // Function to update avatar face based on emotion

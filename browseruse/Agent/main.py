@@ -1,82 +1,79 @@
 # main.py
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from dotenv import load_dotenv
 import os
 import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
-from agent import chat
 
+from agent import chat
 from emotion import EmotionIdentifier
 
-load_dotenv()
+BACKEND_PORT = 5000  # your port
+chat_history = []
+detector = EmotionIdentifier()
 
-BACKEND_PORT = 5000  # choose your port
-#allow this url origin for CORS https://scratch.mit.edu/projects/editor/?tutorial=getStarted
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # allow all origins
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True,
 )
 
-class ChatRequest(BaseModel):
-    message: str
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    """
+    WebSocket endpoint for chat and emotion detection.
+    Expects JSON: {"message": "..."}
+    Sends JSON: {"reply": "...", "emotion": "..."}
+    """
+    await websocket.accept()
+    try:
+        while True:
+            data = await websocket.receive_json()
+            user_message = data.get("message", "")
 
-class ChatResponse(BaseModel):
-    reply: str
+            # Update chat history
+            chat_history.append({"role": "user", "content": user_message})
 
+            # Chat reply
+            chat_result = chat.invoke({"query": chat_history})
+            reply_text = chat_result['result']['formatted_response']
 
-chat_history = []
+            # Emotion detection (using last 3 messages)
+            history_to_use = chat_history[-3:] if len(chat_history) > 3 else chat_history
+            history_text = "\n".join([
+                f"{'User' if msg.get('role') == 'user' else 'Assistant'}: {msg.get('content', '')}"
+                for msg in history_to_use
+            ])
+            emotion = detector.identify_emotion(user_message, history=history_text)
 
-@app.post("/speak", response_model=ChatResponse)
-def speak(req: ChatRequest):
-    result = chat.invoke({
-            "query": chat_history + [{"role": "user", "content": req.message}]
-        })
-    reply=result['result']['formatted_response']
-    return ChatResponse(reply=reply)
+            # Send combined response
+            await websocket.send_json({
+                "reply": reply_text,
+                "emotion": emotion
+            })
+            print(f"[WebSocket] Sent reply: {reply_text} with emotion: {emotion}")
 
-class EmotionRequest(BaseModel):
-    text: str
-detector = EmotionIdentifier()
+    except WebSocketDisconnect:
+        print("Client disconnected")
 
-@app.post("/emotion")
-async def emotion_endpoint(request: EmotionRequest):
-    # Format chat history if needed
-    history_text = ""
-    if  chat_history:
-        # Use only the last 3 entries if history is longer than 3
-        history_to_use = chat_history[-3:] if len(chat_history) > 3 else chat_history
-        
-        # Convert chat history to a readable format
-        history_text = "\n".join([
-            f"{'User' if getattr(msg, 'type', None) == 'human' else 'Assistant'}: {getattr(msg, 'content', '')}"
-            for msg in history_to_use if hasattr(msg, 'content')
-        ])
-        print(f"Formatted history for emotion detection:\n{history_text}")
-    # Pass the formatted history to the emotion identifier
-    emotion = detector.identify_emotion(request.text, history=history_text)
-    return {"emotion": emotion}
 
 @app.get("/health")
 def health_check():
     return {"status": "ok", "message": "Server is healthy"}
 
+
 if __name__ == "__main__":
     import uvicorn
-    print(f"[Server] Starting backend on https://127.0.0.1:{BACKEND_PORT} ...")
+
+    print(f"[Server] Starting backend on ws://127.0.0.1:{BACKEND_PORT} ...")
     uvicorn.run(
         "main:app",
         host="127.0.0.1",
         port=BACKEND_PORT,
-        reload=True,
-        ssl_keyfile="E:\\VS CODE\\Agentic AI\\BrowserUse\\key.pem",
-        ssl_certfile="E:\\VS CODE\\Agentic AI\\BrowserUse\\cert.pem"
+        reload=True
     )
