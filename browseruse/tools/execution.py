@@ -1,56 +1,644 @@
+# import os
+# import sys
+# import json
+# import os
+# import pychrome
+# # from dragTool import Toolbox 
+
+# import time
+# from difflib import SequenceMatcher
+# import time
+
+# _file_ = os.path.abspath(__file__)
+
+# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), '..')))
+# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), '../..')))
+# from tools.dragTool import Toolbox 
+# from dotenv import load_dotenv
+
+# load_dotenv()
+# from tools.browserUseClient import send_task
+
+# # assuming your dragTool.py defines a class
+
+# # Instantiate your drag tool
+# drag_tool = Toolbox()
+
+# ELEMENTS = os.getenv("ELEMENTS_DESCRIPTION_JSON_PATH")
+
+
+# with open(ELEMENTS, 'r') as f:
+#     category_data = json.load(f)
+
+# class Executor:
+
+
+#     def __init__(self, debug_port=9222, tab_index=0):
+#         self.debug_port = debug_port
+#         self.browser = pychrome.Browser(url=f"http://127.0.0.1:{self.debug_port}")
+#         self.tab = self.browser.list_tab()[tab_index]
+#         self.tab.start()
+
+
+#     @staticmethod
+#     def clean_workspace():
+#         """
+#         Clean the workspace by dragging all used blocks back to the palette.
+#         Uses get_list_of_used_blocks() to find blocks and their coordinates.
+#         """
+#         from tools.filter import find_used_blocks
+        
+#         print("🧹 Cleaning workspace...")
+        
+#         # Get all blocks currently in workspace
+#         used_blocks = find_used_blocks()
+        
+#         if not used_blocks or len(used_blocks) == 0:
+#             print("✓ Workspace is already empty")
+#             return True
+        
+#         print(f"Found {len(used_blocks)} blocks to remove")
+        
+#         # Drag each block back to the palette (reverse operation)
+#         for i, block in enumerate(used_blocks, 1):
+#             try:
+#                 # Current position in workspace
+#                 x_current = block["x"]
+#                 y_current = block["y"]
+                
+#                 # Target position (back to palette area - left side of screen)
+#                 # We drag them to a safe area outside the workspace
+#                 x_target = 100  # Left side (palette area)
+#                 y_target = 300  # Middle height
+                
+#                 print(f"  Removing block {i}/{len(used_blocks)}: '{block['text_content']}'")
+#                 print(f"    From workspace ({x_current}, {y_current}) → To palette ({x_target}, {y_target})")
+                
+#                 # Perform reverse drag
+#                 drag_tool.drag_and_drop(
+#                     x_start=x_current,
+#                     y_start=y_current,
+#                     x_end=x_target,
+#                     y_end=y_target
+#                 )
+                
+#                 time.sleep(0.3)  # Small delay between removals
+                
+#             except Exception as e:
+#                 print(f"  ⚠ Error removing block: {e}")
+#                 continue
+        
+#         print("✓ Workspace cleaned successfully")
+#         return True
+#     @staticmethod
+#     def find_closest_block(category: str, block_query: str) -> dict:
+#         """
+#         Find the closest matching block in description.json using fuzzy matching
+#         """
+#         description_path = os.getenv("ELEMENTS_DESCRIPTION_JSON_PATH")
+#         try:
+#             with open(description_path, 'r') as f:
+#                 descriptions = json.load(f)
+            
+#             if category in descriptions:
+#                 best_match = None
+#                 highest_ratio = 0
+                
+#                 # Search through all blocks in the category
+#                 for block in descriptions[category]["blocks"]:
+#                     ratio = SequenceMatcher(
+#                         None, block["name"].lower(), block_query.lower()
+#                     ).ratio()
+                    
+#                     if ratio > highest_ratio and ratio > 0.6:
+#                         highest_ratio = ratio
+#                         best_match = block
+                
+#                 if best_match:
+#                     coords = best_match["coordinates"]
+#                     x = float(coords.split("x: ")[1].split(",")[0])
+#                     y = float(coords.split("y: ")[1])
+                    
+#                     return {
+#                         "name": best_match["name"],
+#                         "description": best_match["description"],
+#                         "coordinates": {"x": x, "y": y},
+#                         "match_confidence": highest_ratio
+#                     }
+                    
+#         except Exception as e:
+#             print(f"Error finding block: {e}")
+#         return None  
+
+#     @staticmethod
+#     def executor_tool(json_plan: str, delay=0.5):
+#         """
+#         Executes a sequence of block manipulation commands generated by an agent.
+
+#         Arguments:
+#             - json_plan (str): A JSON string containing a list of steps to execute.
+#               Each step should specify:
+#             - step (int): The step number in the sequence.
+#             - category (str): The block category (e.g., "Events", "Control").
+#             - block (str): The name of the block to interact with.
+
+#         Example json_plan:
+#         {
+#           "steps": [
+#             {
+#               "step": 1,
+#               "category": "Events",
+#               "block": "when green flag clicked"
+#             },
+#             {
+#               "step": 2,
+#               "category": "Control",
+#               "block": "forever"
+#             }
+#           ]
+#         }
+
+#         The function locates each block by fuzzy matching, clicks the category tab,
+#         and performs drag-and-drop actions to build the desired program structure.
+#         """
+
+#          # Parse the JSON plan
+#         try:
+#             plan = json.loads(json_plan)
+#         except json.JSONDecodeError as e:
+#             print("Invalid JSON plan:", e)
+#             return "❌ Invalid JSON plan."
+        
+#         steps = plan.get("steps", [])
+#         print(f"Executing {len(steps)} steps...")
+#         scroll = False
+#         blockno = 1
+#         for step in steps:
+#             print(f"\nProcessing step: {step}")
+#             step_num = step["step"]
+#             category = step["category"]
+#             block = step["block"]
+
+
+
+#             # print(f"\nExecuting Step {step_num}: {category} → {block}")
+
+#             # 1. Find block in description.json
+#             match = Executor.find_closest_block(category, block)
+#             if not match:
+#                 print(f"❌ Could not find block '{block}' in category '{category}'")           
+#                 continue
+            
+#             start = match["coordinates"]
+#             x_start, y_start = start["x"], start["y"]
+            
+
+#             # scroll to the block position if needed
+       
+                
+
+
+#             # 2. Compute end position
+#             x_end = 350
+#             y_end = 140 + 37 * (blockno - 1)
+#             blockno += 1
+#             print(f"  Start position: ({x_start}, {y_start})")
+#             print(f"  End position:   ({x_end}, {y_end})")
+
+#             # 3. Click category tab first (if needed)
+#             category_position = category_data.get(category, {}).get("coordinates", "x: 0, y: 0")
+#             category_x, category_y = map(int, category_position.replace("x: ", "").replace("y: ", "").split(", "))
+#             drag_tool.click(category_x, category_y + 5)
+
+#             time.sleep(delay)
+#             if y_start > 700:
+#                 scroll = True
+#                 drag_tool.scroll( delta_y=405)
+                
+#                 y_start -= 405
+            
+#             if y_end > 700:
+#                 scroll = True
+#                 drag_tool.scroll( x=574, delta_y=405)
+                
+#                 y_end -= 405
+
+#             # 4. Drag and drop the block
+#             drag_tool.drag_and_drop(
+#                 x_start=x_start, 
+#                 y_start=y_start, 
+#                 x_end=x_end, 
+#                 y_end=y_end
+#             )
+#             if scroll:
+#                 time.sleep(1)
+#             scroll = False
+#         return "✅ Execution completed."
+
+#     @staticmethod
+#     def clean_and_execute_tool(json_plan: str, delay=0.5):
+#         """
+#         NEW TOOL: Cleans workspace first, then executes the new block sequence.
+#         This is specifically for CODE FIXING operations.
+        
+#         Steps:
+#         1. Get all blocks currently in workspace using get_list_of_used_blocks()
+#         2. Drag each block FROM workspace coordinates BACK to palette (reverse drag)
+#         3. Execute the new correct sequence of blocks
+        
+#         Arguments:
+#             - json_plan (str): JSON string with steps to execute
+#             - delay (float): Delay between operations
+            
+#         Returns:
+#             str: Success or error message
+#         """
+#         print("\n" + "="*60)
+#         print("🔧 CLEAN & EXECUTE TOOL")
+#         print("="*60)
+        
+#         # STEP 1: Clean the workspace
+#         print("\n[STEP 1] Cleaning existing workspace...")
+#         try:
+#             Executor.clean_workspace()
+#             time.sleep(1)  # Wait for cleanup to complete
+#         except Exception as e:
+#             print(f"⚠ Error during cleanup: {e}")
+#             print("Continuing with execution anyway...")
+        
+#         # STEP 2: Refresh to update DOM
+#         print("\n[STEP 2] Refreshing workspace state...")
+#         try:
+#             send_task("refresh")
+#             time.sleep(2)
+#         except Exception as e:
+#             print(f"⚠ Error refreshing: {e}")
+        
+#         # STEP 3: Execute new blocks
+#         print("\n[STEP 3] Executing new block sequence...")
+#         result = Executor.executor_tool(json_plan, delay)
+        
+#         print("\n" + "="*60)
+#         print("✅ CLEAN & EXECUTE COMPLETED")
+#         print("="*60)
+        
+#         return result
+
+# # if __name__ == "__main__":
+# #     # Example JSON plan
+# #     test_json_plan = json.dumps({
+# #   "steps": [
+# #     {
+# #       "step": 1,
+# #       "category": "Looks",
+# #       "block": "Hide"
+# #     },
+# #     {
+# #       "step": 2,
+# #       "category": "Looks",
+# #       "block": "show"
+# #     },
+# #     {
+# #       "step": 3,
+# #       "category": "Motion",
+# #       "block": "go to random position"
+# #     }
+# #   ]
+# # })
+
+# #     # Call the executor_tool function with the test JSON plan
+# # Executor.executor_tool(test_json_plan)
+
+
+
 import os
 import sys
 import json
-import os
+import time
 import pychrome
-# from dragTool import Toolbox 
-
-import time
 from difflib import SequenceMatcher
-import time
-
-_file_ = os.path.abspath(__file__)
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), '..')))
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), '../..')))
-from tools.dragTool import Toolbox 
 from dotenv import load_dotenv
 
-load_dotenv()
+_file_ = os.path.abspath(__file__)
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), '../..')))
+
+from tools.dragTool import Toolbox
 from tools.browserUseClient import send_task
 
-# assuming your dragTool.py defines a class
+load_dotenv()
 
-# Instantiate your drag tool
 drag_tool = Toolbox()
 
-ELEMENTS = os.getenv("ELEMENTS_DESCRIPTION_JSON_PATH")
-
+ELEMENTS = os.getenv("ELEMENTS_ENHANCED_DESCRIPTION_JSON_PATH")
 
 with open(ELEMENTS, 'r') as f:
     category_data = json.load(f)
 
-class Executor:
 
-
+class AdvancedExecutor:
+    """
+    Advanced executor with support for nested blocks and condition slots
+    """
+    
     def __init__(self, debug_port=9222, tab_index=0):
         self.debug_port = debug_port
         self.browser = pychrome.Browser(url=f"http://127.0.0.1:{self.debug_port}")
         self.tab = self.browser.list_tab()[tab_index]
         self.tab.start()
-
-
+        self.nesting_stack = []  # Track current nesting context
+        self.block_positions = {}  # Store positions of placed blocks
+        self.current_nesting_level = 0
+        
+    @staticmethod
+    def load_enhanced_descriptions():
+        """Load enhanced description file with nesting metadata"""
+        description_path = os.getenv("ELEMENTS_DESCRIPTION_JSON_PATH")
+        try:
+            with open(description_path, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Error loading descriptions: {e}")
+            return {}
+    
+    def get_block_metadata(self, category, block_name, descriptions):
+        """
+        Find block metadata from descriptions
+        
+        Returns:
+            dict: Block metadata including nesting info
+        """
+        if category not in descriptions:
+            return {}
+            
+        for block in descriptions[category].get("blocks", []):
+            ratio = SequenceMatcher(
+                None, block["name"].lower(), block_name.lower()
+            ).ratio()
+            if ratio > 0.6:
+                return block
+        return {}
+    
+    def calculate_position(self, step_data, descriptions):
+        """
+        Calculate X,Y coordinates based on placement type and nesting
+        
+        Args:
+            step_data: Step with placement and parent info
+            descriptions: Enhanced descriptions
+            
+        Returns:
+            tuple: (x_end, y_end)
+        """
+        placement = step_data.get("placement", "below")
+        parent_step = step_data.get("parent_step")
+        category = step_data["category"]
+        block_name = step_data["block"]
+        step_num = step_data["step"]
+        
+        # Get metadata for this block
+        block_meta = self.get_block_metadata(category, block_name, descriptions)
+        
+        # Base workspace coordinates
+        base_x = 350
+        base_y = 140
+        standard_spacing = 37  # Vertical spacing between blocks
+        
+        print(f"  Calculating position for: {block_name}")
+        print(f"  Placement: {placement}, Parent: {parent_step}")
+        
+        if placement == "root":
+            # Root level - first block
+            x_end = base_x
+            y_end = base_y
+            self.nesting_stack = [(step_num, x_end, y_end, 0)]
+            self.current_nesting_level = 0
+            
+        elif placement == "below":
+            # Directly below previous block
+            if self.nesting_stack:
+                last_step, last_x, last_y, last_level = self.nesting_stack[-1]
+                x_end = last_x
+                y_end = last_y + standard_spacing
+                self.nesting_stack.append((step_num, x_end, y_end, last_level))
+            else:
+                x_end = base_x
+                y_end = base_y
+                self.nesting_stack = [(step_num, x_end, y_end, 0)]
+                
+        elif placement == "inside":
+            # Inside a container block
+            if parent_step and parent_step in self.block_positions:
+                parent_pos = self.block_positions[parent_step]
+                parent_meta = parent_pos.get("metadata", {})
+                
+                # Get nesting offsets from parent
+                x_offset = parent_meta.get("nesting_offset_x", 11)
+                y_offset = parent_meta.get("nesting_offset_y", 35)
+                
+                # Check if there are already blocks inside this container
+                siblings_inside = [
+                    pos for pos in self.block_positions.values()
+                    if pos.get("parent_step") == parent_step 
+                    and pos.get("placement") == "inside"
+                    and pos.get("step") != step_num
+                ]
+                
+                if siblings_inside:
+                    # Stack below existing blocks inside container
+                    last_sibling = max(siblings_inside, key=lambda b: b["y"])
+                    x_end = last_sibling["x"]
+                    y_end = last_sibling["y"] + standard_spacing
+                else:
+                    # First block inside container
+                    x_end = parent_pos["x"] + x_offset
+                    y_end = parent_pos["y"] + y_offset
+                
+                self.current_nesting_level = parent_pos.get("nesting_level", 0) + 1
+                self.nesting_stack.append((step_num, x_end, y_end, self.current_nesting_level))
+                
+            else:
+                # Fallback if parent not found
+                x_end = base_x + 11
+                y_end = base_y + 35
+                self.nesting_stack.append((step_num, x_end, y_end, 1))
+                
+        elif placement == "condition":
+            # In a condition slot (diamond/hexagon)
+            if parent_step and parent_step in self.block_positions:
+                parent_pos = self.block_positions[parent_step]
+                parent_meta = parent_pos.get("metadata", {})
+                
+                # Get condition slot offsets
+                cond_x_offset = parent_meta.get("condition_offset_x", 60)
+                cond_y_offset = parent_meta.get("condition_offset_y", 5)
+                
+                x_end = parent_pos["x"] + cond_x_offset
+                y_end = parent_pos["y"] + cond_y_offset
+                
+                # Condition blocks don't change nesting stack
+            else:
+                x_end = base_x + 60
+                y_end = base_y + 5
+                
+        elif placement == "outside":
+            # Exit container, return to parent's level
+            if parent_step and parent_step in self.block_positions:
+                parent_pos = self.block_positions[parent_step]
+                parent_level = parent_pos.get("nesting_level", 0)
+                
+                # Find last block at parent level
+                parent_level_blocks = [
+                    pos for pos in self.block_positions.values()
+                    if pos.get("nesting_level") == parent_level
+                ]
+                
+                if parent_level_blocks:
+                    last_at_level = max(parent_level_blocks, key=lambda b: b["y"])
+                    x_end = last_at_level["x"]
+                    y_end = last_at_level["y"] + standard_spacing + 35  # Extra space for container bottom
+                else:
+                    x_end = parent_pos["x"]
+                    y_end = parent_pos["y"] + 70
+                
+                self.current_nesting_level = parent_level
+                self.nesting_stack.append((step_num, x_end, y_end, parent_level))
+            else:
+                # Fallback
+                if self.nesting_stack:
+                    self.nesting_stack.pop()
+                if self.nesting_stack:
+                    last_step, last_x, last_y, last_level = self.nesting_stack[-1]
+                    x_end = last_x
+                    y_end = last_y + 70
+                else:
+                    x_end = base_x
+                    y_end = base_y + 70
+        else:
+            # Default: treat as below
+            x_end = base_x
+            y_end = base_y
+        
+        print(f"  Position calculated: ({x_end}, {y_end})")
+        return x_end, y_end
+    
+    @staticmethod
+    def find_closest_block(category, block_query, descriptions):
+        """Find block using fuzzy matching"""
+        if category not in descriptions:
+            return None
+            
+        best_match = None
+        highest_ratio = 0
+        
+        for block in descriptions[category].get("blocks", []):
+            ratio = SequenceMatcher(
+                None, block["name"].lower(), block_query.lower()
+            ).ratio()
+            
+            if ratio > highest_ratio and ratio > 0.6:
+                highest_ratio = ratio
+                best_match = block
+        
+        if best_match:
+            coords = best_match["coordinates"]
+            x = float(coords.split("x: ")[1].split(",")[0])
+            y = float(coords.split("y: ")[1])
+            
+            return {
+                "name": best_match["name"],
+                "description": best_match["description"],
+                "coordinates": {"x": x, "y": y},
+                "metadata": best_match
+            }
+        return None
+    
+    def execute_with_nesting(self, json_plan, delay=0.5):
+        """
+        Execute blocks with full nesting support
+        
+        Args:
+            json_plan: JSON string with enhanced step format
+            delay: Delay between operations
+            
+        Returns:
+            str: Success message
+        """
+        try:
+            plan = json.loads(json_plan)
+        except json.JSONDecodeError as e:
+            print(f"Invalid JSON: {e}")
+            return "❌ Invalid JSON plan."
+        
+        steps = plan.get("steps", [])
+        descriptions = self.load_enhanced_descriptions()
+        
+        print(f"\n{'='*60}")
+        print(f"ADVANCED EXECUTOR - Processing {len(steps)} steps")
+        print(f"{'='*60}\n")
+        
+        for step in steps:
+            step_num = step["step"]
+            category = step["category"]
+            block_name = step["block"]
+            placement = step.get("placement", "below")
+            
+            print(f"\n[Step {step_num}] {block_name}")
+            
+            # Find block in palette
+            match = self.find_closest_block(category, block_name, descriptions)
+            if not match:
+                print(f"❌ Could not find block '{block_name}' in category '{category}'")
+                continue
+            
+            start = match["coordinates"]
+            x_start, y_start = start["x"], start["y"]
+            
+            # Calculate end position with nesting
+            x_end, y_end = self.calculate_position(step, descriptions)
+            
+            # Store block position for reference
+            block_meta = self.get_block_metadata(category, block_name, descriptions)
+            self.block_positions[step_num] = {
+                "step": step_num,
+                "x": x_end,
+                "y": y_end,
+                "placement": placement,
+                "parent_step": step.get("parent_step"),
+                "nesting_level": self.current_nesting_level,
+                "metadata": block_meta
+            }
+            
+            # Click category tab
+            category_position = category_data.get(category, {}).get("coordinates", "x: 0, y: 0")
+            category_x, category_y = map(int, category_position.replace("x: ", "").replace("y: ", "").split(", "))
+            drag_tool.click(category_x, category_y + 5)
+            
+            time.sleep(delay)
+            
+            # Drag and drop
+            print(f"  Dragging from ({x_start}, {y_start}) to ({x_end}, {y_end})")
+            drag_tool.drag_and_drop(
+                x_start=x_start,
+                y_start=y_start,
+                x_end=x_end,
+                y_end=y_end
+            )
+            
+            time.sleep(delay)
+        
+        print(f"\n{'='*60}")
+        print("✅ ADVANCED EXECUTION COMPLETED")
+        print(f"{'='*60}\n")
+        
+        return "✅ Execution completed."
+    
     @staticmethod
     def clean_workspace():
-        """
-        Clean the workspace by dragging all used blocks back to the palette.
-        Uses get_list_of_used_blocks() to find blocks and their coordinates.
-        """
+        """Clean workspace before execution"""
         from tools.filter import find_used_blocks
         
         print("🧹 Cleaning workspace...")
-        
-        # Get all blocks currently in workspace
         used_blocks = find_used_blocks()
         
         if not used_blocks or len(used_blocks) == 0:
@@ -59,22 +647,15 @@ class Executor:
         
         print(f"Found {len(used_blocks)} blocks to remove")
         
-        # Drag each block back to the palette (reverse operation)
         for i, block in enumerate(used_blocks, 1):
             try:
-                # Current position in workspace
                 x_current = block["x"]
                 y_current = block["y"]
-                
-                # Target position (back to palette area - left side of screen)
-                # We drag them to a safe area outside the workspace
-                x_target = 100  # Left side (palette area)
-                y_target = 300  # Middle height
+                x_target = 100
+                y_target = 300
                 
                 print(f"  Removing block {i}/{len(used_blocks)}: '{block['text_content']}'")
-                print(f"    From workspace ({x_current}, {y_current}) → To palette ({x_target}, {y_target})")
                 
-                # Perform reverse drag
                 drag_tool.drag_and_drop(
                     x_start=x_current,
                     y_start=y_current,
@@ -82,230 +663,38 @@ class Executor:
                     y_end=y_target
                 )
                 
-                time.sleep(0.3)  # Small delay between removals
-                
+                time.sleep(0.3)
             except Exception as e:
                 print(f"  ⚠ Error removing block: {e}")
                 continue
         
         print("✓ Workspace cleaned successfully")
         return True
-    @staticmethod
-    def find_closest_block(category: str, block_query: str) -> dict:
-        """
-        Find the closest matching block in description.json using fuzzy matching
-        """
-        description_path = os.getenv("ELEMENTS_DESCRIPTION_JSON_PATH")
-        try:
-            with open(description_path, 'r') as f:
-                descriptions = json.load(f)
-            
-            if category in descriptions:
-                best_match = None
-                highest_ratio = 0
-                
-                # Search through all blocks in the category
-                for block in descriptions[category]["blocks"]:
-                    ratio = SequenceMatcher(
-                        None, block["name"].lower(), block_query.lower()
-                    ).ratio()
-                    
-                    if ratio > highest_ratio and ratio > 0.6:
-                        highest_ratio = ratio
-                        best_match = block
-                
-                if best_match:
-                    coords = best_match["coordinates"]
-                    x = float(coords.split("x: ")[1].split(",")[0])
-                    y = float(coords.split("y: ")[1])
-                    
-                    return {
-                        "name": best_match["name"],
-                        "description": best_match["description"],
-                        "coordinates": {"x": x, "y": y},
-                        "match_confidence": highest_ratio
-                    }
-                    
-        except Exception as e:
-            print(f"Error finding block: {e}")
-        return None  
-
-    @staticmethod
-    def executor_tool(json_plan: str, delay=0.5):
-        """
-        Executes a sequence of block manipulation commands generated by an agent.
-
-        Arguments:
-            - json_plan (str): A JSON string containing a list of steps to execute.
-              Each step should specify:
-            - step (int): The step number in the sequence.
-            - category (str): The block category (e.g., "Events", "Control").
-            - block (str): The name of the block to interact with.
-
-        Example json_plan:
-        {
-          "steps": [
-            {
-              "step": 1,
-              "category": "Events",
-              "block": "when green flag clicked"
-            },
-            {
-              "step": 2,
-              "category": "Control",
-              "block": "forever"
-            }
-          ]
-        }
-
-        The function locates each block by fuzzy matching, clicks the category tab,
-        and performs drag-and-drop actions to build the desired program structure.
-        """
-
-         # Parse the JSON plan
-        try:
-            plan = json.loads(json_plan)
-        except json.JSONDecodeError as e:
-            print("Invalid JSON plan:", e)
-            return "❌ Invalid JSON plan."
-        
-        steps = plan.get("steps", [])
-        print(f"Executing {len(steps)} steps...")
-        scroll = False
-        blockno = 1
-        for step in steps:
-            print(f"\nProcessing step: {step}")
-            step_num = step["step"]
-            category = step["category"]
-            block = step["block"]
-
-
-
-            # print(f"\nExecuting Step {step_num}: {category} → {block}")
-
-            # 1. Find block in description.json
-            match = Executor.find_closest_block(category, block)
-            if not match:
-                print(f"❌ Could not find block '{block}' in category '{category}'")           
-                continue
-            
-            start = match["coordinates"]
-            x_start, y_start = start["x"], start["y"]
-            
-
-            # scroll to the block position if needed
-       
-                
-
-
-            # 2. Compute end position
-            x_end = 350
-            y_end = 140 + 37 * (blockno - 1)
-            blockno += 1
-            print(f"  Start position: ({x_start}, {y_start})")
-            print(f"  End position:   ({x_end}, {y_end})")
-
-            # 3. Click category tab first (if needed)
-            category_position = category_data.get(category, {}).get("coordinates", "x: 0, y: 0")
-            category_x, category_y = map(int, category_position.replace("x: ", "").replace("y: ", "").split(", "))
-            drag_tool.click(category_x, category_y + 5)
-
-            time.sleep(delay)
-            if y_start > 700:
-                scroll = True
-                drag_tool.scroll( delta_y=405)
-                
-                y_start -= 405
-            
-            if y_end > 700:
-                scroll = True
-                drag_tool.scroll( x=574, delta_y=405)
-                
-                y_end -= 405
-
-            # 4. Drag and drop the block
-            drag_tool.drag_and_drop(
-                x_start=x_start, 
-                y_start=y_start, 
-                x_end=x_end, 
-                y_end=y_end
-            )
-            if scroll:
-                time.sleep(1)
-            scroll = False
-        return "✅ Execution completed."
-
-    @staticmethod
-    def clean_and_execute_tool(json_plan: str, delay=0.5):
-        """
-        NEW TOOL: Cleans workspace first, then executes the new block sequence.
-        This is specifically for CODE FIXING operations.
-        
-        Steps:
-        1. Get all blocks currently in workspace using get_list_of_used_blocks()
-        2. Drag each block FROM workspace coordinates BACK to palette (reverse drag)
-        3. Execute the new correct sequence of blocks
-        
-        Arguments:
-            - json_plan (str): JSON string with steps to execute
-            - delay (float): Delay between operations
-            
-        Returns:
-            str: Success or error message
-        """
+    
+    def clean_and_execute(self, json_plan, delay=0.5):
+        """Clean workspace then execute with nesting"""
         print("\n" + "="*60)
-        print("🔧 CLEAN & EXECUTE TOOL")
+        print("🔧 CLEAN & EXECUTE WITH NESTING")
         print("="*60)
         
-        # STEP 1: Clean the workspace
-        print("\n[STEP 1] Cleaning existing workspace...")
+        # Clean
+        print("\n[STEP 1] Cleaning workspace...")
         try:
-            Executor.clean_workspace()
-            time.sleep(1)  # Wait for cleanup to complete
+            self.clean_workspace()
+            time.sleep(1)
         except Exception as e:
             print(f"⚠ Error during cleanup: {e}")
-            print("Continuing with execution anyway...")
         
-        # STEP 2: Refresh to update DOM
-        print("\n[STEP 2] Refreshing workspace state...")
+        # Refresh
+        print("\n[STEP 2] Refreshing...")
         try:
             send_task("refresh")
             time.sleep(2)
         except Exception as e:
             print(f"⚠ Error refreshing: {e}")
         
-        # STEP 3: Execute new blocks
-        print("\n[STEP 3] Executing new block sequence...")
-        result = Executor.executor_tool(json_plan, delay)
-        
-        print("\n" + "="*60)
-        print("✅ CLEAN & EXECUTE COMPLETED")
-        print("="*60)
+        # Execute
+        print("\n[STEP 3] Executing with nesting...")
+        result = self.execute_with_nesting(json_plan, delay)
         
         return result
-
-# if __name__ == "__main__":
-#     # Example JSON plan
-#     test_json_plan = json.dumps({
-#   "steps": [
-#     {
-#       "step": 1,
-#       "category": "Looks",
-#       "block": "Hide"
-#     },
-#     {
-#       "step": 2,
-#       "category": "Looks",
-#       "block": "show"
-#     },
-#     {
-#       "step": 3,
-#       "category": "Motion",
-#       "block": "go to random position"
-#     }
-#   ]
-# })
-
-#     # Call the executor_tool function with the test JSON plan
-# Executor.executor_tool(test_json_plan)
-

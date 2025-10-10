@@ -10,8 +10,10 @@ from typing import Literal
 from langgraph.graph import StateGraph, END, START
 import pprint
 
-from tools.execution import Executor
+from tools.execution import AdvancedExecutor
+
 from langchain_core.messages import HumanMessage
+from utils.tool import make_blocks_advanced, clean_and_make_blocks_advanced
 
 from langchain_core.tools import tool
 
@@ -26,10 +28,10 @@ from utils.jsonextract import extract_first_steps_json,extract_and_format_first_
 from tools.browserUseClient import send_task
 from tools.dragTool import Toolbox
 from tools.filter import filter_json, find_used_blocks, get_list_of_used_blocks, get_category_coordinates, generate_detailed_blocks_summary
-from tools.execution import Executor
+# from tools.execution import Executor
 from reactAgents import command_agent,explaining_agent,debugging_agent,general_coding_agent,format_agent,general_agent,code_fixing_agent
 from utils.state import State
-from utils.tool import make_blocks, clean_and_make_blocks
+# from utils.tool import make_blocks, clean_and_make_blocks
 
 GEMINIAPI = os.getenv("GOOGLE_API_KEY")
 model = ChatGoogleGenerativeAI(
@@ -44,7 +46,7 @@ model2 = ChatGoogleGenerativeAI(
     temperature=0.1  # Lower temperature for more consistent responses
 )
 
-executor = Executor()
+executor = AdvancedExecutor()
 
 
 def llm_router(state: State) -> Literal["code_explain", "code_debugging", "give_instructions","make_blocks", "code_fixing"]:
@@ -134,20 +136,31 @@ def make_blocks_node(state: State) -> State:
     result = command_agent.invoke({"messages": [state['result']['instructions']]})
     return {"result": {"make_blocks": result["messages"][-1].content}}
 
+# def execute_blocks_node(state: State) -> State:
+#     # take state['result']['make_blocks'] and extract json object from it
+#     json_object = extract_and_format_first_json(state['result']['make_blocks'])
+#     # print("Extracted JSON:", json_object)
+#     try:
+#         result = make_blocks(json_object)
+#         # time.sleep(10)  # wait for 2 seconds to ensure the workspace is updated
+#         result = "true"
+#     except Exception as e:
+#         result = f"false"
+#         # print(f"Error occurred: {e}")
+#     # print(json_object)
+#     finally:
+#     # result = command_executor.invoke({"messages": [state['result']['make_blocks']]})
+#         return {"result": {"execute_blocks": result}}
+
+
 def execute_blocks_node(state: State) -> State:
-    # take state['result']['make_blocks'] and extract json object from it
     json_object = extract_and_format_first_json(state['result']['make_blocks'])
-    # print("Extracted JSON:", json_object)
     try:
-        result = make_blocks(json_object)
-        # time.sleep(10)  # wait for 2 seconds to ensure the workspace is updated
+        result = make_blocks_advanced(json_object)  # CHANGED
         result = "true"
     except Exception as e:
-        result = f"false"
-        # print(f"Error occurred: {e}")
-    # print(json_object)
+        result = "false"
     finally:
-    # result = command_executor.invoke({"messages": [state['result']['make_blocks']]})
         return {"result": {"execute_blocks": result}}
 
 def general_agent_node(state: State) -> State:
@@ -204,19 +217,29 @@ def execute_fix_node(state: State) -> State:
     return {"result": {"fix_commands": json_commands}}
 
 
-def execute_fix_blocks_node(state: State) -> State:
-    """
-    Executes the fix by cleaning workspace and placing blocks in correct order.
-    Uses the NEW clean_and_make_blocks tool.
-    """
-    json_object = extract_and_format_first_json(state['result']['fix_commands'])
+# def execute_fix_blocks_node(state: State) -> State:
+#     """
+#     Executes the fix by cleaning workspace and placing blocks in correct order.
+#     Uses the NEW clean_and_make_blocks tool.
+#     """
+#     json_object = extract_and_format_first_json(state['result']['fix_commands'])
     
+#     try:
+#         # Use the NEW tool that cleans THEN executes
+#         result = clean_and_make_blocks(json_object)
+#         result = "true" if result == "true" else "false"
+#     except Exception as e:
+#         result = "false"
+#         print(f"Error executing fix: {e}")
+    
+#     return {"result": {"execute_fix": result}}
+
+def execute_fix_blocks_node(state: State) -> State:
+    json_object = extract_and_format_first_json(state['result']['fix_commands'])
     try:
-        # Use the NEW tool that cleans THEN executes
-        result = clean_and_make_blocks(json_object)
+        result = clean_and_make_blocks_advanced(json_object)  # CHANGED
         result = "true" if result == "true" else "false"
     except Exception as e:
         result = "false"
         print(f"Error executing fix: {e}")
-    
     return {"result": {"execute_fix": result}}
