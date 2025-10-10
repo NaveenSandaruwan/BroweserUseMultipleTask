@@ -16,7 +16,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')
 
 from utils.state import State
 from nodes import (
-    llm_router,code_explain_node,give_instructions_node,
+    format_query, llm_router,code_explain_node,give_instructions_node,
     code_debugging_node,make_blocks_node,execute_blocks_node,
     format_response,general_agent_node,handle_execution_error,
     code_fixing_node, execute_fix_node, execute_fix_blocks_node 
@@ -26,6 +26,7 @@ from nodes import (
 graph = StateGraph(State)
 
 # Add all nodes
+# graph.add_node("format_query", format_query)
 graph.add_node("router", lambda x: x)
 graph.add_node("code_explain", code_explain_node)
 graph.add_node("code_debugging", code_debugging_node)
@@ -62,10 +63,16 @@ graph.add_edge("execute_fix", "execute_fix_blocks")
 graph.add_edge("execute_fix_blocks", "format_response")
 
 # Existing flows
+
 graph.add_edge("code_explain", "format_response")
+
 graph.add_edge("code_debugging", "format_response")
+
 graph.add_edge("give_instructions", "format_response")
+
 graph.add_edge("general_agent", "format_response")
+
+
 graph.add_edge("give_instructions_2", "make_blocks")
 graph.add_edge("make_blocks", "execute_blocks")
 

@@ -34,7 +34,7 @@ function createAvatarUI() {
     return getUIElements();
   }
 
-  // --- Main Container (Position: Top Right) ---
+  // --- Main Container (Position: Top Right, Draggable) ---
   const container = document.createElement("div");
   container.id = "avatar-extension-container";
   container.style.cssText = `
@@ -45,9 +45,10 @@ function createAvatarUI() {
         display: flex;
         flex-direction: column;
         align-items: flex-end; /* Align avatar/mic button to the right */
+        cursor: move; /* Show move cursor */
     `;
 
-  // --- Avatar Graphic Element ---
+  // --- Avatar Graphic Element with drag handle ---
   const avatar = document.createElement("div");
   avatar.id = "python-avatar";
   avatar.innerHTML = `
@@ -84,6 +85,7 @@ function createAvatarUI() {
         margin-bottom: 15px; 
         box-shadow: 0 3px 10px rgba(0,0,0,0.3);
         position: relative;
+        cursor: grab; /* Show grab cursor */
     `;
 
   // --- Speech Bubble (Scrollable and fixed height/width) ---
@@ -102,7 +104,7 @@ function createAvatarUI() {
         transition: opacity 0.3s ease;
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         
-        /* Positioning to the left of the avatar (since we're on right side of window) */
+        /* Positioning to the left of the avatar */
         position: absolute;
         top: 0;
         right: 90px; /* Position to the left of the avatar */
@@ -173,6 +175,24 @@ function createAvatarUI() {
         color: #333;
     `;
 
+  // Save position button
+  const savePositionBtn = document.createElement("button");
+  savePositionBtn.id = "save-position";
+  savePositionBtn.innerHTML = "📌";
+  savePositionBtn.title = "Save current position";
+  savePositionBtn.style.cssText = `
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #4285f4;
+        color: white;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        margin-right: 5px;
+    `;
+
   // Create a button container for all the small buttons
   const buttonContainer = document.createElement("div");
   buttonContainer.style.cssText = `
@@ -182,6 +202,7 @@ function createAvatarUI() {
     `;
   buttonContainer.appendChild(ttsBtn);
   buttonContainer.appendChild(emotionBtn);
+  buttonContainer.appendChild(savePositionBtn);
 
   // Append elements to container
   container.appendChild(avatar);
@@ -200,28 +221,74 @@ function createAvatarUI() {
 
   // Add event listener for Emotion test button
   emotionBtn.addEventListener("click", async () => {
-    const emotions = [
-      "happy",
-      "sad",
-      "angry",
-      "surprised",
-      "fearful",
-      "disgusted",
-      "neutral",
-    ];
-    const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+    try {
+      statusEl.textContent = "Testing emotion detection...";
 
-    statusEl.textContent = "Showing: " + randomEmotion;
-    updateAvatarEmotion(randomEmotion);
+      // Ensure WebSocket is connected
+      if (!isSocketConnected) {
+        console.log("WebSocket not connected, attempting to reconnect...");
+        connectWebSocket();
 
-    // Show a message
-    showSpeech(`Avatar is now feeling ${randomEmotion}`);
+        // Wait a bit for connection to establish
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Reset status after a delay
-    setTimeout(() => {
-      statusEl.textContent =
-        randomEmotion.charAt(0).toUpperCase() + randomEmotion.slice(1);
-    }, 2000);
+        // If still not connected, use a fallback
+        if (!isSocketConnected) {
+          throw new Error("WebSocket connection failed");
+        }
+      }
+
+      // Create a sample message to detect emotion from
+      const testMessages = [
+        "I'm so happy today!",
+        "That makes me sad",
+        "I'm really angry about this",
+        "Wow, that's surprising!",
+        "I'm afraid of what might happen",
+        "That's really disgusting",
+        "Just a normal day",
+      ];
+      const randomMessage =
+        testMessages[Math.floor(Math.random() * testMessages.length)];
+
+      // Send an emotion-only request
+      socket.send(
+        JSON.stringify({
+          type: "emotion",
+          message: randomMessage,
+        })
+      );
+
+      // Show what message was used
+      showSpeech(`Testing emotion detection with: "${randomMessage}"`);
+    } catch (err) {
+      // Fallback in case of error
+      console.error("Emotion test error:", err);
+      statusEl.textContent = "Error testing emotion";
+
+      // Use a random emotion as fallback
+      const emotions = [
+        "happy",
+        "sad",
+        "angry",
+        "surprised",
+        "fearful",
+        "disgusted",
+        "neutral",
+      ];
+      const randomEmotion =
+        emotions[Math.floor(Math.random() * emotions.length)];
+      updateAvatarEmotion(randomEmotion);
+
+      setTimeout(() => {
+        statusEl.textContent = "Fallback: " + randomEmotion;
+      }, 2000);
+    }
+  });
+
+  // Add event listener for save position button
+  savePositionBtn.addEventListener("click", () => {
+    saveAvatarPosition(true); // Show notification when button is clicked
   });
 
   return { micBtn, statusEl, ttsBtn, emotionBtn };
@@ -237,6 +304,49 @@ function getUIElements() {
   };
 }
 
+// Save avatar position to local storage
+function saveAvatarPosition(showNotification = false) {
+  const container = document.getElementById("avatar-extension-container");
+  if (container) {
+    const position = {
+      left: container.style.left,
+      top: container.style.top,
+      right: container.style.right,
+    };
+    localStorage.setItem("avatar-position", JSON.stringify(position));
+
+    // Show saved confirmation only if explicitly requested
+    if (showNotification) {
+      const statusEl = document.getElementById("status");
+      if (statusEl) {
+        statusEl.textContent = "Position saved!";
+        setTimeout(() => {
+          statusEl.textContent = "";
+        }, 2000);
+      }
+    }
+  }
+}
+
+// Restore avatar position from local storage
+function restoreAvatarPosition() {
+  try {
+    const savedPosition = localStorage.getItem("avatar-position");
+    if (savedPosition) {
+      const position = JSON.parse(savedPosition);
+      const container = document.getElementById("avatar-extension-container");
+      if (container) {
+        if (position.left) container.style.left = position.left;
+        if (position.top) container.style.top = position.top;
+        if (position.right && !position.left)
+          container.style.right = position.right;
+      }
+    }
+  } catch (e) {
+    console.error("Error restoring avatar position:", e);
+  }
+}
+
 // Function to toggle avatar UI visibility
 function toggleAvatarUI() {
   const container = document.getElementById("avatar-extension-container");
@@ -245,6 +355,7 @@ function toggleAvatarUI() {
       container.style.display === "none" ? "flex" : "none";
   } else {
     createAvatarUI();
+    restoreAvatarPosition();
   }
 }
 
@@ -256,10 +367,129 @@ chrome.runtime.onMessage.addListener((message) => {
 });
 
 // =========================
-// Speech Recognition
+// Speech Recognition & WebSocket Connection
 // =========================
 const SpeechRecognitionAPI =
   window.SpeechRecognition || window.webkitSpeechRecognition;
+
+// WebSocket connection variables
+let socket;
+let isSocketConnected = false;
+
+// Function to establish WebSocket connection
+function connectWebSocket() {
+  if (
+    socket &&
+    (socket.readyState === WebSocket.OPEN ||
+      socket.readyState === WebSocket.CONNECTING)
+  ) {
+    console.log("WebSocket already connected or connecting");
+    return socket;
+  }
+
+  socket = new WebSocket("ws://127.0.0.1:5000/ws");
+
+  socket.onopen = () => {
+    console.log("WebSocket connection established");
+    isSocketConnected = true;
+    const statusEl = document.getElementById("status");
+    if (statusEl) statusEl.textContent = "Connected to AI";
+  };
+
+  socket.onclose = () => {
+    console.log("WebSocket connection closed");
+    isSocketConnected = false;
+    const statusEl = document.getElementById("status");
+    if (statusEl) statusEl.textContent = "Disconnected";
+    setTimeout(connectWebSocket, 3000); // Try to reconnect after 3 seconds
+  };
+
+  socket.onerror = (error) => {
+    console.error("WebSocket error:", error);
+    isSocketConnected = false;
+  };
+
+  socket.onmessage = (event) => {
+    try {
+      const data = JSON.parse(event.data);
+      console.log("WebSocket message received:", data);
+
+      // Check if there's an error
+      if (data.error) {
+        console.error("Server error:", data.error);
+        const statusEl = document.getElementById("status");
+        if (statusEl) statusEl.textContent = `Error: ${data.error}`;
+        return;
+      }
+
+      // Handle different response types
+      const responseType = data.type || "chat"; // Default to chat for backward compatibility
+
+      if (responseType === "chat") {
+        // Stop thinking animation when we get the response
+        stopThinkingAnimation();
+
+        // Chat response already has emotion processed earlier
+        // Just display the reply and speak it
+
+        // If emotion is provided again, update it (but it should already be updated)
+        if (data.emotion) {
+          console.log("Chat response includes emotion:", data.emotion);
+          // No need to call updateAvatarEmotion again as we've already done it
+          // in the separate emotion request, but do it as a fallback
+          updateAvatarEmotion(data.emotion);
+        }
+
+        // Display and speak the reply
+        if (data.reply) {
+          // Display the reply with markdown rendering
+          showSpeech(data.reply);
+
+          // Speak the reply
+          speakText(data.reply);
+
+          const statusEl = document.getElementById("status");
+          if (statusEl) statusEl.textContent = "Reply received";
+        }
+      } else if (responseType === "emotion") {
+        // Handle emotion-only response - this comes first in our new flow
+        if (data.emotion) {
+          console.log("Got emotion response first:", data.emotion);
+          // Update avatar based on received emotion immediately
+          updateAvatarEmotion(data.emotion);
+
+          const statusEl = document.getElementById("status");
+          if (statusEl)
+            statusEl.textContent = `Processing with emotion: ${data.emotion}`;
+
+          // Start thinking animation instead of showing text
+          startThinkingAnimation();
+        }
+      } else if (responseType === "error") {
+        // Stop thinking animation on error
+        stopThinkingAnimation();
+
+        console.error("Server returned error:", data.error);
+        const statusEl = document.getElementById("status");
+        if (statusEl) statusEl.textContent = `Error: ${data.error}`;
+
+        // Show the error in speech bubble
+        showSpeech(`Error: ${data.error}`);
+      }
+
+      // Dispatch a custom event that other handlers can listen for
+      // This is useful for promises waiting for specific responses
+      const customEvent = new CustomEvent("websocketMessage", {
+        detail: data,
+      });
+      document.dispatchEvent(customEvent);
+    } catch (e) {
+      console.error("Error processing WebSocket message:", e);
+    }
+  };
+
+  return socket;
+}
 
 if (!SpeechRecognitionAPI) {
   alert("Speech recognition not supported in this browser");
@@ -280,6 +510,9 @@ if (!SpeechRecognitionAPI) {
       }
     });
   }, 1000);
+
+  // Initialize WebSocket connection
+  connectWebSocket();
 
   const recognition = new SpeechRecognitionAPI();
   recognition.continuous = false;
@@ -309,35 +542,56 @@ if (!SpeechRecognitionAPI) {
   recognition.onresult = async (event) => {
     const transcript = event.results[0][0].transcript.trim();
     console.log("Heard:", transcript);
-    statusEl.textContent = "Sending to LLM...";
+    statusEl.textContent = "Processing...";
 
     try {
-      // First, detect emotion from user input
-      const emotion = await detectEmotion(transcript);
+      // Ensure WebSocket is connected
+      if (!isSocketConnected) {
+        console.log("WebSocket not connected, attempting to reconnect...");
+        connectWebSocket();
 
-      // Update avatar based on detected emotion
-      updateAvatarEmotion(emotion);
+        // Wait a bit for connection to establish
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Now send the message to the LLM for response
-      const response = await fetch("http://127.0.0.1:5000/speak", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: transcript }),
-      });
+        // If still not connected, throw error
+        if (!isSocketConnected) {
+          throw new Error("WebSocket connection failed");
+        }
+      }
 
-      if (!response.ok) throw new Error("Network response not OK");
+      // First, we detect emotion (which is faster)
+      statusEl.textContent = "Detecting emotion...";
 
-      const data = await response.json();
-      console.log("Backend reply:", data);
-      statusEl.textContent = "Reply received.";
+      // Send the message over WebSocket with type 'emotion'
+      socket.send(
+        JSON.stringify({
+          type: "emotion",
+          message: transcript,
+        })
+      );
 
-      // Display the reply with markdown rendering
-      showSpeech(data.reply);
+      // Wait a short time for the emotion to be processed
+      await new Promise((resolve) => setTimeout(resolve, 200));
 
-      // Speak the reply
-      speakText(data.reply);
+      // Start thinking animation and send for full chat processing
+      statusEl.textContent = "Getting AI response...";
+      startThinkingAnimation();
+
+      socket.send(
+        JSON.stringify({
+          type: "chat",
+          message: transcript,
+        })
+      );
+
+      // Note: We no longer need to handle the response here
+      // The WebSocket onmessage handler will take care of it
     } catch (err) {
       console.error("Error:", err);
+
+      // Stop thinking animation on error
+      stopThinkingAnimation();
+
       statusEl.textContent = "Error! Check console.";
       const fallbackReply = `AI says: 'I heard '${transcript}', but there was an error connecting to the backend.'`;
       showSpeech(fallbackReply);
@@ -399,29 +653,55 @@ function showSpeech(text) {
 // Emotion Detection & Avatar Updates
 // =========================
 
-// Function to detect emotion from text
+// Function to detect emotion for text via WebSocket
 async function detectEmotion(text) {
-  try {
-    const response = await fetch("http://127.0.0.1:5000/emotion", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        text: text,
-        include_history: true,
-      }),
-    });
+  return new Promise((resolve, reject) => {
+    try {
+      // Ensure WebSocket is connected
+      if (!isSocketConnected) {
+        console.log("WebSocket not connected for emotion detection");
+        resolve("neutral"); // Default fallback
+        return;
+      }
 
-    if (!response.ok) {
-      throw new Error(`Emotion detection failed: ${response.status}`);
+      // Create a one-time message handler for this specific request
+      const messageHandler = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+
+          // Check if this is an emotion response
+          if (data.type === "emotion" && data.emotion) {
+            // Remove this one-time handler
+            socket.removeEventListener("message", messageHandler);
+            resolve(data.emotion);
+          }
+        } catch (e) {
+          console.error("Error in emotion detection handler:", e);
+        }
+      };
+
+      // Add the one-time message handler
+      socket.addEventListener("message", messageHandler);
+
+      // Send the emotion request
+      socket.send(
+        JSON.stringify({
+          type: "emotion",
+          message: text,
+        })
+      );
+
+      // Set a timeout to prevent hanging if no response
+      setTimeout(() => {
+        socket.removeEventListener("message", messageHandler);
+        console.log("Emotion detection timed out");
+        resolve("neutral"); // Default fallback
+      }, 3000);
+    } catch (error) {
+      console.error("Error detecting emotion:", error);
+      resolve("neutral"); // Default fallback
     }
-
-    const data = await response.json();
-    console.log("Emotion detected:", data.emotion);
-    return data.emotion;
-  } catch (error) {
-    console.error("Emotion detection error:", error);
-    return "neutral"; // Default fallback
-  }
+  });
 }
 
 // Function to update avatar face based on emotion
@@ -578,8 +858,236 @@ avatarStyles.textContent = `
     transform-origin: center;
     animation: blink 4s infinite;
   }
+  
+  /* Thinking animation styles */
+  .thinking-dots {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    display: flex;
+    gap: 3px;
+  }
+  
+  .thinking-dot {
+    width: 6px;
+    height: 6px;
+    background: #3776AB;
+    border-radius: 50%;
+    animation: thinkingPulse 1.4s ease-in-out infinite both;
+  }
+  
+  .thinking-dot:nth-child(1) { animation-delay: -0.32s; }
+  .thinking-dot:nth-child(2) { animation-delay: -0.16s; }
+  .thinking-dot:nth-child(3) { animation-delay: 0; }
+  
+  @keyframes thinkingPulse {
+    0%, 80%, 100% {
+      transform: scale(0.8);
+      opacity: 0.5;
+    }
+    40% {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+  }
+  
+  /* Avatar thinking glow effect */
+  .avatar-thinking {
+    box-shadow: 0 0 20px rgba(55, 118, 171, 0.6) !important;
+    animation: thinkingGlow 2s ease-in-out infinite alternate !important;
+  }
+  
+  @keyframes thinkingGlow {
+    from {
+      box-shadow: 0 0 15px rgba(55, 118, 171, 0.4);
+    }
+    to {
+      box-shadow: 0 0 25px rgba(55, 118, 171, 0.8);
+    }
+  }
 `;
 document.head.appendChild(avatarStyles);
 
+// =========================
+// Thinking Animation Functions
+// =========================
+function startThinkingAnimation() {
+  const avatar = document.getElementById("python-avatar");
+  const speechBubble = document.getElementById("python-avatar-speech");
+
+  if (!avatar) return;
+
+  // Hide speech bubble during thinking
+  if (speechBubble) {
+    speechBubble.style.opacity = 0;
+  }
+
+  // Add thinking class to avatar for glow effect
+  avatar.classList.add("avatar-thinking");
+
+  // Create thinking dots if they don't exist
+  let thinkingDots = document.getElementById("thinking-dots");
+  if (!thinkingDots) {
+    thinkingDots = document.createElement("div");
+    thinkingDots.id = "thinking-dots";
+    thinkingDots.className = "thinking-dots";
+
+    // Create three dots
+    for (let i = 0; i < 3; i++) {
+      const dot = document.createElement("div");
+      dot.className = "thinking-dot";
+      thinkingDots.appendChild(dot);
+    }
+
+    // Add to avatar container
+    avatar.appendChild(thinkingDots);
+  }
+
+  // Make dots visible
+  thinkingDots.style.display = "flex";
+}
+
+function stopThinkingAnimation() {
+  const avatar = document.getElementById("python-avatar");
+  const thinkingDots = document.getElementById("thinking-dots");
+
+  if (avatar) {
+    // Remove thinking class from avatar
+    avatar.classList.remove("avatar-thinking");
+  }
+
+  if (thinkingDots) {
+    // Hide thinking dots
+    thinkingDots.style.display = "none";
+  }
+}
+
+// =========================
+// Drag Functionality
+// =========================
+function makeDraggable(container) {
+  let offsetX, offsetY;
+  let isDragging = false;
+
+  // Function to handle starting drag
+  function dragStart(e) {
+    // Check if we're clicking on a button or interactive element
+    if (e.target.tagName === "BUTTON") {
+      return; // Don't start dragging if clicking buttons
+    }
+
+    // Prevent default only for mouse events, not for touch events
+    if (e.type !== "touchstart") {
+      e.preventDefault();
+    }
+
+    // Get the initial position
+    const boundingRect = container.getBoundingClientRect();
+
+    // Use pageX/pageY for accurate positioning with scroll
+    const pageX = e.pageX || e.touches[0].pageX;
+    const pageY = e.pageY || e.touches[0].pageY;
+
+    // Calculate the offset of the mouse pointer from the top-left corner of the container
+    offsetX = pageX - boundingRect.left;
+    offsetY = pageY - boundingRect.top;
+
+    isDragging = true;
+
+    // Change cursor style
+    container.style.cursor = "grabbing";
+
+    // Add event listeners for drag and end
+    if (e.type === "mousedown") {
+      document.addEventListener("mousemove", dragMove);
+      document.addEventListener("mouseup", dragEnd);
+    } else if (e.type === "touchstart") {
+      document.addEventListener("touchmove", dragMove, { passive: false });
+      document.addEventListener("touchend", dragEnd);
+    }
+  }
+
+  // Function to handle drag movement
+  function dragMove(e) {
+    if (!isDragging) return;
+
+    // Prevent default to stop text selection during drag
+    e.preventDefault();
+
+    // Get current pointer position
+    const pageX = e.pageX || e.touches[0].pageX;
+    const pageY = e.pageY || e.touches[0].pageY;
+
+    // Calculate new position (with bounds checking)
+    const newLeft = pageX - offsetX;
+    const newTop = pageY - offsetY;
+
+    // Get viewport dimensions
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Get container dimensions
+    const containerWidth = container.offsetWidth;
+    const containerHeight = container.offsetHeight;
+
+    // Keep the avatar within the viewport
+    const boundedLeft = Math.max(
+      0,
+      Math.min(newLeft, viewportWidth - containerWidth)
+    );
+    const boundedTop = Math.max(
+      0,
+      Math.min(newTop, viewportHeight - containerHeight)
+    );
+
+    // Convert from absolute position to fixed position
+    container.style.left = boundedLeft + "px";
+    container.style.top = boundedTop + "px";
+    container.style.right = "auto"; // Clear the right position
+  }
+
+  // Function to handle end of drag
+  function dragEnd() {
+    isDragging = false;
+
+    // Change cursor back
+    container.style.cursor = "move";
+
+    // Remove event listeners
+    document.removeEventListener("mousemove", dragMove);
+    document.removeEventListener("mouseup", dragEnd);
+    document.removeEventListener("touchmove", dragMove);
+    document.removeEventListener("touchend", dragEnd);
+
+    // Automatically save the position when drag ends
+    saveAvatarPosition();
+
+    // Show subtle visual feedback that position was saved
+    const saveBtn = document.getElementById("save-position");
+    if (saveBtn) {
+      // Flash the save button briefly
+      const originalColor = saveBtn.style.backgroundColor;
+      saveBtn.style.backgroundColor = "#34A853"; // Green flash
+      setTimeout(() => {
+        saveBtn.style.backgroundColor = originalColor;
+      }, 300);
+    }
+  }
+
+  // Add event listeners for drag start
+  container.addEventListener("mousedown", dragStart);
+  container.addEventListener("touchstart", dragStart, { passive: true });
+
+  return container;
+}
+
 // Start the process of creating the UI when the script loads.
-createAvatarUI();
+const avatarUI = createAvatarUI();
+
+// Make the avatar container draggable
+const container = document.getElementById("avatar-extension-container");
+if (container) {
+  makeDraggable(container);
+  // Restore saved position if available
+  restoreAvatarPosition();
+}
