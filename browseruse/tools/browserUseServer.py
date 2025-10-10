@@ -50,37 +50,45 @@ async def agent_worker(agent):
     """Process tasks from the queue."""
     print("📝 Agent worker started. Waiting for tasks...")
     while True:
-        try:
-            task = await task_queue.get()
-            if task == "exit":
-                print("👋 Exiting worker loop")
-                task_queue.task_done()
-                break
-
-            try:
-                # Special task handling
-                if task == "refresh" or task == "screenshot":
-                    try:
-                        # Capture browser state and elements
-                        pass
-                    except Exception as e:
-                        print(f"❌ Screenshot error: {type(e).__name__}: {e}")
-                else:
-                    # Execute regular tasks through the agent
-                    result = await execute_task(agent, task)
-                    print(f"✅ Task completed: {task}")
-                    
-            except Exception as e:
-                print(f"❌ Task execution error: {type(e).__name__}: {e}")
-                traceback.print_exc()
-            finally:
-                task_queue.task_done()
-        except asyncio.CancelledError:
-            print("� Agent worker task was cancelled")
+        task = await task_queue.get()
+        if task == "exit":
+            print("👋 Exiting worker loop")
+            task_queue.task_done()
             break
-        except Exception as outer_e:
-            print(f"❌ Critical agent worker error: {type(outer_e).__name__}: {outer_e}")
+
+        print(f"\n🔄 Executing task: {task}")
+        try:
+            # Special task handling
+            if task == "refresh" or task == "screenshot":
+                try:
+                    print("\n📸 Taking screenshot and updating DOM...")
+                    
+                    # Use the function to capture browser state and elements
+                    from browseruse.browser_use.agent.service import capture_element_positions
+                    browser_state, elements_file = await capture_element_positions(agent)
+                    
+                    print(f"✅ Screenshot captured with {len(browser_state.dom_state.selector_map)} elements")
+                    print(f"✅ Element data stored at: {elements_file}")
+                    
+                except Exception as e:
+                    print(f"❌ Error during refresh: {type(e).__name__}: {e}")
+                    import traceback
+                    traceback.print_exc()
+            else:
+                # ADDED: Execute regular tasks through the agent
+                print(f"🤖 Agent executing: {task}")
+                result = await execute_task(agent, task)
+                print(f"✅ Task completed: {task}")
+                # Optionally print result summary
+                if hasattr(result, 'output'):
+                    print(f"📝 Result: {result.output[:100]}..." if len(result.output) > 100 else f"📝 Result: {result.output}")
+                
+        except Exception as e:
+            print(f"❌ Error: {type(e).__name__}: {e}")
+            import traceback
             traceback.print_exc()
+        finally:
+            task_queue.task_done()
 
 def socket_listener(loop):
     """Run a socket server in a thread that pushes tasks into asyncio queue."""
