@@ -106,8 +106,8 @@ function connectWebSocket() {
         const statusEl = document.getElementById("status");
         if (statusEl) statusEl.textContent = `Error: ${data.error}`;
 
-        // Show the error in speech bubble
-        window.AvatarUI.showSpeech(`Error: ${data.error}`);
+        // Show the error in speech bubble (instant for errors)
+        window.AvatarUI.showSpeechInstant(`Error: ${data.error}`);
       }
 
       // Dispatch a custom event that other handlers can listen for

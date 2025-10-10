@@ -104,7 +104,7 @@ function setupSpeechRecognition(micBtn, statusEl) {
 
       statusEl.textContent = "Error! Check console.";
       const fallbackReply = `AI says: 'I heard '${transcript}', but there was an error connecting to the backend.'`;
-      window.AvatarUI.showSpeech(fallbackReply);
+      window.AvatarUI.showSpeechInstant(fallbackReply);
       speakText(fallbackReply);
 
       // Set to neutral emotion on error

@@ -244,8 +244,8 @@ function setupEventListeners(ttsBtn, emotionBtn, savePositionBtn, statusEl) {
         message: randomMessage,
       });
 
-      // Show what message was used
-      showSpeech(`Testing emotion detection with: "${randomMessage}"`);
+      // Show what message was used (instant for test messages)
+      showSpeechInstant(`Testing emotion detection with: "${randomMessage}"`);
     } catch (err) {
       // Fallback in case of error
       console.error("Emotion test error:", err);
@@ -290,11 +290,15 @@ function getUIElements() {
   };
 }
 
+// Global variable to track current animation
+let currentSpeechAnimation = null;
+
 /**
- * Display speech in the avatar's speech bubble
+ * Display speech in the avatar's speech bubble with word-by-word animation
  * @param {string} text - Text to display
+ * @param {number} wordsPerSecond - Speed of word animation (default: 3)
  */
-function showSpeech(text) {
+function showSpeech(text, wordsPerSecond = 3) {
   let speechBubble = document.getElementById("python-avatar-speech");
   const avatarContainer = document.getElementById("avatar-extension-container");
 
@@ -317,9 +321,10 @@ function showSpeech(text) {
             position: absolute;
             top: 0;
             right: 90px;
-            font-size: 14px;
-            line-height: 1.4;
+            font-size: 16px;
+            line-height: 1.6;
             cursor: default;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
         `;
     avatarContainer.appendChild(speechBubble);
   } else if (!speechBubble) {
@@ -327,14 +332,92 @@ function showSpeech(text) {
     return;
   }
 
-  // APPLY MARKDOWN CONVERSION AND SET INNER HTML
-  const htmlContent = window.AvatarUtils.simpleMarkdownToHtml(text);
-  speechBubble.innerHTML = htmlContent;
+  // Cancel any existing animation
+  if (currentSpeechAnimation) {
+    clearInterval(currentSpeechAnimation);
+    currentSpeechAnimation = null;
+  }
 
+  // Show the speech bubble
   speechBubble.style.opacity = 1;
 
-  // Scroll to top of the new message
-  speechBubble.scrollTop = 0;
+  // Convert markdown to HTML first
+  const htmlContent = window.AvatarUtils.simpleMarkdownToHtml(text);
+
+  // Extract plain text for word-by-word animation (removing HTML tags for splitting)
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = htmlContent;
+  const plainText = tempDiv.textContent || tempDiv.innerText || "";
+
+  // Split into words while preserving the HTML structure
+  const words = plainText.split(/\s+/).filter((word) => word.length > 0);
+
+  // Calculate delay between words (in milliseconds)
+  const delayBetweenWords = 1000 / wordsPerSecond;
+
+  // Clear the speech bubble and start animation
+  speechBubble.innerHTML = "";
+
+  let currentWordIndex = 0;
+  let displayedText = "";
+
+  // Add a cursor element for typing effect
+  const cursor = document.createElement("span");
+  cursor.style.cssText = `
+    animation: blink 1s infinite;
+    font-weight: bold;
+    color: #3776AB;
+  `;
+  cursor.textContent = "|";
+
+  // Start the word-by-word animation
+  currentSpeechAnimation = setInterval(() => {
+    if (currentWordIndex < words.length) {
+      // Add the next word
+      displayedText +=
+        (currentWordIndex > 0 ? " " : "") + words[currentWordIndex];
+      currentWordIndex++;
+
+      // Convert the current text to HTML and display it
+      const currentHtmlContent =
+        window.AvatarUtils.simpleMarkdownToHtml(displayedText);
+      speechBubble.innerHTML = currentHtmlContent;
+
+      // Add cursor temporarily
+      speechBubble.appendChild(cursor);
+
+      // Scroll to bottom to follow the text
+      speechBubble.scrollTop = speechBubble.scrollHeight;
+
+      // Add a subtle highlight effect to the latest word
+      const words_elements = speechBubble.querySelectorAll("*");
+      if (words_elements.length > 0) {
+        const lastElement = words_elements[words_elements.length - 2]; // -2 because cursor is last
+        if (lastElement) {
+          lastElement.style.animation = "wordHighlight 0.5s ease-in-out";
+        }
+      }
+    } else {
+      // Animation complete - remove cursor and clean up
+      if (cursor.parentNode) {
+        cursor.parentNode.removeChild(cursor);
+      }
+      clearInterval(currentSpeechAnimation);
+      currentSpeechAnimation = null;
+
+      // Final content update to ensure proper HTML formatting
+      const finalHtmlContent = window.AvatarUtils.simpleMarkdownToHtml(text);
+      speechBubble.innerHTML = finalHtmlContent;
+    }
+  }, delayBetweenWords);
+}
+
+/**
+ * Show speech instantly (for test messages or quick responses)
+ * @param {string} text - Text to display
+ */
+function showSpeechInstant(text) {
+  showSpeech(text, 10); // Very fast animation for instant effect
 }
 
 /**
@@ -404,6 +487,7 @@ window.AvatarUI = {
   createAvatarUI,
   getUIElements,
   showSpeech,
+  showSpeechInstant,
   saveAvatarPosition,
   restoreAvatarPosition,
   toggleAvatarUI,

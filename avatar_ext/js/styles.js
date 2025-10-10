@@ -73,6 +73,27 @@ function initializeStyles() {
       }
     }
     
+    /* Word-by-word animation styles */
+    @keyframes wordHighlight {
+      0% {
+        background-color: transparent;
+        transform: scale(1);
+      }
+      50% {
+        background-color: rgba(255, 212, 59, 0.3);
+        transform: scale(1.02);
+      }
+      100% {
+        background-color: transparent;
+        transform: scale(1);
+      }
+    }
+    
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+    
     /* General avatar container styles */
     #avatar-extension-container {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
