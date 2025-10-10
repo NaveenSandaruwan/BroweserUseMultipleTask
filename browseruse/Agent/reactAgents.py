@@ -285,6 +285,7 @@ so that they are simple, clear, and fun for children to understand.
 - Keep explanations supportive and encouraging.
 - Keep all important instructions from the original message intact, but simplify any technical terms.
 - Present the steps in a way that kids can follow easily.
+- Do not include coordinates of blocks like (x:100, y:200) in your response.
 
 Input: The message from the supervisor or other agents.
 Output: A child-friendly version of that message not more than 200 words.
