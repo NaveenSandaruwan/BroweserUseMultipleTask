@@ -28,8 +28,9 @@ from utils.jsonextract import extract_first_steps_json,extract_and_format_first_
 from tools.browserUseClient import send_task
 from tools.dragTool import Toolbox
 from tools.filter import filter_json, find_used_blocks, get_list_of_used_blocks, get_category_coordinates, generate_detailed_blocks_summary
-# from tools.execution import Executor
-from reactAgents import command_agent,explaining_agent,debugging_agent,general_coding_agent,format_agent,general_agent,code_fixing_agent
+
+from tools.execution import Executor
+from reactAgents import command_agent,explaining_agent,debugging_agent,general_coding_agent,format_agent,general_agent,code_fixing_agent,fromat_query_agent
 from utils.state import State
 # from utils.tool import make_blocks, clean_and_make_blocks
 
@@ -47,6 +48,19 @@ model2 = ChatGoogleGenerativeAI(
 )
 
 executor = AdvancedExecutor()
+
+def format_query(state: State) -> State:
+    ''' Formats the user query to ensure clarity and context.
+    This node helps to refine the user's input for better processing by subsequent nodes.
+    Some times child's query is not clear, so this node will help to make it clear.
+    '''
+    query = state["query"]
+
+    response = fromat_query_agent.invoke({"messages": [HumanMessage(content=query)]})
+    
+    state["query"] = response["messages"][-1].content
+    print(f"Formatted Query: {state['query']}")
+    return state
 
 
 def llm_router(state: State) -> Literal["code_explain", "code_debugging", "give_instructions","make_blocks", "code_fixing"]:
@@ -103,7 +117,12 @@ def code_explain_node(state: State) -> State:
     )
 
     result = explaining_agent.invoke({"messages": [HumanMessage(content=message)]})
-    return {"result": {"explanation": result["messages"][-1].content}}
+    # Update the existing state instead of replacing it
+    new_state = state.copy()
+    if "result" not in new_state:
+        new_state["result"] = {}
+    new_state["result"]["explanation"] = result["messages"][-1].content
+    return new_state
 
 def code_debugging_node(state: State) -> State:
 
@@ -120,7 +139,12 @@ def code_debugging_node(state: State) -> State:
     )
 
     result = debugging_agent.invoke({"messages": [HumanMessage(content=message)]})
-    return {"result": {"debugging_advice": result["messages"][-1].content}}
+    # Update the existing state instead of replacing it
+    new_state = state.copy()
+    if "result" not in new_state:
+        new_state["result"] = {}
+    new_state["result"]["debugging_advice"] = result["messages"][-1].content
+    return new_state
 
 def give_instructions_node(state: State) -> State:
     web_application_coding_summary = generate_detailed_blocks_summary(include_all_blocks=True)
@@ -130,11 +154,21 @@ def give_instructions_node(state: State) -> State:
         
         )
     result = general_coding_agent.invoke({"messages": [HumanMessage(content=message)]})
-    return {"result": {"instructions": result["messages"][-1].content}}
+    # Update the existing state instead of replacing it
+    new_state = state.copy()
+    if "result" not in new_state:
+        new_state["result"] = {}
+    new_state["result"]["instructions"] = result["messages"][-1].content
+    return new_state
 
 def make_blocks_node(state: State) -> State:
     result = command_agent.invoke({"messages": [state['result']['instructions']]})
-    return {"result": {"make_blocks": result["messages"][-1].content}}
+    # Update the existing state instead of replacing it
+    new_state = state.copy()
+    if "result" not in new_state:
+        new_state["result"] = {}
+    new_state["result"]["make_blocks"] = result["messages"][-1].content
+    return new_state
 
 # def execute_blocks_node(state: State) -> State:
 #     # take state['result']['make_blocks'] and extract json object from it
@@ -161,11 +195,22 @@ def execute_blocks_node(state: State) -> State:
     except Exception as e:
         result = "false"
     finally:
-        return {"result": {"execute_blocks": result}}
+        # Update the existing state instead of replacing it
+        new_state = state.copy()
+        if "result" not in new_state:
+            new_state["result"] = {}
+        new_state["result"]["execute_blocks"] = result
+        return new_state
+
 
 def general_agent_node(state: State) -> State:
     result = general_agent.invoke({"messages": [HumanMessage(content=state["query"])]})
-    return {"result": {"general_response": result["messages"][-1].content}}
+    # Update the existing state instead of replacing it
+    new_state = state.copy()
+    if "result" not in new_state:
+        new_state["result"] = {}
+    new_state["result"]["general_response"] = result["messages"][-1].content
+    return new_state
 
 
 def format_response(state: State) -> State:
@@ -176,7 +221,13 @@ def format_response(state: State) -> State:
         
         # Pass the string content to HumanMessage
         result = format_agent.invoke({"messages": [HumanMessage(content=result_content)]})
-        return {"result": {"formatted_response": result["messages"][-1].content}}
+        
+        # Update the existing state instead of replacing it
+        new_state = state.copy()
+        if "result" not in new_state:
+            new_state["result"] = {}
+        new_state["result"]["formatted_response"] = result["messages"][-1].content
+        return new_state
     return state
 
 def code_fixing_node(state: State) -> State:
@@ -201,7 +252,12 @@ def code_fixing_node(state: State) -> State:
     # Get fixing instructions from the code_fixing_agent
     result = code_fixing_agent.invoke({"messages": [HumanMessage(content=message)]})
     
-    return {"result": {"fixing_instructions": result["messages"][-1].content}}
+    # Update the existing state instead of replacing it
+    new_state = state.copy()
+    if "result" not in new_state:
+        new_state["result"] = {}
+    new_state["result"]["fixing_instructions"] = result["messages"][-1].content
+    return new_state
 
 def execute_fix_node(state: State) -> State:
     """
@@ -214,7 +270,12 @@ def execute_fix_node(state: State) -> State:
     result = command_agent.invoke({"messages": [HumanMessage(content=fixing_instructions)]})
     json_commands = result["messages"][-1].content
     
-    return {"result": {"fix_commands": json_commands}}
+    # Update the existing state instead of replacing it
+    new_state = state.copy()
+    if "result" not in new_state:
+        new_state["result"] = {}
+    new_state["result"]["fix_commands"] = json_commands
+    return new_state
 
 
 # def execute_fix_blocks_node(state: State) -> State:
@@ -242,4 +303,11 @@ def execute_fix_blocks_node(state: State) -> State:
     except Exception as e:
         result = "false"
         print(f"Error executing fix: {e}")
-    return {"result": {"execute_fix": result}}
+ 
+    # Update the existing state instead of replacing it
+    new_state = state.copy()
+    if "result" not in new_state:
+        new_state["result"] = {}
+    new_state["result"]["execute_fix"] = result
+    return new_state
+
