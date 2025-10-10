@@ -11,7 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')
 
 from browseruse.Agent.agent import chat
 from browseruse.Agent.emotion import EmotionIdentifier
-
+from browseruse.tools.browserUseClient import send_task
 BACKEND_PORT = 5000  # your port
 chat_history = []
 detector = EmotionIdentifier()
@@ -50,7 +50,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     "error": "No message provided"
                 })
                 continue
-
+            send_task("refresh")
             print(f"[WebSocket] Received {request_type} request: '{user_message[:30]}...'")
 
             try:

@@ -106,7 +106,8 @@ class Executor:
         """
         Find the closest matching block in description.json using fuzzy matching
         """
-        description_path = os.getenv("ELEMENTS_DESCRIPTION_JSON_PATH")
+        description_path = ELEMENTS
+        
         try:
             with open(description_path, 'r') as f:
                 descriptions = json.load(f)

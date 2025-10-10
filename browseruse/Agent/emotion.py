@@ -3,7 +3,6 @@ import os
 import sys
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
-from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from pathlib import Path
 # load_dotenv()

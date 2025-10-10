@@ -202,6 +202,8 @@ def main():
         agent_server_process = multiprocessing.Process(target=start_agent_server)
         agent_server_process.start()
         time.sleep(2)  # Give agent server time to start
+        send_task("refresh")
+        time.sleep(2)
         print("✅ Agent server started")
 
     # Keep alive until processes finish

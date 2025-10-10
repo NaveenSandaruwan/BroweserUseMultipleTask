@@ -816,12 +816,12 @@ class BrowserProfile(BrowserConnectArgs, BrowserLaunchPersistentContextArgs, Bro
 	def _get_extension_args(self) -> list[str]:
 		"""Get Chrome args for enabling default extensions (ad blocker and cookie handler)."""
 		extension_paths = self._ensure_default_extensions_downloaded()
-		BASE_DIR = get_base_path()
-		avatar_ext_path = BASE_DIR / "extension"
-		if avatar_ext_path.exists():
-			extension_paths.append(str(avatar_ext_path))
-			print(f'✅ Using cached avatar extension from {avatar_ext_path}')
-			logger.debug(f'✅ Using cached avatar extension from {_log_pretty_path(avatar_ext_path)}')
+		# BASE_DIR = get_base_path()
+		# avatar_ext_path = BASE_DIR / "extension"
+		# if avatar_ext_path.exists():
+		# 	extension_paths.append(str(avatar_ext_path))
+		# 	print(f'✅ Using cached avatar extension from {avatar_ext_path}')
+		# 	logger.debug(f'✅ Using cached avatar extension from {_log_pretty_path(avatar_ext_path)}')
 
 		args = [
 			'--enable-extensions',
@@ -829,7 +829,7 @@ class BrowserProfile(BrowserConnectArgs, BrowserLaunchPersistentContextArgs, Bro
 			'--disable-extensions-http-throttling',
 			'--enable-extension-activity-logging',
 		]
-		print(f'🧩 Loading extensions: {extension_paths}')
+		# print(f'🧩 Loading extensions: {extension_paths}')
 		if extension_paths:
 			args.append(f'--load-extension={",".join(extension_paths)}')
 		# print(f"args: {args}")
