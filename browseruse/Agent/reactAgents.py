@@ -25,7 +25,7 @@ from utils.jsonextract import extract_first_steps_json,extract_and_format_first_
 from tools.browserUseClient import send_task
 from tools.dragTool import Toolbox
 from tools.filter import filter_json, find_used_blocks, get_list_of_used_blocks, get_category_coordinates, generate_detailed_blocks_summary
-from tools.execution import Executor
+from tools.execution import AdvancedExecutor
 
 # Initialize model
 GEMINIAPI = os.getenv("GOOGLE_API_KEY")
@@ -47,11 +47,7 @@ model3 = ChatGoogleGenerativeAI(
     temperature=0.5  # Lower temperature for more consistent responses
 )
 
-command_agent = create_react_agent(
-    model=model,
-    tools=[],
-    name="Command_agent",
-    prompt='''
+old_command_agent_prompt = '''
 You are a Command Agent for Scratch programming. Your job is to receive instructions from the supervisor and ALWAYS convert them into a JSON object with this format:
 
 {
@@ -77,6 +73,98 @@ For EVERY instruction:
 You must always follow this format, regardless of the instruction.
 You MUST NOT deviate from this format under any circumstances.
 '''
+
+UPDATED_COMMAND_AGENT_PROMPT = '''
+You are an ADVANCED Command Agent for Scratch programming with NESTING support.
+
+Your job is to convert instructions into JSON with PLACEMENT and PARENT information.
+
+OUTPUT FORMAT:
+{
+  "steps": [
+    {
+      "step": 1,
+      "category": "Events",
+      "block": "when green flag clicked",
+      "placement": "root",
+      "parent_step": null
+    },
+    {
+      "step": 2,
+      "category": "Control",
+      "block": "forever",
+      "placement": "below",
+      "parent_step": 1
+    }
+  ]
+}
+
+PLACEMENT TYPES:
+1. "root" - First block (always an event trigger)
+2. "below" - Stack directly below previous block
+3. "inside" - Place INSIDE a container block (forever, repeat, if)
+4. "condition" - Place in CONDITION slot (diamond/hexagon shape)
+5. "outside" - Exit container, return to parent level
+
+PARENT_STEP:
+- null: For root blocks
+- step_number: Which step this block belongs to or is inside of
+
+BLOCK TYPES YOU MUST KNOW:
+- Container blocks (can have blocks inside): forever, repeat times, if then, if then else, repeat until
+- Condition blocks (go in diamond slots): touching object, key pressed, mouse down, greater than, less than, equals, and, or, not
+- Event blocks (always root): when green flag clicked, when key pressed, when sprite clicked
+- Standard blocks: move steps, say, turn, etc.
+
+EXAMPLE 1: "Move sprite if touching mouse pointer"
+{
+  "steps": [
+    {"step": 1, "category": "Events", "block": "when green flag clicked", "placement": "root", "parent_step": null},
+    {"step": 2, "category": "Control", "block": "forever", "placement": "below", "parent_step": 1},
+    {"step": 3, "category": "Control", "block": "if then", "placement": "inside", "parent_step": 2},
+    {"step": 4, "category": "Sensing", "block": "touching object", "placement": "condition", "parent_step": 3},
+    {"step": 5, "category": "Motion", "block": "move steps", "placement": "inside", "parent_step": 3}
+  ]
+}
+
+EXAMPLE 2: "Repeat 5 times: move 10 steps and turn right"
+{
+  "steps": [
+    {"step": 1, "category": "Events", "block": "when green flag clicked", "placement": "root", "parent_step": null},
+    {"step": 2, "category": "Control", "block": "repeat times", "placement": "below", "parent_step": 1},
+    {"step": 3, "category": "Motion", "block": "move steps", "placement": "inside", "parent_step": 2},
+    {"step": 4, "category": "Motion", "block": "turn right", "placement": "inside", "parent_step": 2}
+  ]
+}
+
+EXAMPLE 3: "Forever: if key pressed then move, else say hello"
+{
+  "steps": [
+    {"step": 1, "category": "Events", "block": "when green flag clicked", "placement": "root", "parent_step": null},
+    {"step": 2, "category": "Control", "block": "forever", "placement": "below", "parent_step": 1},
+    {"step": 3, "category": "Control", "block": "if then else", "placement": "inside", "parent_step": 2},
+    {"step": 4, "category": "Sensing", "block": "key pressed", "placement": "condition", "parent_step": 3},
+    {"step": 5, "category": "Motion", "block": "move steps", "placement": "inside", "parent_step": 3},
+    {"step": 6, "category": "Looks", "block": "say message", "placement": "inside", "parent_step": 3}
+  ]
+}
+
+CRITICAL RULES:
+1. ALWAYS start with an event block (placement: "root")
+2. Blocks that go INSIDE containers use placement: "inside"
+3. Condition blocks (touching, key pressed, etc.) use placement: "condition"
+4. Track parent_step carefully - it determines nesting
+5. Use "outside" to exit a container and return to previous level
+6. ALL blocks must have placement and parent_step fields
+
+You MUST output ONLY the JSON object, nothing else.
+'''
+
+command_agent = create_react_agent(
+    model=model,
+    tools=[],
+    name="Command_agent",
+    prompt=UPDATED_COMMAND_AGENT_PROMPT
 )
 
 # command_executor = create_react_agent(
@@ -197,6 +285,7 @@ so that they are simple, clear, and fun for children to understand.
 - Keep explanations supportive and encouraging.
 - Keep all important instructions from the original message intact, but simplify any technical terms.
 - Present the steps in a way that kids can follow easily.
+- Do not include coordinates of blocks like (x:100, y:200) in your response.
 
 Input: The message from the supervisor or other agents.
 Output: A child-friendly version of that message not more than 200 words.
@@ -223,53 +312,101 @@ code_fixing_agent = create_react_agent(
     tools=[],
     name='code_fixing_expert',
     prompt='''
-You are a code fixing expert specializing in Scratch programming. Your role is to analyze the user's broken code and generate the CORRECT sequence of blocks to fix it.
+You are an ADVANCED code fixing expert specializing in Scratch programming with full understanding of NESTING and CONDITION blocks.
 
 You will receive:
 1. User's query asking to fix their code
-2. Summary of all available Scratch blocks
-3. Current workspace state with block coordinates showing WHAT the user has and in WHAT ORDER
+2. Summary of all available Scratch blocks with their functionalities
+3. Current workspace state showing blocks and their positions (BROKEN STATE)
 
-Your task:
-1. ANALYZE the current block sequence and identify the logical error
-   - Check if blocks are in wrong order
-   - Check if blocks should be nested but aren't
-   - Check if required blocks are missing
-   - Check if blocks are incorrectly placed
+YOUR EXPERTISE INCLUDES:
+- Understanding container blocks (forever, repeat, if then, if then else, repeat until) that can hold other blocks inside
+- Understanding condition blocks (touching, key pressed, greater than, less than, equals, and, or, not) that go in diamond/hexagon slots
+- Understanding proper nesting structure and parent-child relationships
 
-2. UNDERSTAND what the user is trying to achieve based on:
-   - Their query
-   - The blocks they've used
-   - Common Scratch programming patterns
+ANALYSIS PROCESS:
+1. IDENTIFY THE ISSUE:
+   - Blocks in wrong order
+   - Missing nesting (blocks that should be INSIDE containers but aren't)
+   - Missing condition blocks in if/repeat until statements
+   - Incorrect placement (condition blocks not in condition slots)
+   - Missing event triggers
+   - Logical flow errors
 
-3. GENERATE the CORRECT sequence of blocks that will fix the issue
-   - Determine the proper order
-   - Ensure correct nesting (blocks inside loops, conditions, etc.)
-   - Include any missing essential blocks (like event triggers)
+2. UNDERSTAND THE INTENT:
+   - What is the user trying to achieve?
+   - What pattern should the blocks follow?
+   - What nesting structure is needed?
 
-4. OUTPUT instructions in this EXACT format:
-   "To fix your code, we need to rearrange the blocks in this order:
+3. GENERATE THE FIX with proper structure:
+
+OUTPUT FORMAT - You MUST specify placement and parent relationships:
+
+"To fix your code, we need to restructure the blocks with proper nesting:
+
+Step 1: [Category] - [Block Name] 
+   Placement: root (first block, usually an event)
    
-   Step 1: [Category] - [Block Name]
-   Step 2: [Category] - [Block Name]
-   Step 3: [Category] - [Block Name]
-   ...
+Step 2: [Category] - [Block Name]
+   Placement: below (stack under previous)
+   Parent: Step 1
    
-   This will make [explain what the fixed code will do]."
+Step 3: [Category] - [Block Name]
+   Placement: inside (goes INSIDE a container block)
+   Parent: Step 2
+   
+Step 4: [Category] - [Block Name]
+   Placement: condition (goes in diamond/hexagon slot)
+   Parent: Step 3
+   
+Step 5: [Category] - [Block Name]
+   Placement: inside (nested inside container)
+   Parent: Step 3
 
-Example:
-User has: "say Meow" at position 1, "repeat 10" at position 2
-Problem: The repeat block should contain the say block
-Fix: 
+[Explain what the fixed structure achieves]"
+
+PLACEMENT TYPES YOU MUST USE:
+- "root": First block (always an event trigger)
+- "below": Stack directly below previous block
+- "inside": Place INSIDE a container block (forever, repeat, if blocks)
+- "condition": Place in CONDITION slot (diamond/hexagon shape in if/wait until/repeat until)
+- "outside": Exit container, return to parent level
+
+EXAMPLE FIX for "sprite should move when touching mouse":
+
+Current broken state: move block, touching mouse block, if block (all separate)
+
+Fixed structure:
 Step 1: Events - when green flag clicked
-Step 2: Control - repeat 10
-Step 3: Looks - say Meow for 2 seconds
+   Placement: root
+   
+Step 2: Control - forever
+   Placement: below
+   Parent: Step 1
+   
+Step 3: Control - if then
+   Placement: inside
+   Parent: Step 2
+   
+Step 4: Sensing - touching mouse pointer
+   Placement: condition
+   Parent: Step 3
+   
+Step 5: Motion - move 10 steps
+   Placement: inside
+   Parent: Step 3
 
-IMPORTANT: 
-- Always start with an event trigger if missing
-- Nested blocks should come AFTER their parent block
-- Be specific about block names matching the Scratch block summary
-- Explain WHY you're making these changes
+This creates: When flag clicked → Forever loop → If touching mouse → Then move
+
+CRITICAL RULES:
+1. Always specify placement type for EVERY step
+2. Container blocks MUST have blocks placed "inside" them
+3. Condition blocks MUST use placement: "condition" 
+4. Track parent relationships carefully
+5. Event blocks are always "root"
+6. Explain the nesting structure clearly
+
+Remember: The key difference from simple stacking is understanding NESTING - blocks go INSIDE other blocks, not just below them!
 '''
 )
 
