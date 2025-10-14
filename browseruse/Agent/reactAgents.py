@@ -116,18 +116,39 @@ BLOCK TYPES YOU MUST KNOW:
 - Event blocks (always root): when green flag clicked, when key pressed, when sprite clicked
 - Standard blocks: move steps, say, turn, etc.
 
-EXAMPLE 1: "Move sprite if touching mouse pointer"
+EXAMPLE 1:
+INPUT:
+   "To create a turn block in Scratch, you can use the "turn right" block (located at x: 1, y: 93) or the "turn left" block (located at x: 1, y: 93) from the Motion category.
+
+Here's how they work:
+
+*   **turn right (clockwise):** This block rotates the sprite clockwise by a specified number of degrees.
+*   **turn left (counterclockwise):** This block rotates the sprite counterclockwise by a specified number of degrees.
+
+"
+OUTPUT:
 {
   "steps": [
-    {"step": 1, "category": "Events", "block": "when green flag clicked", "placement": "root", "parent_step": null},
-    {"step": 2, "category": "Control", "block": "forever", "placement": "below", "parent_step": 1},
-    {"step": 3, "category": "Control", "block": "if then", "placement": "inside", "parent_step": 2},
-    {"step": 4, "category": "Sensing", "block": "touching object", "placement": "condition", "parent_step": 3},
-    {"step": 5, "category": "Motion", "block": "move steps", "placement": "inside", "parent_step": 3}
+    {"step": 1, "category": "Motion", "block": "turn right", "placement": "root", "parent_step": null},
+    {"step": 2, "category": "Motion", "block": "turn left", "placement": "below", "parent_step": 1},
+   
   ]
 }
 
-EXAMPLE 2: "Repeat 5 times: move 10 steps and turn right"
+EXAMPLE 2: "Let's make our sprite move and turn in a fun way! We're going to use a "repeat" block to do this. It's like telling our sprite to do the same thing over and over!
+
+Here's how:
+
+1.  Go to the **"Control"** blocks.
+2.  Grab the **"repeat"** block and bring it to the scripts area.
+3.  Make it repeat **5** times by changing the number to "5".
+4.  Now, go to the **"Motion"** blocks.
+5.  Find the **"move steps"** block. Put it inside the "repeat" block.
+6.  Set the steps to **10** by changing the number to "10".
+7.  Find the **"turn right"** block. Put it inside the "repeat" block, below the "move steps" block.
+
+Now, your sprite will move 10 steps and turn right, five times in a row! How cool is that? Have fun, and keep on exploring!"
+ OUTPUT:  
 {
   "steps": [
     {"step": 1, "category": "Events", "block": "when green flag clicked", "placement": "root", "parent_step": null},
@@ -137,8 +158,43 @@ EXAMPLE 2: "Repeat 5 times: move 10 steps and turn right"
   ]
 }
 
-EXAMPLE 3: "Forever: if key pressed then move, else say hello"
-{
+EXAMPLE 3: 
+INPUT:
+"Hey there, Scratch Explorers! Let's make a cool program where your sprite moves when you press a key, and says "hello" when you don't!
+
+1.  **Always and Forever:**
+    *   Go to the "Control" blocks (they're orange).
+    *   Grab a "forever" block. This makes your code run again and again!
+
+2.  **If...Then...Else:**
+    *   Go back to the "Control" blocks.
+    *   Find an "if then else" block and put it inside the "forever" block. It's like a question: "If something is true, do this. Else (if it's not true), do that!"   
+
+3.  **Key Check:**
+    *   Go to the "Sensing" blocks (they're light blue).
+    *   Drag a "key pressed?" block into the "if" part of the "if then else" block.
+    *   Pick a key from the list (like "space" or "right arrow").
+
+4.  **Move It!**
+    *   Go to the "Motion" blocks (they're blue).
+    *   Drag a "move steps" block inside the "then" part of the "if then else" block.
+    *   Type in how many steps you want your sprite to move (like 10).
+
+5.  **Say Hello!**
+    *   Go to the "Looks" blocks (they're purple).
+    *   Drag a "say message" block inside the "else" part of the "if then else" block.
+    *   Type "hello" (or any fun message!).
+
+6.  **Start the Show:**
+    *   Go to the "Events" blocks (they're yellow).
+    *   Grab a "when green flag clicked" block and put it at the top, above the "forever" block.
+
+**How it Works:**
+
+*   Click the green flag, and the "forever" block keeps checking.
+*   "If" you press the key, your sprite moves. "Else," it says "hello"! Isn't that neat?"
+
+OUTPUT:{
   "steps": [
     {"step": 1, "category": "Events", "block": "when green flag clicked", "placement": "root", "parent_step": null},
     {"step": 2, "category": "Control", "block": "forever", "placement": "below", "parent_step": 1},
@@ -301,7 +357,9 @@ general_agent = create_react_agent(
 You are a general assistant for Scratch programming. Your task is to help users with a wide range of questions and issues related to Scratch.
 
  give a normal response to user according to his query.
-Input: The message from the user.
+Input: User query:The message from the user And Past conversation history. Like Conversation 1 User: hi AI agent: hello User: my code is not working AI agent: what is the issue you are facing? Conversation 2 User: i want to make a sprite move AI agent: you can use the move block from motion category.
+
+First analyze the user's query and IF you need use the past conversation history to understand the context and what the user needs help with.
 Output: A response that addresses the user's needs.
 """
         )
@@ -424,5 +482,31 @@ Make user's query more clear and specific. For example, if the user says "My cod
 Some times in user's query words are wrong and not related to Scratch programming. So, you have to correct those words and make the query more relevant to Scratch programming.
 If user's questions not related to the Scratch programming, then return  this response: This is not a Scratch programming related query.
 Normal queries like 'hi', 'hello' directlly return.
+'''
+)
+
+add_history_agent = create_react_agent(
+      model=model,
+      tools=[],
+      name='add_history_agent',
+      prompt='''
+You are an expert in maintaining conversation history for a Scratch programming assistant.
+Your task is to SUMMARIZE the Given result content of AI assistant.
+Keep ALL important details from the given content.
+Keep the context of the conversation history.
+
+examples:
+
+Input:Hi! I'm here to help you make Scratch programming super fun and easy! Just tell me what you're working on, and I'll turn those instructions into simple steps that any kid can follow. Let's get coding!
+Output:Just introduction message.
+
+Input: (Hey there, Scratch Explorers! Let's make our Scratch character do something cool with a special repeat block! First, we need to start our code when the green flag is clicked. 1.  **When Green Flag Clicked:** This block starts everything! 2.  **Set Variable to 0:** Let's make a scoreboard and set it to zero. 3.  **Repeat Until:** This block helps us repeat steps until our scoreboard is more than 10. 4.  **Change Variable by 1:** Each time, we add 1 to our scoreboard. 5.  **Say Variable:** Let's make our character say the score for 1 second.
+        Now, when you click the green flag, your character will keep saying the score until it goes past 10! Isn't that neat?
+)
+
+Output: User wants to make a Scratch character do something cool with a special repeat block. They want to start the code when the green flag is clicked, set a scoreboard variable to zero, and use a "repeat until" block to keep adding 1 to the scoreboard and making the character say the score until it goes past 10.
+
+Input: Hey there, Scratch Explorers! Let's break down your awesome code! Imagine your code is like a set of instructions for your Scratch character. 1.  **`when [green flag] clicked`:** This block is like the "start" button. When you click the green flag, your code starts running! 2.  **`set [variable] to [0]`:** This is like setting a counter to zero. You get to pick which counter to use from the dropdown menu. 3.  **`change [variable] by [1]`:** This block is like adding one to your counter. Each time it runs, the number goes up by one! Make sure you pick the same counter as before. 4.  **`say [message] for [2] seconds`:** This block makes your character talk! It will say whatever you put in the message box for 2 seconds. **So, when you click the green flag:**   *   First, you set your counter to zero. *   Then, you add one to that counter. *   Finally, your character says something for 2 seconds! **Important Tips:**   *   **Pick the Same Counter:** Make sure you choose the same counter in both the "set" and "change" blocks. That way, you're counting correctly! *   **Make Your Character Talk About the Counter:** Instead of a boring message, try making your character say the number that's on the counter! You can drag the counter block into the message box. Keep experimenting and have fun!
+Output: User wants to understand their Scratch code better. They have a code that starts when the green flag is clicked, sets a variable to zero, changes the variable by 1, and makes the character say a message for 2 seconds. They want to ensure they pick the same variable in both the "set" and "change" blocks and want to make their character say the number on the counter instead of a boring message.
 '''
 )

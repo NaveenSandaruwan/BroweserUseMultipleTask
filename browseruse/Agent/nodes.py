@@ -29,7 +29,7 @@ from tools.browserUseClient import send_task
 from tools.dragTool import Toolbox
 from tools.filter import filter_json, find_used_blocks, get_list_of_used_blocks, get_category_coordinates, generate_detailed_blocks_summary
 from tools.execution import AdvancedExecutor
-from reactAgents import command_agent,explaining_agent,debugging_agent,general_coding_agent,format_agent,general_agent,code_fixing_agent,fromat_query_agent
+from reactAgents import command_agent,explaining_agent,debugging_agent,general_coding_agent,format_agent,general_agent,code_fixing_agent,fromat_query_agent,add_history_agent
 from utils.state import State
 # from utils.tool import make_blocks, clean_and_make_blocks
 
@@ -111,6 +111,7 @@ def code_explain_node(state: State) -> State:
     # Compose a message that includes the query, coding summary, and working space
     message = (
         f"User Query: {state['query']}\n\n"
+        f"Conversation history between user and AI agent (USE ONLY IF NEED PAST INFORMATION): {state['chat_history']}\n\n"
         f"Scratch Block Summary and functionalities of blocks in each category:\n{web_application_coding_summary}\n\n"
         f"Current Workspace ( you can see what user have done):\n{working_space}"
     )
@@ -133,6 +134,7 @@ def code_debugging_node(state: State) -> State:
     # Compose a message that includes the query, coding summary, and working space
     message = (
         f"User Query: {state['query']}\n\n"
+        f"Conversation history between user and AI agent (USE ONLY IF NEED PAST INFORMATION): {state['chat_history']}\n\n"
         f"Scratch Block Summary and functionalities of blocks in each category:\n{web_application_coding_summary}\n\n"
         f"Current Workspace ( you can see what user have done):\n{working_space}"
     )
@@ -149,9 +151,9 @@ def give_instructions_node(state: State) -> State:
     web_application_coding_summary = generate_detailed_blocks_summary(include_all_blocks=True)
     message = (
         f"User Query: {state['query']}\n\n"
+        f"Conversation history between user and AI agent (USE ONLY IF NEED PAST INFORMATION): {state['chat_history']}\n\n"
         f"Scratch Block Summary and functionalities of blocks in each category:\n{web_application_coding_summary}\n\n"
-        
-        )
+    )
     result = general_coding_agent.invoke({"messages": [HumanMessage(content=message)]})
     # Update the existing state instead of replacing it
     new_state = state.copy()
@@ -203,7 +205,9 @@ def execute_blocks_node(state: State) -> State:
 
 
 def general_agent_node(state: State) -> State:
-    result = general_agent.invoke({"messages": [HumanMessage(content=state["query"])]})
+    message = (f"User Query: {state['query']}\n\n"
+               f"Conversation history between user and AI agent (USE ONLY IF NEED PAST INFORMATION): {state['chat_history']}\n\n")
+    result = general_agent.invoke({"messages": [HumanMessage(content=message)]})
     # Update the existing state instead of replacing it
     new_state = state.copy()
     if "result" not in new_state:
@@ -243,6 +247,7 @@ def code_fixing_node(state: State) -> State:
     # Compose analysis message
     message = (
         f"User Query: {state['query']}\n\n"
+        f"Conversation history between user and AI agent (USE ONLY IF NEED PAST INFORMATION): {state['chat_history']}\n\n"
         f"Scratch Block Summary:\n{web_application_coding_summary}\n\n"
         f"Current Workspace (CURRENT STATE - NEEDS FIXING):\n{working_space}\n\n"
         f"Task: Analyze the workspace and generate the CORRECT sequence of blocks to fix the issue."
