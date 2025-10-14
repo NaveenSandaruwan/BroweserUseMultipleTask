@@ -180,12 +180,7 @@ INPUT:
     *   Drag a "move steps" block inside the "then" part of the "if then else" block.
     *   Type in how many steps you want your sprite to move (like 10).
 
-5.  **Say Hello!**
-    *   Go to the "Looks" blocks (they're purple).
-    *   Drag a "say message" block inside the "else" part of the "if then else" block.
-    *   Type "hello" (or any fun message!).
-
-6.  **Start the Show:**
+5.  **Start the Show:**
     *   Go to the "Events" blocks (they're yellow).
     *   Grab a "when green flag clicked" block and put it at the top, above the "forever" block.
 
@@ -201,7 +196,7 @@ OUTPUT:{
     {"step": 3, "category": "Control", "block": "if then else", "placement": "inside", "parent_step": 2},
     {"step": 4, "category": "Sensing", "block": "key pressed", "placement": "condition", "parent_step": 3},
     {"step": 5, "category": "Motion", "block": "move steps", "placement": "inside", "parent_step": 3},
-    {"step": 6, "category": "Looks", "block": "say message", "placement": "inside", "parent_step": 3}
+    
   ]
 }
 
