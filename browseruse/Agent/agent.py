@@ -21,7 +21,7 @@ from nodes import (
     format_response,general_agent_node,handle_execution_error,
     code_fixing_node, execute_fix_node, execute_fix_blocks_node 
     )
-
+from reactAgents import add_history_agent
 
 graph = StateGraph(State)
 
@@ -92,16 +92,35 @@ graph.add_edge("format_response", END)
 chat = graph.compile()
 
 chat_history = []
+user_input = None
+previous_output = ""
 
 if __name__ == "__main__":
     while True:
+        if len(previous_output) > 0:
+            chat_history.append({"User": user_input, "AI agent": add_history_agent.invoke({"messages": previous_output})["messages"][-1].content})
+            user_input = ""
+            previous_output = ""
+            # print(chat_history)
         user_input = input("You: ")
         if user_input.lower() in ["exit", "quit"]:
             print("Exiting chat.")
             break
+        history = chat_history[-5:] if len(chat_history) > 5 else chat_history
+        conversation = ""
+        if len(history) > 0:
+            
+            # Create a formatted conversation string
+            n= 1
+            for turn in history:
+                conversation += f" Conversation {n}\nUser: {turn['User']}\nAI agent: {turn['AI agent']}\n"
+                n += 1
+        print("Conversation history:", conversation)
 
         result = chat.invoke({
-            "query": chat_history + [{"role": "user", "content": user_input}]
+            "query":  user_input,
+            "chat_history": conversation
         })
-        print(result['result']['formatted_response'])
-       
+
+        previous_output = result['result']['formatted_response']
+        print(previous_output)
