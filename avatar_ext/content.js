@@ -265,6 +265,26 @@ function simpleMarkdownToHtml(markdownText) {
 }
 
 // =========================
+// Helper function to update disable voice button properly
+// =========================
+function updateDisableVoiceButton(btn) {
+  if (!btn) return;
+
+  // Update the original icon and title stored in the button's dataset
+  if (window.isVoiceEnabled) {
+    btn.dataset.originalIcon = "🔊";
+    btn.dataset.originalTitle = "Disable Voice";
+    btn.innerHTML = "🔊";
+    btn.title = "Disable Voice";
+  } else {
+    btn.dataset.originalIcon = "🔇";
+    btn.dataset.originalTitle = "Enable Voice";
+    btn.innerHTML = "🔇";
+    btn.title = "Enable Voice";
+  }
+}
+
+// =========================
 // Create and Insert UI Elements
 // =================================
 function createAvatarUI() {
@@ -284,12 +304,12 @@ function createAvatarUI() {
         top: 20px;
         right: 20px;
         z-index: 10000;
-        width: 120px;
-        height: 120px;
+        width: 80px;
+        height: 80px;
         cursor: move;
     `;
 
-  // --- Avatar Graphic Element (Center of the circular menu) ---
+  // --- Avatar Graphic Element (Simplified, no menu) ---
   const avatar = document.createElement("div");
   avatar.id = "python-avatar";
   avatar.innerHTML = `
@@ -330,8 +350,8 @@ function createAvatarUI() {
     `;
   avatar.style.cssText = `
         position: absolute;
-        top: 20px;
-        left: 20px;
+        top: 0;
+        left: 0;
         width: 80px;
         height: 80px;
         border-radius: 50%;
@@ -340,22 +360,62 @@ function createAvatarUI() {
         transition: transform 0.3s ease;
     `;
 
-  // --- Circular Button Menu (Hidden by default, shows on hover) ---
-  const buttonMenu = document.createElement("div");
-  buttonMenu.id = "avatar-button-menu";
-  buttonMenu.style.cssText = `
+  // --- Menu Button Container (Separate movable element) ---
+  const menuContainer = document.createElement("div");
+  menuContainer.id = "avatar-menu-container";
+  menuContainer.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 120px;
+        z-index: 10000;
+        width: 200px;
+        height: 200px;
+        pointer-events: auto;
+    `;
+
+  // --- Menu Button (Center of the radial menu) ---
+  const menuButton = document.createElement("button");
+  menuButton.id = "avatar-menu-button";
+  menuButton.innerHTML = "☰";
+  menuButton.title = "Avatar Menu";
+  menuButton.style.cssText = `
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 120px;
-        height: 120px;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-size: 24px;
+        border: none;
+        cursor: move;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
     `;
 
-  // --- Speech Bubble (Scrollable and fixed height/width) ---
+  // --- Radial Menu Buttons (Hidden by default, shows on hover) ---
+  const radialButtonsContainer = document.createElement("div");
+  radialButtonsContainer.id = "avatar-radial-buttons";
+  radialButtonsContainer.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 200px;
+        height: 200px;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        transform-origin: center;
+    `;
+
+  // --- Speech Bubble (Positioned relative to avatar) ---
   const speechBubble = document.createElement("div");
   speechBubble.id = "python-avatar-speech";
   speechBubble.style.cssText = `
@@ -372,175 +432,142 @@ function createAvatarUI() {
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         position: absolute;
         top: 0;
-        right: 130px;
+        right: 90px;
         font-size: 14px;
         line-height: 1.4;
         cursor: default;
     `;
 
-  // Function to create a circular menu button
-  function createMenuButton(id, emoji, title, background, angle) {
+  // Function to create a radial menu button
+  function createRadialButton(id, icon, title, color, angle) {
     const btn = document.createElement("button");
     btn.id = id;
-    btn.innerHTML = emoji;
     btn.title = title;
 
-    // Calculate position on circle (60px radius from center)
-    const radius = 60;
+    // Calculate position on circle (80px radius from center)
+    const radius = 80;
     const radian = (angle * Math.PI) / 180;
     const x = radius * Math.cos(radian);
     const y = radius * Math.sin(radian);
 
+    btn.className = "radial-button"; // Add the CSS class for animations
+
+    // Set the base position using top/left instead of transform for stability
+    const centerOffset = 22.5; // Half of button width/height (45px/2)
     btn.style.cssText = `
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(calc(-50% + ${x}px), calc(-50% + ${y}px));
-        width: 35px;
-        height: 35px;
+        left: ${100 + x - centerOffset}px;
+        top: ${100 + y - centerOffset}px;
+        width: 45px;
+        height: 45px;
         border-radius: 50%;
-        background: ${background};
+        background: ${color};
         color: white;
-        font-size: 16px;
+        font-size: 18px;
         border: none;
         cursor: pointer;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        display: flex;
+        align-items: center;
+        justify-content: center;
         pointer-events: auto;
-        z-index: 1;
+        z-index: 5;
+        opacity: 0;
+        transform: scale(0);
+        transform-origin: center center;
     `;
 
-    // Hover effects
+    // Store original icon and color
+    btn.dataset.originalIcon = icon;
+    btn.dataset.originalColor = color;
+    btn.dataset.originalTitle = title;
+
+    // Set initial content to just the icon
+    btn.innerHTML = icon;
+
+    // Add staggered animation delay based on angle
+    const delay = (angle / 360) * 0.3; // 0.3s total spread
+    btn.style.transitionDelay = `${delay}s`;
+
+    // Hover effects - simple scale and shadow only, no text expansion
     btn.addEventListener("mouseenter", () => {
-      btn.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(1.2)`;
-      btn.style.boxShadow = "0 5px 15px rgba(0,0,0,0.4)";
+      btn.style.transform = "scale(1.15)";
+      btn.style.boxShadow = "0 6px 20px rgba(0,0,0,0.4)";
     });
 
     btn.addEventListener("mouseleave", () => {
-      btn.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(1)`;
-      btn.style.boxShadow = "0 3px 10px rgba(0,0,0,0.3)";
+      btn.style.transform = "scale(1)";
+      btn.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
     });
 
     return btn;
   }
 
-  // Create circular menu buttons
-  const micBtn = createMenuButton("mic", "🎤", "Voice input", "#4285f4", 0); // Right
-  const ttsBtn = createMenuButton(
+  // Create radial menu buttons
+  const micBtn = createRadialButton("mic", "🎤", "Voice Input", "#4285f4", 0); // Right
+  const ttsBtn = createRadialButton(
     "tts-test",
     "🔊",
-    "Test text-to-speech",
+    "Test Text-to-Speech",
     "#34A853",
     45
   ); // Top-right
-  const elevenLabsBtn = createMenuButton(
+  const elevenLabsBtn = createRadialButton(
     "elevenlabs-config",
     "🎵",
     "Configure ElevenLabs TTS",
     "#FF6B35",
     90
   ); // Top
-  const emotionBtn = createMenuButton(
+  const emotionBtn = createRadialButton(
     "emotion-test",
     "🎭",
-    "Test avatar emotions",
+    "Test Avatar Emotions",
     "#FBBC05",
     135
   ); // Top-left
-  const disableVoiceBtn = createMenuButton(
+  const disableVoiceBtn = createRadialButton(
     "disable-voice",
     "🔇",
-    "Disable/Enable voice",
+    "Disable/Enable Voice",
     "#EA4335",
     180
   ); // Left
-  const helpBtn = createMenuButton(
+  const helpBtn = createRadialButton(
     "help-guide",
     "❓",
     "Help & Guide",
     "#9C27B0",
     225
   ); // Bottom-left
-  const savePositionBtn = createMenuButton(
+  const savePositionBtn = createRadialButton(
     "save-position",
     "📌",
-    "Save current position",
+    "Save Current Position",
     "#607D8B",
     270
   ); // Bottom
-  const lipSyncBtn = createMenuButton(
+  const lipSyncBtn = createRadialButton(
     "lipsync-test",
     "👄",
-    "Test lip sync animation",
+    "Test Lip Sync Animation",
     "#E91E63",
     315
   ); // Bottom-right
 
-  // Add buttons to menu
-  buttonMenu.appendChild(micBtn);
-  buttonMenu.appendChild(ttsBtn);
-  buttonMenu.appendChild(elevenLabsBtn);
-  buttonMenu.appendChild(emotionBtn);
-  buttonMenu.appendChild(disableVoiceBtn);
-  buttonMenu.appendChild(helpBtn);
-  buttonMenu.appendChild(savePositionBtn);
-  buttonMenu.appendChild(lipSyncBtn);
+  // Add event listeners for buttons
+  // Note: mic button event listener is handled in the main speech recognition section
 
-  // --- Status element ---
-  const statusEl = document.createElement("div");
-  statusEl.id = "status";
-  statusEl.style.cssText = `
-        position: absolute;
-        bottom: -30px;
-        left: 50%;
-        transform: translateX(-50%);
-        font-family: Arial, sans-serif;
-        font-size: 12px;
-        color: #333;
-        background: rgba(255,255,255,0.9);
-        padding: 4px 8px;
-        border-radius: 12px;
-        white-space: nowrap;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    `;
-
-  // Append elements to container
-  container.appendChild(avatar);
-  container.appendChild(buttonMenu);
-  container.appendChild(speechBubble);
-  container.appendChild(statusEl);
-
-  // Add hover effects for the entire container
-  container.addEventListener("mouseenter", () => {
-    buttonMenu.style.opacity = "1";
-    buttonMenu.style.pointerEvents = "auto";
-    avatar.style.transform = "scale(1.1)";
-  });
-
-  container.addEventListener("mouseleave", () => {
-    buttonMenu.style.opacity = "0";
-    buttonMenu.style.pointerEvents = "none";
-    avatar.style.transform = "scale(1)";
-  });
-
-  console.log("Appending avatar container to document body");
-  document.body.appendChild(container);
-  console.log("Avatar UI created successfully");
-
-  // Add event listener for TTS test button
   ttsBtn.addEventListener("click", () => {
     statusEl.textContent = "Testing TTS...";
     speakText("test");
   });
 
-  // Add event listener for ElevenLabs config button
   elevenLabsBtn.addEventListener("click", () => {
     createElevenLabsConfigModal();
   });
 
-  // Add event listener for Emotion test button
   emotionBtn.addEventListener("click", async () => {
     try {
       statusEl.textContent = "Testing emotion detection...";
@@ -555,7 +582,7 @@ function createAvatarUI() {
 
         // If still not connected, use a fallback
         if (!isSocketConnected) {
-          throw new Error("WebSocket connection failed");
+          console.log("WebSocket still not connected, using fallback");
         }
       }
 
@@ -607,12 +634,48 @@ function createAvatarUI() {
     }
   });
 
-  // Add event listener for save position button
+  disableVoiceBtn.addEventListener("click", () => {
+    window.isVoiceEnabled = !window.isVoiceEnabled; // Toggle global state directly
+
+    console.log(
+      "Voice disable button clicked - New status:",
+      window.isVoiceEnabled
+    );
+
+    if (window.isVoiceEnabled) {
+      disableVoiceBtn.innerHTML = `<span style="margin-right: 10px; font-size: 16px;">🔊</span>`;
+      statusEl.textContent = "Voice enabled";
+      statusEl.style.opacity = "1";
+    } else {
+      disableVoiceBtn.innerHTML = `<span style="margin-right: 10px; font-size: 16px;">🔇</span>`;
+      statusEl.textContent = "Voice disabled";
+      statusEl.style.opacity = "1";
+      // Stop any current speech
+      if (window.elevenLabsTTS && window.elevenLabsTTS.stopSpeaking) {
+        window.elevenLabsTTS.stopSpeaking();
+      }
+    }
+    setTimeout(() => {
+      statusEl.style.opacity = "0";
+    }, 2000);
+  });
+
+  // Fix for disableVoiceBtn innerHTML - corrected version
+  const fixDisableVoiceBtn = () => {
+    updateDisableVoiceButton(disableVoiceBtn);
+  };
+
+  // Apply the fix immediately
+  fixDisableVoiceBtn();
+
+  helpBtn.addEventListener("click", () => {
+    showHelpGuide();
+  });
+
   savePositionBtn.addEventListener("click", () => {
     saveAvatarPosition(true); // Show notification when button is clicked
   });
 
-  // Add event listener for lip sync test button
   lipSyncBtn.addEventListener("click", async () => {
     statusEl.textContent = "Testing lip sync...";
     statusEl.style.opacity = "1";
@@ -641,48 +704,112 @@ function createAvatarUI() {
     }
   });
 
-  // Add event listener for disable voice button
-  disableVoiceBtn.addEventListener("click", () => {
-    window.isVoiceEnabled = !window.isVoiceEnabled; // Toggle global state directly
+  // Add radial buttons to container
+  radialButtonsContainer.appendChild(micBtn);
+  radialButtonsContainer.appendChild(ttsBtn);
+  radialButtonsContainer.appendChild(elevenLabsBtn);
+  radialButtonsContainer.appendChild(emotionBtn);
+  radialButtonsContainer.appendChild(disableVoiceBtn);
+  radialButtonsContainer.appendChild(helpBtn);
+  radialButtonsContainer.appendChild(savePositionBtn);
+  radialButtonsContainer.appendChild(lipSyncBtn);
 
-    console.log(
-      "Voice disable button clicked - New status:",
-      window.isVoiceEnabled
-    );
+  // --- Status element (positioned relative to avatar) ---
+  const statusEl = document.createElement("div");
+  statusEl.id = "status";
+  statusEl.style.cssText = `
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        color: #333;
+        background: rgba(255,255,255,0.9);
+        padding: 4px 8px;
+        border-radius: 12px;
+        white-space: nowrap;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    `;
 
-    if (window.isVoiceEnabled) {
-      disableVoiceBtn.innerHTML = "🔊";
-      disableVoiceBtn.title = "Disable voice";
-      statusEl.textContent = "Voice enabled";
-      statusEl.style.opacity = "1";
-    } else {
-      disableVoiceBtn.innerHTML = "🔇";
-      disableVoiceBtn.title = "Enable voice";
-      statusEl.textContent = "Voice disabled";
-      statusEl.style.opacity = "1";
-      // Stop any current speech
-      if (window.elevenLabsTTS && window.elevenLabsTTS.stopSpeaking) {
-        window.elevenLabsTTS.stopSpeaking();
-      }
-    }
-    setTimeout(() => {
-      statusEl.style.opacity = "0";
-    }, 2000);
+  // Append elements to avatar container
+  container.appendChild(avatar);
+  container.appendChild(speechBubble);
+  container.appendChild(statusEl);
+
+  // Append elements to menu container
+  menuContainer.appendChild(menuButton);
+  menuContainer.appendChild(radialButtonsContainer);
+
+  // Add hover effects for radial menu
+  menuContainer.addEventListener("mouseenter", () => {
+    console.log("🎯 Menu hover detected - showing radial buttons");
+    radialButtonsContainer.style.opacity = "1";
+    radialButtonsContainer.style.pointerEvents = "auto";
+    menuButton.style.transform = "translate(-50%, -50%) scale(1.1)";
+    menuButton.style.boxShadow = "0 6px 20px rgba(0,0,0,0.4)";
+
+    // Animate radial buttons in with stable positioning
+    const buttons = radialButtonsContainer.querySelectorAll(".radial-button");
+    console.log("📍 Found buttons:", buttons.length);
+    buttons.forEach((btn, index) => {
+      setTimeout(() => {
+        btn.style.opacity = "1";
+        // Use consistent scale transform without position changes
+        btn.style.transform = "scale(1)";
+        console.log(`Button ${index + 1} animated in`);
+      }, index * 50);
+    });
   });
+
+  menuContainer.addEventListener("mouseleave", () => {
+    console.log("🎯 Menu hover ended - hiding radial buttons");
+    radialButtonsContainer.style.opacity = "0";
+    radialButtonsContainer.style.pointerEvents = "none";
+    menuButton.style.transform = "translate(-50%, -50%) scale(1)";
+    menuButton.style.boxShadow = "0 4px 15px rgba(0,0,0,0.3)";
+
+    // Animate radial buttons out with stable positioning
+    const buttons = radialButtonsContainer.querySelectorAll(".radial-button");
+    buttons.forEach((btn, index) => {
+      setTimeout(() => {
+        btn.style.opacity = "0";
+        // Use consistent scale transform without position changes
+        btn.style.transform = "scale(0)";
+      }, index * 30);
+    });
+  });
+
+  console.log("Appending avatar and menu containers to document body");
+  document.body.appendChild(container);
+  document.body.appendChild(menuContainer);
+  console.log("Avatar UI created successfully");
+
+  // Debug function to show buttons manually
+  window.showRadialButtons = function () {
+    console.log("🔧 Debug: Manually showing radial buttons");
+    radialButtonsContainer.style.opacity = "1";
+    radialButtonsContainer.style.pointerEvents = "auto";
+    const buttons = radialButtonsContainer.querySelectorAll(".radial-button");
+    console.log("🔧 Found buttons for manual show:", buttons.length);
+    buttons.forEach((btn, index) => {
+      btn.style.opacity = "1";
+      // Use consistent scale transform without position changes
+      btn.style.transform = "scale(1)";
+      console.log(`🔧 Button ${index + 1}:`, btn.innerHTML, btn.title);
+    });
+  };
+
+  // Event listeners are now handled in menu item creation above
 
   // Initialize button state based on current voice status
   if (window.isVoiceEnabled) {
-    disableVoiceBtn.innerHTML = "🔊";
-    disableVoiceBtn.title = "Disable voice";
+    disableVoiceBtn.innerHTML = `<span style="margin-right: 10px; font-size: 16px;">🔊</span>`;
   } else {
-    disableVoiceBtn.innerHTML = "🔇";
-    disableVoiceBtn.title = "Enable voice";
+    disableVoiceBtn.innerHTML = `<span style="margin-right: 10px; font-size: 16px;">🔇</span>`;
   }
-
-  // Add event listener for help button
-  helpBtn.addEventListener("click", () => {
-    showHelpGuide();
-  });
 
   return {
     micBtn,
@@ -693,6 +820,8 @@ function createAvatarUI() {
     disableVoiceBtn,
     helpBtn,
     savePositionBtn,
+    lipSyncBtn,
+    menuContainer, // Add menu container to return
   };
 }
 
@@ -714,23 +843,34 @@ function getUIElements() {
 // Save avatar position to local storage
 function saveAvatarPosition(showNotification = false) {
   const container = document.getElementById("avatar-extension-container");
+  const menuContainer = document.getElementById("avatar-menu-container");
+
   if (container) {
-    const position = {
+    const avatarPosition = {
       left: container.style.left,
       top: container.style.top,
       right: container.style.right,
     };
-    localStorage.setItem("avatar-position", JSON.stringify(position));
+    localStorage.setItem("avatar-position", JSON.stringify(avatarPosition));
+  }
 
-    // Show saved confirmation only if explicitly requested
-    if (showNotification) {
-      const statusEl = document.getElementById("status");
-      if (statusEl) {
-        statusEl.textContent = "Position saved!";
-        setTimeout(() => {
-          statusEl.textContent = "";
-        }, 2000);
-      }
+  if (menuContainer) {
+    const menuPosition = {
+      left: menuContainer.style.left,
+      top: menuContainer.style.top,
+      right: menuContainer.style.right,
+    };
+    localStorage.setItem("menu-position", JSON.stringify(menuPosition));
+  }
+
+  // Show saved confirmation only if explicitly requested
+  if (showNotification) {
+    const statusEl = document.getElementById("status");
+    if (statusEl) {
+      statusEl.textContent = "Positions saved!";
+      setTimeout(() => {
+        statusEl.textContent = "";
+      }, 2000);
     }
   }
 }
@@ -738,9 +878,10 @@ function saveAvatarPosition(showNotification = false) {
 // Restore avatar position from local storage
 function restoreAvatarPosition() {
   try {
-    const savedPosition = localStorage.getItem("avatar-position");
-    if (savedPosition) {
-      const position = JSON.parse(savedPosition);
+    // Restore avatar position
+    const savedAvatarPosition = localStorage.getItem("avatar-position");
+    if (savedAvatarPosition) {
+      const position = JSON.parse(savedAvatarPosition);
       const container = document.getElementById("avatar-extension-container");
       if (container) {
         if (position.left) container.style.left = position.left;
@@ -749,8 +890,21 @@ function restoreAvatarPosition() {
           container.style.right = position.right;
       }
     }
+
+    // Restore menu position
+    const savedMenuPosition = localStorage.getItem("menu-position");
+    if (savedMenuPosition) {
+      const position = JSON.parse(savedMenuPosition);
+      const menuContainer = document.getElementById("avatar-menu-container");
+      if (menuContainer) {
+        if (position.left) menuContainer.style.left = position.left;
+        if (position.top) menuContainer.style.top = position.top;
+        if (position.right && !position.left)
+          menuContainer.style.right = position.right;
+      }
+    }
   } catch (e) {
-    console.error("Error restoring avatar position:", e);
+    console.error("Error restoring positions:", e);
   }
 }
 
@@ -1082,13 +1236,17 @@ if (!SpeechRecognitionAPI) {
 
   recognition.onstart = () => {
     isListening = true;
-    micBtn.style.background = "#EA4335";
+    micBtn.style.background = "#FF5722"; // Change to red background when listening
+    micBtn.innerHTML = "🔴";
+    micBtn.title = "Stop Listening";
     statusEl.textContent = "Listening...";
   };
 
   recognition.onend = () => {
     isListening = false;
-    micBtn.style.background = "#4285f4";
+    micBtn.style.background = "#4285f4"; // Restore original blue background
+    micBtn.innerHTML = "🎤";
+    micBtn.title = "Voice Input";
     statusEl.textContent = "";
   };
 
@@ -1400,6 +1558,8 @@ async function speakText(text) {
               break;
             case "completed":
               statusEl.textContent = "Speech completed";
+              // Set avatar to neutral mood after speaking
+              updateAvatarEmotion("neutral");
               setTimeout(() => {
                 statusEl.style.opacity = "0";
                 setTimeout(() => {
@@ -1446,6 +1606,11 @@ async function speakText(text) {
                 statusEl.textContent = "";
               }, 3000);
             }
+            // Set avatar to neutral mood after speech failure
+            updateAvatarEmotion("neutral");
+          } else if (response && response.success) {
+            // Set avatar to neutral mood after successful speech
+            updateAvatarEmotion("neutral");
           }
         }
       );
@@ -1472,17 +1637,23 @@ async function speakText(text) {
                 setTimeout(() => {
                   statusEl.textContent = "";
                 }, 2000);
+                // Set avatar to neutral mood after successful fallback speech
+                updateAvatarEmotion("neutral");
               } else {
                 statusEl.textContent = "Speech error";
                 setTimeout(() => {
                   statusEl.textContent = "";
                 }, 3000);
+                // Set avatar to neutral mood after speech error
+                updateAvatarEmotion("neutral");
               }
             }
           }
         );
       } catch (fallbackError) {
         console.error("Fallback TTS also failed:", fallbackError);
+        // Set avatar to neutral mood after complete TTS failure
+        updateAvatarEmotion("neutral");
       }
     }
   }
@@ -1491,122 +1662,7 @@ async function speakText(text) {
 // =========================
 // Initialization
 // =========================
-// Add Avatar and Menu Styles
-const avatarStyles = document.createElement("style");
-avatarStyles.textContent = `
-  /* Avatar animations */
-  #left-eyebrow, #right-eyebrow, #left-pupil, #right-pupil {
-    transition: all 0.5s ease-in-out;
-  }
-  
-  /* Emoji-style mouth animation optimized for lip sync */
-  #upper-mouth, #lower-mouth {
-    transition: d 0.08s ease-out;
-  }
-  
-  #mouth-group {
-    transition: all 0.08s ease-out;
-  }
-  
-  @keyframes blink {
-    0% { transform: scaleY(1); }
-    45% { transform: scaleY(1); }
-    50% { transform: scaleY(0.1); }
-    55% { transform: scaleY(1); }
-    100% { transform: scaleY(1); }
-  }
-  
-  #eyes {
-    transform-origin: center;
-    animation: blink 4s infinite;
-  }
-
-  /* Avatar container hover effects */
-  #avatar-extension-container {
-    transition: all 0.3s ease;
-  }
-
-  #avatar-extension-container:hover {
-    filter: drop-shadow(0 0 20px rgba(55, 118, 171, 0.3));
-  }
-
-  /* Circular menu animations */
-  #avatar-button-menu button {
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  /* Status element improvements */
-  #status {
-    transition: all 0.3s ease;
-  }
-
-  /* Help modal scrollbar */
-  #avatar-help-modal div::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  #avatar-help-modal div::-webkit-scrollbar-track {
-    background: rgba(255,255,255,0.1);
-    border-radius: 4px;
-  }
-  
-  #avatar-help-modal div::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.3);
-    border-radius: 4px;
-  }
-  
-  #avatar-help-modal div::-webkit-scrollbar-thumb:hover {
-    background: rgba(255,255,255,0.5);
-  }
-  
-  /* Thinking animation styles */
-  .thinking-dots {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    display: flex;
-    gap: 3px;
-  }
-  
-  .thinking-dot {
-    width: 6px;
-    height: 6px;
-    background: #3776AB;
-    border-radius: 50%;
-    animation: thinkingPulse 1.4s ease-in-out infinite both;
-  }
-  
-  .thinking-dot:nth-child(1) { animation-delay: -0.32s; }
-  .thinking-dot:nth-child(2) { animation-delay: -0.16s; }
-  .thinking-dot:nth-child(3) { animation-delay: 0; }
-  
-  @keyframes thinkingPulse {
-    0%, 80%, 100% {
-      transform: scale(0.8);
-      opacity: 0.5;
-    }
-    40% {
-      transform: scale(1.2);
-      opacity: 1;
-    }
-  }
-  
-  /* Avatar thinking glow effect */
-  .avatar-thinking {
-    box-shadow: 0 0 20px rgba(55, 118, 171, 0.6) !important;
-    animation: thinkingGlow 2s ease-in-out infinite alternate !important;
-  }
-  
-  @keyframes thinkingGlow {
-    from {
-      box-shadow: 0 0 15px rgba(55, 118, 171, 0.4);
-    }
-    to {
-      box-shadow: 0 0 25px rgba(55, 118, 171, 0.8);
-    }
-  }
-`;
-document.head.appendChild(avatarStyles);
+// Styles will be initialized in initializeAvatarExtension function
 
 // =========================
 // Thinking Animation Functions
@@ -1781,23 +1837,168 @@ function makeDraggable(container) {
   return container;
 }
 
+// Special draggable function for menu button that moves the entire menu container
+function makeDraggableMenuButton(menuContainer, menuButton) {
+  let offsetX, offsetY;
+  let isDragging = false;
+
+  // Function to handle starting drag
+  function dragStart(e) {
+    // Only allow dragging when clicking directly on the menu button
+    if (e.target !== menuButton) {
+      return; // Don't start dragging if clicking elsewhere
+    }
+
+    // Prevent default only for mouse events, not for touch events
+    if (e.type !== "touchstart") {
+      e.preventDefault();
+    }
+
+    // Get the initial position of the menu container
+    const boundingRect = menuContainer.getBoundingClientRect();
+
+    // Use pageX/pageY for accurate positioning with scroll
+    const pageX = e.pageX || e.touches[0].pageX;
+    const pageY = e.pageY || e.touches[0].pageY;
+
+    // Calculate the offset of the mouse pointer from the top-left corner of the container
+    offsetX = pageX - boundingRect.left;
+    offsetY = pageY - boundingRect.top;
+
+    isDragging = true;
+
+    // Change cursor style
+    menuButton.style.cursor = "grabbing";
+    menuContainer.style.pointerEvents = "none"; // Prevent interference with radial buttons
+
+    // Add event listeners for drag and end
+    if (e.type === "mousedown") {
+      document.addEventListener("mousemove", dragMove);
+      document.addEventListener("mouseup", dragEnd);
+    } else if (e.type === "touchstart") {
+      document.addEventListener("touchmove", dragMove, { passive: false });
+      document.addEventListener("touchend", dragEnd);
+    }
+  }
+
+  // Function to handle drag movement
+  function dragMove(e) {
+    if (!isDragging) return;
+
+    // Prevent default to stop text selection during drag
+    e.preventDefault();
+
+    // Get current pointer position
+    const pageX = e.pageX || e.touches[0].pageX;
+    const pageY = e.pageY || e.touches[0].pageY;
+
+    // Calculate new position (with bounds checking)
+    const newLeft = pageX - offsetX;
+    const newTop = pageY - offsetY;
+
+    // Get viewport dimensions
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Get container dimensions
+    const containerWidth = menuContainer.offsetWidth;
+    const containerHeight = menuContainer.offsetHeight;
+
+    // Keep the menu within the viewport
+    const boundedLeft = Math.max(
+      0,
+      Math.min(newLeft, viewportWidth - containerWidth)
+    );
+    const boundedTop = Math.max(
+      0,
+      Math.min(newTop, viewportHeight - containerHeight)
+    );
+
+    // Convert from absolute position to fixed position
+    menuContainer.style.left = boundedLeft + "px";
+    menuContainer.style.top = boundedTop + "px";
+    menuContainer.style.right = "auto"; // Clear the right position
+  }
+
+  // Function to handle end of drag
+  function dragEnd() {
+    isDragging = false;
+
+    // Change cursor back
+    menuButton.style.cursor = "pointer";
+    menuContainer.style.pointerEvents = "auto"; // Re-enable pointer events
+
+    // Remove event listeners
+    document.removeEventListener("mousemove", dragMove);
+    document.removeEventListener("mouseup", dragEnd);
+    document.removeEventListener("touchmove", dragMove);
+    document.removeEventListener("touchend", dragEnd);
+
+    // Automatically save the position when drag ends
+    saveAvatarPosition();
+
+    // Show subtle visual feedback that position was saved
+    const saveBtn = document.getElementById("save-position");
+    if (saveBtn) {
+      // Flash the save button briefly
+      const originalColor = saveBtn.style.backgroundColor;
+      saveBtn.style.backgroundColor = "#34A853"; // Green flash
+      setTimeout(() => {
+        saveBtn.style.backgroundColor = originalColor;
+      }, 300);
+    }
+  }
+
+  // Add event listeners for drag start only to the menu button
+  menuButton.addEventListener("mousedown", dragStart);
+  menuButton.addEventListener("touchstart", dragStart, { passive: true });
+
+  return menuButton;
+}
+
 // Main initialization function
 function initializeAvatarExtension() {
   console.log("Initializing Avatar Extension...");
 
   try {
+    // Initialize styles first
+    console.log("🎨 Attempting to initialize styles...");
+    if (window.AvatarStyles && window.AvatarStyles.initializeStyles) {
+      window.AvatarStyles.initializeStyles();
+      console.log("✅ Styles initialized successfully");
+    } else {
+      console.warn(
+        "❌ AvatarStyles not available, styles may not load properly"
+      );
+      console.log(
+        "Available window properties:",
+        Object.keys(window).filter((key) => key.includes("Avatar"))
+      );
+    }
+
     // Create the UI
     const avatarUI = createAvatarUI();
     console.log("Avatar UI created successfully");
 
-    // Make the avatar container draggable
+    // Make containers draggable
     const container = document.getElementById("avatar-extension-container");
+    const menuContainer = document.getElementById("avatar-menu-container");
+    const menuButton = document.getElementById("avatar-menu-button");
+
     if (container) {
       makeDraggable(container);
-      // Restore saved position if available
-      restoreAvatarPosition();
-      console.log("Avatar made draggable and position restored");
+      console.log("Avatar made draggable");
     }
+
+    if (menuContainer && menuButton) {
+      // Make only the menu button draggable, not the entire container
+      makeDraggableMenuButton(menuContainer, menuButton);
+      console.log("Menu button made draggable");
+    }
+
+    // Restore saved positions if available
+    restoreAvatarPosition();
+    console.log("Positions restored");
 
     // Initialize ElevenLabs TTS if configured
     setTimeout(async () => {
@@ -1830,7 +2031,7 @@ function safeInitialize() {
 }
 
 // Start initialization
-console.log("Avatar Extension content script loaded");
+console.log("🤖 Avatar Extension content script loaded - v2.0");
 safeInitialize();
 
 // Demo function for testing (can be called from console)
@@ -1857,6 +2058,62 @@ window.avatarDemo = function () {
 
   console.log("💡 Try these commands:");
   console.log("- avatarDemo() - Run this demo again");
+  console.log("- showRadialButtons() - Force show the radial menu buttons");
   console.log("- Hover over the avatar to see the circular menu");
   console.log("- Click the ❓ button for the full help guide");
+};
+
+// Debug function for testing radial buttons
+window.testRadialMenu = function () {
+  console.log("🧪 Testing radial menu...");
+  const menuContainer = document.getElementById("avatar-menu-container");
+  const radialContainer = document.getElementById("avatar-radial-buttons");
+  const menuButton = document.getElementById("avatar-menu-button");
+  const micBtn = document.getElementById("mic");
+  const disableVoiceBtn = document.getElementById("disable-voice");
+
+  console.log("Menu container:", !!menuContainer);
+  console.log("Menu button:", !!menuButton);
+  console.log("Radial container:", !!radialContainer);
+
+  if (radialContainer) {
+    const buttons = radialContainer.querySelectorAll(".radial-button");
+    console.log("Radial buttons found:", buttons.length);
+    buttons.forEach((btn, i) => {
+      console.log(`Button ${i + 1}: ${btn.innerHTML} - ${btn.title}`);
+    });
+
+    // Force show buttons
+    if (window.showRadialButtons) {
+      window.showRadialButtons();
+    }
+  }
+
+  // Test hover functionality
+  if (micBtn) {
+    console.log("🎤 Mic button found - testing hover functionality");
+    console.log("Current innerHTML:", micBtn.innerHTML);
+    console.log("Original icon:", micBtn.dataset.originalIcon);
+  }
+
+  if (disableVoiceBtn) {
+    console.log("🔇 Disable voice button found");
+    console.log("Current innerHTML:", disableVoiceBtn.innerHTML);
+    console.log("Original icon:", disableVoiceBtn.dataset.originalIcon);
+  }
+
+  // Test draggability
+  if (menuButton && menuContainer) {
+    console.log(
+      "✅ Menu button drag fix applied - only center button should be draggable"
+    );
+    console.log(
+      "🎯 Menu container cursor:",
+      window.getComputedStyle(menuContainer).cursor
+    );
+    console.log(
+      "🎯 Menu button cursor:",
+      window.getComputedStyle(menuButton).cursor
+    );
+  }
 };

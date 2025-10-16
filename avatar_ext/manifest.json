@@ -19,6 +19,7 @@
       "js": [
         "js/elevenlabs.js",
         "js/elevenlabs-config.js",
+        "js/styles.js",
         "content.js"
       ],
       "run_at": "document_end"

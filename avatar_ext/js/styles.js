@@ -9,8 +9,18 @@ function initializeStyles() {
   // Add SVG animation styles
   const avatarStyles = document.createElement("style");
   avatarStyles.textContent = `
-    #avatar-mouth, #left-eyebrow, #right-eyebrow, #left-pupil, #right-pupil {
+    /* Avatar animations */
+    #left-eyebrow, #right-eyebrow, #left-pupil, #right-pupil {
       transition: all 0.5s ease-in-out;
+    }
+    
+    /* Emoji-style mouth animation optimized for lip sync */
+    #upper-mouth, #lower-mouth {
+      transition: all 0.08s ease-out;
+    }
+    
+    #mouth-group {
+      transition: all 0.08s ease-out;
     }
     
     @keyframes blink {
@@ -24,6 +34,93 @@ function initializeStyles() {
     #eyes {
       transform-origin: center;
       animation: blink 4s infinite;
+    }
+
+    /* Avatar container hover effects */
+    #avatar-extension-container {
+      transition: all 0.3s ease;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    #avatar-extension-container:hover {
+      filter: drop-shadow(0 0 20px rgba(55, 118, 171, 0.3));
+    }
+
+    /* Menu container styles */
+    #avatar-menu-container {
+      transition: all 0.3s ease;
+    }
+
+    #avatar-menu-button {
+      transition: all 0.3s ease;
+    }
+
+    #avatar-menu-button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+
+    /* Dropdown menu animations */
+    #avatar-dropdown-menu {
+      transition: all 0.3s ease;
+    }
+
+    /* Menu item hover effects */
+    .menu-item {
+      transition: background-color 0.2s ease;
+    }
+
+    .menu-item:hover {
+      background-color: #f5f5f5;
+    }
+
+    /* Status element improvements */
+    #status {
+      transition: all 0.3s ease;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    /* Help modal scrollbar */
+    #avatar-help-modal div::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    #avatar-help-modal div::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+    }
+    
+    #avatar-help-modal div::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.3);
+      border-radius: 4px;
+    }
+    
+    #avatar-help-modal div::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,255,255,0.5);
+    }
+    
+    /* Speech bubble enhancements */
+    #python-avatar-speech {
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    
+    #python-avatar-speech::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    #python-avatar-speech::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+    
+    #python-avatar-speech::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 3px;
+    }
+    
+    #python-avatar-speech::-webkit-scrollbar-thumb:hover {
+      background: #555;
     }
     
     /* Thinking animation styles */
@@ -89,40 +186,6 @@ function initializeStyles() {
       }
     }
     
-    @keyframes blink {
-      0%, 50% { opacity: 1; }
-      51%, 100% { opacity: 0; }
-    }
-    
-    /* General avatar container styles */
-    #avatar-extension-container {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    
-    /* Speech bubble enhancements */
-    #python-avatar-speech {
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-    
-    #python-avatar-speech::-webkit-scrollbar {
-      width: 6px;
-    }
-    
-    #python-avatar-speech::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 3px;
-    }
-    
-    #python-avatar-speech::-webkit-scrollbar-thumb {
-      background: #888;
-      border-radius: 3px;
-    }
-    
-    #python-avatar-speech::-webkit-scrollbar-thumb:hover {
-      background: #555;
-    }
-    
     /* Button hover effects */
     button {
       transition: all 0.2s ease;
@@ -136,10 +199,42 @@ function initializeStyles() {
     button:active {
       transform: scale(0.95);
     }
-    
-    /* Status text styling */
-    #status {
-      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+
+    /* Radial menu button styling - fixed positioning */
+    .radial-button {
+      position: absolute !important;
+      border-radius: 50% !important;
+      border: none !important;
+      cursor: pointer !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: 18px !important;
+      color: white !important;
+      width: 45px !important;
+      height: 45px !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+      /* Fixed transition to prevent positioning shifts */
+      transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease !important;
+      /* Ensure buttons maintain their exact positions */
+      transform-origin: center center !important;
+    }
+
+    .radial-button:hover {
+      /* Only scale without changing position */
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4) !important;
+      /* Don't override transform here - let JavaScript handle it */
+    }
+
+    /* Radial buttons container */
+    #avatar-radial-buttons {
+      /* Ensure container doesn't affect button positioning */
+      pointer-events: none !important;
+    }
+
+    #avatar-radial-buttons .radial-button {
+      /* Re-enable pointer events for buttons */
+      pointer-events: auto !important;
     }
   `;
 
