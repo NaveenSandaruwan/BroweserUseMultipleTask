@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatar Extension Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .button {
+            background: #4285f4;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #3367d6;
+        }
+        .status {
+            background: #e8f5e8;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border-left: 4px solid #4caf50;
+        }
+        .error {
+            background: #ffeaea;
+            border-left-color: #f44336;
+        }
+        .info {
+            background: #e3f2fd;
+            border-left-color: #2196f3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🤖 Avatar Extension Test Page</h1>
+    
+    <div class="test-section">
+        <h2>📋 Instructions</h2>
+        <ol>
+            <li><strong>Load the extension</strong> in Chrome (chrome://extensions/ → Developer mode → Load unpacked)</li>
+            <li><strong>Refresh this page</strong> after loading the extension</li>
+            <li><strong>Look for the avatar</strong> in the top-right corner of the page</li>
+            <li><strong>Click the buttons below</strong> to test various functions</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>🔍 Quick Tests</h2>
+        <button class="button" onclick="checkExtension()">Check Extension Status</button>
+        <button class="button" onclick="toggleAvatar()">Toggle Avatar Visibility</button>
+        <button class="button" onclick="testElevenLabs()">Test ElevenLabs Integration</button>
+        <button class="button" onclick="showConsoleInstructions()">Show Console Debug</button>
+    </div>
+
+    <div id="test-results"></div>
+
+    <div class="test-section">
+        <h2>🎯 Expected Behavior</h2>
+        <ul>
+            <li><strong>Avatar should appear</strong> in the top-right corner with a Python logo</li>
+            <li><strong>Buttons should be visible:</strong>
+                <ul>
+                    <li>🎤 Microphone (blue)</li>
+                    <li>🔊 Test TTS (green)</li>
+                    <li>🎵 ElevenLabs Config (orange)</li>
+                    <li>🎭 Emotion Test (yellow)</li>
+                    <li>📌 Save Position (blue)</li>
+                </ul>
+            </li>
+            <li><strong>Avatar should be draggable</strong> (click and drag to move)</li>
+            <li><strong>Speech bubble</strong> should appear to the left of the avatar</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🐛 Troubleshooting</h2>
+        <div class="status info">
+            <strong>If you don't see the avatar:</strong>
+            <ul>
+                <li>Check Chrome Extensions page - is the extension enabled?</li>
+                <li>Look for errors in the extension details page</li>
+                <li>Open browser console (F12) and look for error messages</li>
+                <li>Try reloading the extension and refreshing this page</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('test-results');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+            
+            // Auto-scroll to results
+            div.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function checkExtension() {
+            addResult('🔍 Checking extension status...', 'info');
+            
+            let found = [];
+            let missing = [];
+
+            // Check for avatar elements
+            const avatar = document.getElementById('python-avatar');
+            const container = document.getElementById('avatar-extension-container');
+            const micBtn = document.getElementById('mic');
+            const elevenLabsBtn = document.getElementById('elevenlabs-config');
+
+            if (container) found.push('✅ Avatar container');
+            else missing.push('❌ Avatar container');
+
+            if (avatar) found.push('✅ Avatar graphic');
+            else missing.push('❌ Avatar graphic');
+
+            if (micBtn) found.push('✅ Microphone button');
+            else missing.push('❌ Microphone button');
+
+            if (elevenLabsBtn) found.push('✅ ElevenLabs button');
+            else missing.push('❌ ElevenLabs button');
+
+            // Check for functions
+            if (typeof createAvatarUI === 'function') found.push('✅ createAvatarUI function');
+            else missing.push('❌ createAvatarUI function');
+
+            if (typeof window.elevenLabsTTS !== 'undefined') found.push('✅ ElevenLabs TTS class');
+            else missing.push('❌ ElevenLabs TTS class');
+
+            if (typeof createElevenLabsConfigModal === 'function') found.push('✅ ElevenLabs config function');
+            else missing.push('❌ ElevenLabs config function');
+
+            let resultMessage = '<strong>Extension Status Check:</strong><br>';
+            if (found.length > 0) {
+                resultMessage += '<br><strong>Found:</strong><br>' + found.join('<br>');
+            }
+            if (missing.length > 0) {
+                resultMessage += '<br><br><strong>Missing:</strong><br>' + missing.join('<br>');
+            }
+
+            addResult(resultMessage, missing.length === 0 ? 'status' : 'error');
+        }
+
+        function toggleAvatar() {
+            const container = document.getElementById('avatar-extension-container');
+            if (container) {
+                const isVisible = container.style.display !== 'none';
+                container.style.display = isVisible ? 'none' : 'flex';
+                addResult(`🎭 Avatar ${isVisible ? 'hidden' : 'shown'}`, 'status');
+            } else {
+                addResult('❌ Avatar container not found! Extension may not be loaded.', 'error');
+            }
+        }
+
+        function testElevenLabs() {
+            if (typeof window.elevenLabsTTS !== 'undefined' && typeof ELEVENLABS_API_KEY !== 'undefined') {
+                addResult('🎵 ElevenLabs integration found. API Key: ' + (ELEVENLABS_API_KEY !== "YOUR_ELEVENLABS_API_KEY_HERE" ? 'Configured ✅' : 'Not set ❌'), 'status');
+                
+                // Try to open config modal
+                if (typeof createElevenLabsConfigModal === 'function') {
+                    createElevenLabsConfigModal();
+                    addResult('🔧 ElevenLabs config modal opened', 'status');
+                } else {
+                    addResult('❌ ElevenLabs config function not found', 'error');
+                }
+            } else {
+                addResult('❌ ElevenLabs integration not found. Check console for errors.', 'error');
+            }
+        }
+
+        function showConsoleInstructions() {
+            addResult(`
+                <strong>📊 Console Debug Instructions:</strong><br>
+                1. Press <strong>F12</strong> to open browser dev tools<br>
+                2. Go to <strong>Console</strong> tab<br>
+                3. Look for any <strong style="color: red;">red error messages</strong><br>
+                4. Paste this command to run detailed diagnostics:<br>
+                <code style="background: #f0f0f0; padding: 4px;">
+                // Copy and paste the contents of debug-extension.js here
+                </code><br><br>
+                <strong>Common issues:</strong><br>
+                • Manifest parsing errors<br>
+                • JavaScript syntax errors<br>
+                • Missing file errors<br>
+                • Content Security Policy violations
+            `, 'info');
+        }
+
+        // Auto-check extension status when page loads
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                addResult('🚀 Page loaded. Checking for avatar extension...', 'info');
+                checkExtension();
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

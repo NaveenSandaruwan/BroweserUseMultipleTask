@@ -29,8 +29,11 @@ function simpleMarkdownToHtml(markdownText) {
 // Create and Insert UI Elements
 // =================================
 function createAvatarUI() {
+  console.log("createAvatarUI called");
+
   // Check if UI already exists
   if (document.getElementById("avatar-extension-container")) {
+    console.log("UI already exists, returning existing elements");
     return getUIElements();
   }
 
@@ -148,6 +151,24 @@ function createAvatarUI() {
         margin-right: 5px;
     `;
 
+  // --- ElevenLabs Config button ---
+  const elevenLabsBtn = document.createElement("button");
+  elevenLabsBtn.id = "elevenlabs-config";
+  elevenLabsBtn.innerHTML = "🎵";
+  elevenLabsBtn.title = "Configure ElevenLabs TTS";
+  elevenLabsBtn.style.cssText = `
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #FF6B35;
+        color: white;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        margin-right: 5px;
+    `;
+
   // --- Emotion Test button ---
   const emotionBtn = document.createElement("button");
   emotionBtn.id = "emotion-test";
@@ -201,6 +222,7 @@ function createAvatarUI() {
         margin-bottom: 10px;
     `;
   buttonContainer.appendChild(ttsBtn);
+  buttonContainer.appendChild(elevenLabsBtn);
   buttonContainer.appendChild(emotionBtn);
   buttonContainer.appendChild(savePositionBtn);
 
@@ -211,12 +233,19 @@ function createAvatarUI() {
   container.appendChild(buttonContainer);
   container.appendChild(statusEl);
 
+  console.log("Appending avatar container to document body");
   document.body.appendChild(container);
+  console.log("Avatar UI created successfully");
 
   // Add event listener for TTS test button
   ttsBtn.addEventListener("click", () => {
     statusEl.textContent = "Testing TTS...";
-    speakText("Hello, this is a test of the text to speech functionality.");
+    speakText("test");
+  });
+
+  // Add event listener for ElevenLabs config button
+  elevenLabsBtn.addEventListener("click", () => {
+    createElevenLabsConfigModal();
   });
 
   // Add event listener for Emotion test button
@@ -291,7 +320,7 @@ function createAvatarUI() {
     saveAvatarPosition(true); // Show notification when button is clicked
   });
 
-  return { micBtn, statusEl, ttsBtn, emotionBtn };
+  return { micBtn, statusEl, ttsBtn, emotionBtn, elevenLabsBtn };
 }
 
 // Helper function to get UI elements
@@ -301,6 +330,7 @@ function getUIElements() {
     statusEl: document.getElementById("status"),
     ttsBtn: document.getElementById("tts-test"),
     emotionBtn: document.getElementById("emotion-test"),
+    elevenLabsBtn: document.getElementById("elevenlabs-config"),
   };
 }
 
@@ -791,9 +821,9 @@ function updateAvatarEmotion(emotion) {
 }
 
 // =========================
-// Browser TTS (Speech Synthesis)
+// Enhanced Text-to-Speech with ElevenLabs Integration
 // =========================
-function speakText(text) {
+async function speakText(text) {
   if (!text || text.trim() === "") {
     console.log("Empty text provided to speakText, ignoring");
     return;
@@ -805,34 +835,101 @@ function speakText(text) {
   }
 
   try {
-    // Send message to background script to handle speech synthesis
-    chrome.runtime.sendMessage(
-      {
-        action: "speak",
-        text: text,
-      },
-      (response) => {
-        if (chrome.runtime.lastError) {
-          console.log(
-            "Speech message status:",
-            chrome.runtime.lastError.message
-          );
-          return;
-        }
+    // Check if ElevenLabs is enabled and configured
+    if (isElevenLabsEnabled() && window.elevenLabsTTS) {
+      console.log("Using ElevenLabs TTS");
 
-        if (response && !response.success) {
-          console.error("Background speech failed:", response.error);
-          if (statusEl) {
-            statusEl.textContent = "Speech failed";
-            setTimeout(() => {
-              statusEl.textContent = "";
-            }, 3000);
+      // Use ElevenLabs TTS with progress tracking
+      await window.elevenLabsTTS.speakText(text, (progress) => {
+        if (statusEl) {
+          switch (progress.status) {
+            case "generating":
+              statusEl.textContent = `Generating audio ${progress.current}/${progress.total}...`;
+              break;
+            case "playing":
+              statusEl.textContent = `Speaking ${progress.current}/${progress.total}...`;
+              break;
+            case "completed":
+              statusEl.textContent = "Speech completed";
+              setTimeout(() => {
+                statusEl.textContent = "";
+              }, 2000);
+              break;
+            case "error":
+              statusEl.textContent = `TTS Error: ${progress.error}`;
+              setTimeout(() => {
+                statusEl.textContent = "";
+              }, 3000);
+              break;
           }
         }
-      }
-    );
+      });
+    } else {
+      // Fallback to browser TTS
+      console.log("Using browser TTS (fallback)");
+
+      // Send message to background script to handle speech synthesis
+      chrome.runtime.sendMessage(
+        {
+          action: "speak",
+          text: text,
+        },
+        (response) => {
+          if (chrome.runtime.lastError) {
+            console.log(
+              "Speech message status:",
+              chrome.runtime.lastError.message
+            );
+            return;
+          }
+
+          if (response && !response.success) {
+            console.error("Background speech failed:", response.error);
+            if (statusEl) {
+              statusEl.textContent = "Speech failed";
+              setTimeout(() => {
+                statusEl.textContent = "";
+              }, 3000);
+            }
+          }
+        }
+      );
+    }
   } catch (error) {
-    console.error("Exception while sending speech message:", error);
+    console.error("Error in speakText:", error);
+
+    // Fallback to browser TTS if ElevenLabs fails
+    if (isElevenLabsEnabled()) {
+      console.log("ElevenLabs failed, falling back to browser TTS");
+      if (statusEl) {
+        statusEl.textContent = "Switching to browser TTS...";
+      }
+
+      try {
+        chrome.runtime.sendMessage(
+          {
+            action: "speak",
+            text: text,
+          },
+          (response) => {
+            if (statusEl) {
+              if (response && response.success) {
+                setTimeout(() => {
+                  statusEl.textContent = "";
+                }, 2000);
+              } else {
+                statusEl.textContent = "Speech error";
+                setTimeout(() => {
+                  statusEl.textContent = "";
+                }, 3000);
+              }
+            }
+          }
+        );
+      } catch (fallbackError) {
+        console.error("Fallback TTS also failed:", fallbackError);
+      }
+    }
   }
 }
 
@@ -1081,13 +1178,54 @@ function makeDraggable(container) {
   return container;
 }
 
-// Start the process of creating the UI when the script loads.
-const avatarUI = createAvatarUI();
+// Main initialization function
+function initializeAvatarExtension() {
+  console.log("Initializing Avatar Extension...");
 
-// Make the avatar container draggable
-const container = document.getElementById("avatar-extension-container");
-if (container) {
-  makeDraggable(container);
-  // Restore saved position if available
-  restoreAvatarPosition();
+  try {
+    // Create the UI
+    const avatarUI = createAvatarUI();
+    console.log("Avatar UI created successfully");
+
+    // Make the avatar container draggable
+    const container = document.getElementById("avatar-extension-container");
+    if (container) {
+      makeDraggable(container);
+      // Restore saved position if available
+      restoreAvatarPosition();
+      console.log("Avatar made draggable and position restored");
+    }
+
+    // Initialize ElevenLabs TTS if configured
+    setTimeout(async () => {
+      try {
+        await initializeElevenLabsIfConfigured();
+        console.log("ElevenLabs initialization completed");
+      } catch (error) {
+        console.error("ElevenLabs initialization failed:", error);
+      }
+    }, 1000);
+
+    console.log("Avatar Extension initialization completed successfully");
+  } catch (error) {
+    console.error("Avatar Extension initialization failed:", error);
+  }
 }
+
+// Multiple initialization strategies to ensure the extension loads
+function safeInitialize() {
+  if (document.readyState === "loading") {
+    // DOM is still loading
+    document.addEventListener("DOMContentLoaded", initializeAvatarExtension);
+  } else {
+    // DOM is already loaded
+    initializeAvatarExtension();
+  }
+
+  // Backup initialization after a delay
+  setTimeout(initializeAvatarExtension, 2000);
+}
+
+// Start initialization
+console.log("Avatar Extension content script loaded");
+safeInitialize();
