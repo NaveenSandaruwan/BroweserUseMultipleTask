@@ -17,14 +17,10 @@
     {
       "matches": ["<all_urls>"],
       "js": [
-        "js/utils.js",
-        "js/styles.js", 
-        "js/websocket.js",
-        "js/avatar.js",
-        "js/speech.js",
-        "js/ui.js",
-        "js/drag.js",
-        "content_new.js"
+        "js/elevenlabs.js",
+        "js/elevenlabs-config.js",
+        "js/styles.js",
+        "content.js"
       ],
       "run_at": "document_end"
     }
@@ -34,10 +30,12 @@
     "activeTab",
     "clipboardWrite",
     "clipboardRead",
-    "audioCapture"
+    "audioCapture",
+    "storage"
   ],
   "host_permissions": [
-    "<all_urls>"
+    "<all_urls>",
+    "https://api.elevenlabs.io/*"
   ],
   "web_accessible_resources": [{
     "resources": ["images/*"],
