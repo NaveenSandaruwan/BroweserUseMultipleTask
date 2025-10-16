@@ -20,6 +20,224 @@ window.testVoiceDisable = function () {
 };
 
 // =========================
+// Lip Sync Management
+// =========================
+class LipSyncManager {
+  constructor() {
+    this.audioContext = null;
+    this.analyser = null;
+    this.audioSource = null;
+    this.animationFrame = null;
+    this.isAnalyzing = false;
+    this.dataArray = null;
+    this.bufferLength = 0;
+
+    // Mouth animation parameters
+    this.minMouthValue = 52; // Closed mouth Y position
+    this.maxMouthValue = 65; // Open mouth Y position
+    this.smoothingFactor = 0.7; // For smooth animation
+    this.currentMouthValue = this.minMouthValue;
+
+    console.log("LipSyncManager initialized");
+  }
+
+  // Initialize Web Audio API
+  async initAudioContext() {
+    try {
+      this.audioContext = new (window.AudioContext ||
+        window.webkitAudioContext)();
+      this.analyser = this.audioContext.createAnalyser();
+      this.analyser.fftSize = 256;
+      this.bufferLength = this.analyser.frequencyBinCount;
+      this.dataArray = new Uint8Array(this.bufferLength);
+
+      console.log("Audio context initialized for lip sync");
+      return true;
+    } catch (error) {
+      console.error("Failed to initialize audio context:", error);
+      return false;
+    }
+  }
+
+  // Connect audio element to analyzer
+  connectAudio(audioElement) {
+    if (!this.audioContext || !this.analyser) {
+      console.error("Audio context not initialized");
+      return false;
+    }
+
+    try {
+      // Disconnect previous source if exists
+      if (this.audioSource) {
+        this.audioSource.disconnect();
+      }
+
+      // Create new audio source and connect to analyser
+      this.audioSource =
+        this.audioContext.createMediaElementSource(audioElement);
+      this.audioSource.connect(this.analyser);
+      this.analyser.connect(this.audioContext.destination);
+
+      console.log("Audio connected to lip sync analyzer");
+      return true;
+    } catch (error) {
+      console.error("Failed to connect audio:", error);
+      return false;
+    }
+  }
+
+  // Start lip sync animation
+  startLipSync() {
+    if (!this.analyser || this.isAnalyzing) {
+      return;
+    }
+
+    this.isAnalyzing = true;
+    console.log("Starting lip sync animation");
+    this.animateMouth();
+  }
+
+  // Stop lip sync animation
+  stopLipSync() {
+    if (this.animationFrame) {
+      cancelAnimationFrame(this.animationFrame);
+      this.animationFrame = null;
+    }
+    this.isAnalyzing = false;
+
+    // Return mouth to neutral position
+    this.updateMouthShape(this.minMouthValue);
+    console.log("Stopped lip sync animation");
+  }
+
+  // Main animation loop
+  animateMouth() {
+    if (!this.isAnalyzing) return;
+
+    // Get audio frequency data
+    this.analyser.getByteFrequencyData(this.dataArray);
+
+    // Calculate audio energy (focus on speech frequencies 85Hz-255Hz)
+    let sum = 0;
+    const startFreq = Math.floor(
+      (85 / (this.audioContext.sampleRate / 2)) * this.bufferLength
+    );
+    const endFreq = Math.floor(
+      (255 / (this.audioContext.sampleRate / 2)) * this.bufferLength
+    );
+
+    for (let i = startFreq; i < endFreq && i < this.bufferLength; i++) {
+      sum += this.dataArray[i];
+    }
+
+    const avgEnergy = sum / (endFreq - startFreq);
+
+    // Normalize energy value (0-1)
+    const normalizedEnergy = Math.min(avgEnergy / 128, 1);
+
+    // Calculate target mouth opening
+    const targetMouthValue =
+      this.minMouthValue +
+      normalizedEnergy * (this.maxMouthValue - this.minMouthValue);
+
+    // Apply smoothing
+    this.currentMouthValue =
+      this.currentMouthValue * this.smoothingFactor +
+      targetMouthValue * (1 - this.smoothingFactor);
+
+    // Update mouth shape
+    this.updateMouthShape(this.currentMouthValue);
+
+    // Continue animation
+    this.animationFrame = requestAnimationFrame(() => this.animateMouth());
+  }
+
+  // Update avatar mouth shape based on energy value (bigger emoji-style)
+  updateMouthShape(openingAmount) {
+    const avatarSvg = document.querySelector("#python-avatar svg");
+    if (!avatarSvg) return;
+
+    const upperMouth = avatarSvg.querySelector("#upper-mouth");
+    const lowerMouth = avatarSvg.querySelector("#lower-mouth");
+
+    if (!upperMouth || !lowerMouth) return;
+
+    // Calculate opening based on energy (0 = closed, 1 = fully open)
+    const normalizedOpening =
+      (openingAmount - this.minMouthValue) /
+      (this.maxMouthValue - this.minMouthValue);
+    const clampedOpening = Math.max(0, Math.min(1, normalizedOpening));
+
+    // Shift by 0.8 and re-normalize to focus on top 20% of values
+    const shiftedValue = Math.max(0, clampedOpening - 0.8);
+    const reNormalizedOpening = shiftedValue / 0.2; // Re-normalize from 0-0.2 range to 0-1 range
+
+    // Apply quartic relation (y = x⁴) to create extreme sensitivity differences between quiet and loud sounds
+    const quarticOpening =
+      reNormalizedOpening *
+      reNormalizedOpening *
+      reNormalizedOpening *
+      reNormalizedOpening;
+
+    // Fixed corner positions (narrower mouth)
+    const leftCornerX = 25;
+    const rightCornerX = 55;
+    const leftCornerY = 51;
+    const rightCornerY = 51;
+
+    // Middle points move up and down based on speech energy
+    // Using quartic opening for extreme sensitivity - Upper lip moves less, lower lip moves 2x more for better visibility
+    const upperMovement = quarticOpening * 10; // Increased range with quartic function
+    const lowerMovement = quarticOpening * 20; // Lower curve moves 2x more
+
+    const upperMiddleY = 51 - upperMovement; // Upper curve goes up
+    const lowerMiddleY = 51 + lowerMovement; // Lower curve goes down more
+
+    // Console log the lip change values for debugging
+    // console.log(`Lip Sync Values:`, {
+    //   openingAmount: openingAmount.toFixed(3),
+    //   normalizedOpening: normalizedOpening.toFixed(3),
+    //   clampedOpening: clampedOpening.toFixed(3),
+    //   shiftedValue: shiftedValue.toFixed(3),
+    //   reNormalizedOpening: reNormalizedOpening.toFixed(3),
+    //   quarticOpening: quarticOpening.toFixed(5),
+    //   upperMovement: upperMovement.toFixed(2),
+    //   lowerMovement: lowerMovement.toFixed(2),
+    //   upperMiddleY: upperMiddleY.toFixed(2),
+    //   lowerMiddleY: lowerMiddleY.toFixed(2),
+    // });
+
+    // Update white background shape between lips
+    const mouthBackground = avatarSvg.querySelector("#mouth-background");
+    if (mouthBackground) {
+      // Create a white area between upper and lower lips
+      const backgroundPath = `M${leftCornerX} ${leftCornerY} Q40 ${upperMiddleY} ${rightCornerX} ${rightCornerY} Q40 ${lowerMiddleY} ${leftCornerX} ${leftCornerY}`;
+      mouthBackground.setAttribute("d", backgroundPath);
+    }
+
+    // Update upper mouth curve - wider corners, middle moves up
+    upperMouth.setAttribute(
+      "d",
+      `M${leftCornerX} ${leftCornerY} Q40 ${upperMiddleY} ${rightCornerX} ${rightCornerY}`
+    );
+
+    // Update lower mouth curve - wider corners, middle moves down 2x more
+    lowerMouth.setAttribute(
+      "d",
+      `M${leftCornerX} ${leftCornerY} Q40 ${lowerMiddleY} ${rightCornerX} ${rightCornerY}`
+    );
+  }
+
+  // Reset mouth to neutral position
+  resetMouth() {
+    this.updateMouthShape(this.minMouthValue);
+  }
+}
+
+// Global lip sync manager instance
+window.lipSyncManager = new LipSyncManager();
+
+// =========================
 // Markdown Parsing Utility
 // =========================
 // Correct the markdown parsing function
@@ -97,8 +315,17 @@ function createAvatarUI() {
             <path id="left-eyebrow" d="M20 22 Q30 18 35 22" stroke="#000" stroke-width="2" fill="transparent" />
             <path id="right-eyebrow" d="M45 22 Q50 18 60 22" stroke="#000" stroke-width="2" fill="transparent" />
             
-            <!-- Mouth - will be animated for different emotions -->
-            <path id="avatar-mouth" d="M25 50 Q40 65 55 50" stroke="#000" stroke-width="3" fill="transparent" />
+            <!-- Emoji-style mouth with white background and black curves -->
+            <g id="mouth-group">
+                <!-- White background between lips -->
+                <path id="mouth-background" d="M25 51 Q40 54 55 51 Q40 56 25 51" fill="white" stroke="none" />
+                
+                <!-- Upper mouth curve (narrower width, more downward curve) -->
+                <path id="upper-mouth" d="M25 51 Q40 54 55 51" stroke="#000" stroke-width="2" fill="none" stroke-linecap="round" />
+                
+                <!-- Lower mouth curve (narrower width, deeper downward curve) -->
+                <path id="lower-mouth" d="M25 51 Q40 56 55 51" stroke="#000" stroke-width="2" fill="none" stroke-linecap="round" />
+            </g>
         </svg>
     `;
   avatar.style.cssText = `
@@ -241,6 +468,13 @@ function createAvatarUI() {
     "#607D8B",
     270
   ); // Bottom
+  const lipSyncBtn = createMenuButton(
+    "lipsync-test",
+    "👄",
+    "Test lip sync animation",
+    "#E91E63",
+    315
+  ); // Bottom-right
 
   // Add buttons to menu
   buttonMenu.appendChild(micBtn);
@@ -250,6 +484,7 @@ function createAvatarUI() {
   buttonMenu.appendChild(disableVoiceBtn);
   buttonMenu.appendChild(helpBtn);
   buttonMenu.appendChild(savePositionBtn);
+  buttonMenu.appendChild(lipSyncBtn);
 
   // --- Status element ---
   const statusEl = document.createElement("div");
@@ -377,6 +612,35 @@ function createAvatarUI() {
     saveAvatarPosition(true); // Show notification when button is clicked
   });
 
+  // Add event listener for lip sync test button
+  lipSyncBtn.addEventListener("click", async () => {
+    statusEl.textContent = "Testing lip sync...";
+    statusEl.style.opacity = "1";
+
+    try {
+      // Initialize lip sync manager
+      if (!window.lipSyncManager.audioContext) {
+        await window.lipSyncManager.initAudioContext();
+      }
+
+      // Test lip sync with sample text
+      speakText(
+        "This is a test of the lip sync animation. The avatar mouth should move with the speech patterns."
+      );
+
+      statusEl.textContent = "Lip sync test started";
+      setTimeout(() => {
+        statusEl.style.opacity = "0";
+      }, 2000);
+    } catch (error) {
+      console.error("Lip sync test failed:", error);
+      statusEl.textContent = "Lip sync test failed";
+      setTimeout(() => {
+        statusEl.style.opacity = "0";
+      }, 2000);
+    }
+  });
+
   // Add event listener for disable voice button
   disableVoiceBtn.addEventListener("click", () => {
     window.isVoiceEnabled = !window.isVoiceEnabled; // Toggle global state directly
@@ -443,6 +707,7 @@ function getUIElements() {
     disableVoiceBtn: document.getElementById("disable-voice"),
     helpBtn: document.getElementById("help-guide"),
     savePositionBtn: document.getElementById("save-position"),
+    lipSyncBtn: document.getElementById("lipsync-test"),
   };
 }
 
@@ -574,6 +839,9 @@ function showHelpGuide() {
         </div>
         <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
           <strong>📌 Save Position</strong><br>Remember location
+        </div>
+        <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
+          <strong>👄 Lip Sync</strong><br>Test mouth animation
         </div>
       </div>
     </div>
@@ -997,11 +1265,14 @@ function updateAvatarEmotion(emotion) {
 
   // Get the SVG elements
   const svgDoc = avatar.querySelector("svg");
-  const mouth = svgDoc.getElementById("avatar-mouth");
+  const upperMouth = svgDoc.getElementById("upper-mouth");
+  const lowerMouth = svgDoc.getElementById("lower-mouth");
   const leftEyebrow = svgDoc.getElementById("left-eyebrow");
   const rightEyebrow = svgDoc.getElementById("right-eyebrow");
   const leftPupil = svgDoc.getElementById("left-pupil");
   const rightPupil = svgDoc.getElementById("right-pupil");
+
+  if (!upperMouth || !lowerMouth) return;
 
   // Remove emoji indicator if it exists
   const existingIndicator = document.getElementById("emotion-indicator");
@@ -1009,62 +1280,76 @@ function updateAvatarEmotion(emotion) {
     existingIndicator.remove();
   }
 
-  // Update SVG facial expressions based on emotion
+  // Update SVG facial expressions based on emotion (bigger emoji-style)
   switch (emotion) {
     case "happy":
-      mouth.setAttribute("d", "M25 50 Q40 65 55 50"); // Big smile
-      leftEyebrow.setAttribute("d", "M20 22 Q30 18 35 22"); // Normal eyebrows
+      // Happy smile - narrower corners, upper curve goes up, lower goes down more
+      upperMouth.setAttribute("d", "M25 51 Q40 47 55 51");
+      lowerMouth.setAttribute("d", "M25 51 Q40 59 55 51");
+      leftEyebrow.setAttribute("d", "M20 22 Q30 18 35 22");
       rightEyebrow.setAttribute("d", "M45 22 Q50 18 60 22");
-      leftPupil.setAttribute("cy", "29"); // Slightly raised pupils
+      leftPupil.setAttribute("cy", "29");
       rightPupil.setAttribute("cy", "29");
       break;
 
     case "sad":
-      mouth.setAttribute("d", "M25 55 Q40 45 55 55"); // Frown
-      leftEyebrow.setAttribute("d", "M20 25 Q30 28 35 25"); // Sad eyebrows
+      // Sad frown - both curves go down from corners, lower more pronounced
+      upperMouth.setAttribute("d", "M25 51 Q40 54 55 51");
+      lowerMouth.setAttribute("d", "M25 51 Q40 60 55 51");
+      leftEyebrow.setAttribute("d", "M20 25 Q30 28 35 25");
       rightEyebrow.setAttribute("d", "M45 25 Q50 28 60 25");
-      leftPupil.setAttribute("cy", "32"); // Slightly lowered pupils
+      leftPupil.setAttribute("cy", "32");
       rightPupil.setAttribute("cy", "32");
       break;
 
     case "angry":
-      mouth.setAttribute("d", "M25 55 Q40 48 55 55"); // Straight/slight frown
-      leftEyebrow.setAttribute("d", "M20 20 Q30 15 35 25"); // Angry eyebrows
+      // Angry - downward curves, narrower and more pronounced
+      upperMouth.setAttribute("d", "M25 51 Q40 52 55 51");
+      lowerMouth.setAttribute("d", "M25 51 Q40 57 55 51");
+      leftEyebrow.setAttribute("d", "M20 20 Q30 15 35 25");
       rightEyebrow.setAttribute("d", "M45 25 Q50 15 60 20");
-      leftPupil.setAttribute("cy", "30"); // Center pupils
+      leftPupil.setAttribute("cy", "30");
       rightPupil.setAttribute("cy", "30");
       break;
 
     case "surprised":
-      mouth.setAttribute("d", "M30 55 Q40 60 50 55"); // Small O shape
-      leftEyebrow.setAttribute("d", "M20 18 Q30 13 35 18"); // Raised eyebrows
+      // Surprised - narrower oval open mouth
+      upperMouth.setAttribute("d", "M25 51 Q40 48 55 51");
+      lowerMouth.setAttribute("d", "M25 51 Q40 60 55 51");
+      leftEyebrow.setAttribute("d", "M20 18 Q30 13 35 18");
       rightEyebrow.setAttribute("d", "M45 18 Q50 13 60 18");
-      leftPupil.setAttribute("cy", "28"); // Raised pupils
+      leftPupil.setAttribute("cy", "28");
       rightPupil.setAttribute("cy", "28");
       break;
 
     case "fearful":
-      mouth.setAttribute("d", "M30 55 Q40 53 50 55"); // Small straight mouth
-      leftEyebrow.setAttribute("d", "M20 20 Q30 15 35 20"); // Raised eyebrows
+      // Fearful - narrower worried mouth
+      upperMouth.setAttribute("d", "M25 51 Q40 50 55 51");
+      lowerMouth.setAttribute("d", "M25 51 Q40 56 55 51");
+      leftEyebrow.setAttribute("d", "M20 20 Q30 15 35 20");
       rightEyebrow.setAttribute("d", "M45 20 Q50 15 60 20");
-      leftPupil.setAttribute("cy", "28"); // Raised pupils
+      leftPupil.setAttribute("cy", "28");
       rightPupil.setAttribute("cy", "28");
       break;
 
     case "disgusted":
-      mouth.setAttribute("d", "M25 50 Q40 45 55 52"); // Asymmetric mouth
-      leftEyebrow.setAttribute("d", "M20 20 Q30 18 35 25"); // Asymmetric eyebrows
+      // Disgusted - narrower asymmetric mouth, one side raised
+      upperMouth.setAttribute("d", "M25 51 Q35 49 55 52");
+      lowerMouth.setAttribute("d", "M25 51 Q35 58 55 52");
+      leftEyebrow.setAttribute("d", "M20 20 Q30 18 35 25");
       rightEyebrow.setAttribute("d", "M45 25 Q50 15 60 20");
-      leftPupil.setAttribute("cy", "31"); // Asymmetric pupils
+      leftPupil.setAttribute("cy", "31");
       rightPupil.setAttribute("cy", "29");
       break;
 
     case "neutral":
     default:
-      mouth.setAttribute("d", "M25 52 Q40 55 55 52"); // Straight mouth
-      leftEyebrow.setAttribute("d", "M20 22 Q30 20 35 22"); // Normal eyebrows
+      // Neutral - narrower mouth with more downward curvature
+      upperMouth.setAttribute("d", "M25 51 Q40 54 55 51");
+      lowerMouth.setAttribute("d", "M25 51 Q40 56 55 51");
+      leftEyebrow.setAttribute("d", "M20 22 Q30 20 35 22");
       rightEyebrow.setAttribute("d", "M45 22 Q50 20 60 22");
-      leftPupil.setAttribute("cy", "30"); // Center pupils
+      leftPupil.setAttribute("cy", "30");
       rightPupil.setAttribute("cy", "30");
       break;
   }
@@ -1210,8 +1495,17 @@ async function speakText(text) {
 const avatarStyles = document.createElement("style");
 avatarStyles.textContent = `
   /* Avatar animations */
-  #avatar-mouth, #left-eyebrow, #right-eyebrow, #left-pupil, #right-pupil {
+  #left-eyebrow, #right-eyebrow, #left-pupil, #right-pupil {
     transition: all 0.5s ease-in-out;
+  }
+  
+  /* Emoji-style mouth animation optimized for lip sync */
+  #upper-mouth, #lower-mouth {
+    transition: d 0.08s ease-out;
+  }
+  
+  #mouth-group {
+    transition: all 0.08s ease-out;
   }
   
   @keyframes blink {

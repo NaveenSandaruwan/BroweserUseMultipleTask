@@ -156,14 +156,55 @@ class ElevenLabsTTS {
         const audioUrl = URL.createObjectURL(audioBlob);
         const audio = new Audio(audioUrl);
 
+        // Initialize lip sync if available
+        const initializeLipSync = async () => {
+          if (window.lipSyncManager) {
+            try {
+              // Initialize audio context if not done
+              if (!window.lipSyncManager.audioContext) {
+                await window.lipSyncManager.initAudioContext();
+              }
+
+              // Connect audio to lip sync analyzer
+              if (window.lipSyncManager.connectAudio(audio)) {
+                console.log("Lip sync connected for audio playback");
+              }
+            } catch (error) {
+              console.error("Failed to initialize lip sync:", error);
+            }
+          }
+        };
+
+        audio.onloadeddata = () => {
+          initializeLipSync();
+        };
+
+        audio.onplay = () => {
+          if (window.lipSyncManager) {
+            window.lipSyncManager.startLipSync();
+          }
+        };
+
         audio.onended = () => {
+          if (window.lipSyncManager) {
+            window.lipSyncManager.stopLipSync();
+          }
           URL.revokeObjectURL(audioUrl);
           resolve();
         };
 
         audio.onerror = (error) => {
+          if (window.lipSyncManager) {
+            window.lipSyncManager.stopLipSync();
+          }
           URL.revokeObjectURL(audioUrl);
           reject(error);
+        };
+
+        audio.onpause = () => {
+          if (window.lipSyncManager) {
+            window.lipSyncManager.stopLipSync();
+          }
         };
 
         audio.play().catch(reject);
@@ -238,9 +279,15 @@ class ElevenLabsTTS {
     }
   }
 
-  // Stop current playback
+  // Stop current playbook
   stopSpeaking() {
     this.isPlaying = false;
+
+    // Stop lip sync animation
+    if (window.lipSyncManager) {
+      window.lipSyncManager.stopLipSync();
+    }
+
     // Stop all audio elements
     const audioElements = document.querySelectorAll("audio");
     audioElements.forEach((audio) => {
