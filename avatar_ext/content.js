@@ -408,10 +408,10 @@ function createAvatarUI() {
 
   // Initialize button state based on current voice status
   if (window.isVoiceEnabled) {
-    disableVoiceBtn.innerHTML = "🔇";
+    disableVoiceBtn.innerHTML = "🔊";
     disableVoiceBtn.title = "Disable voice";
   } else {
-    disableVoiceBtn.innerHTML = "🔊";
+    disableVoiceBtn.innerHTML = "🔇";
     disableVoiceBtn.title = "Enable voice";
   }
 
@@ -570,7 +570,7 @@ function showHelpGuide() {
           <strong>🎭 Emotions</strong><br>Test avatar emotions
         </div>
         <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
-          <strong>🔇 Disable Voice</strong><br>Mute/unmute speech
+          <strong>🔊 Disable Voice</strong><br>Mute/unmute speech
         </div>
         <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
           <strong>📌 Save Position</strong><br>Remember location
