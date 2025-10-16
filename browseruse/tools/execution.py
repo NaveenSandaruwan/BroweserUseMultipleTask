@@ -434,7 +434,7 @@ class AdvancedExecutor:
                 
                 # Get nesting offsets from parent
                 x_offset = parent_meta.get("nesting_offset_x", 11)
-                y_offset = parent_meta.get("nesting_offset_y", 35)
+                y_offset = parent_meta.get("nesting_offset_y", 47)
                 
                 # Check if there are already blocks inside this container
                 siblings_inside = [
@@ -460,7 +460,7 @@ class AdvancedExecutor:
             else:
                 # Fallback if parent not found
                 x_end = base_x + 11
-                y_end = base_y + 35
+                y_end = base_y + 36
                 self.nesting_stack.append((step_num, x_end, y_end, 1))
                 
         elif placement == "condition":
@@ -496,7 +496,7 @@ class AdvancedExecutor:
                 if parent_level_blocks:
                     last_at_level = max(parent_level_blocks, key=lambda b: b["y"])
                     x_end = last_at_level["x"]
-                    y_end = last_at_level["y"] + standard_spacing + 35  # Extra space for container bottom
+                    y_end = last_at_level["y"] + standard_spacing + 37  # Extra space for container bottom
                 else:
                     x_end = parent_pos["x"]
                     y_end = parent_pos["y"] + 70
@@ -671,6 +671,139 @@ class AdvancedExecutor:
         print("✓ Workspace cleaned successfully")
         return True
     
+    @staticmethod
+    def clean_workspace_reverse():
+        """
+        Clean workspace by removing blocks from bottom to top.
+        This approach can be more stable since upper blocks don't shift.
+        """
+        from tools.filter import find_used_blocks
+        from tools.browserUseClient import send_task
+        
+        print("🧹 Cleaning workspace (reverse order)...")
+        
+        # Get all blocks once
+        send_task("refresh")
+        time.sleep(0.5)
+        used_blocks = find_used_blocks()
+        
+        if not used_blocks or len(used_blocks) == 0:
+            print("✓ Workspace is already empty")
+            return True
+        
+        # Sort blocks by Y coordinate (highest Y = bottom blocks first)
+        blocks_sorted = sorted(used_blocks, key=lambda b: b["y"], reverse=True)
+        
+        print(f"Found {len(blocks_sorted)} blocks to remove")
+        
+        for i, block in enumerate(blocks_sorted, 1):
+            try:
+                # Refresh every 3 blocks to keep coordinates accurate
+                if i % 3 == 0:
+                    send_task("refresh")
+                    time.sleep(0.3)
+                
+                x_current = block["x"]
+                y_current = block["y"]
+                x_target = 100
+                y_target = 300
+                
+                print(f"  [{i}/{len(blocks_sorted)}] Removing: '{block['text_content']}'")
+                
+                drag_tool.drag_and_drop(
+                    x_start=x_current,
+                    y_start=y_current,
+                    x_end=x_target,
+                    y_end=y_target
+                )
+                
+                time.sleep(0.3)
+                
+            except Exception as e:
+                print(f"  ⚠ Error removing block: {e}")
+                continue
+        
+        # Final verification
+        send_task("refresh")
+        time.sleep(0.5)
+        remaining = find_used_blocks()
+        
+        if remaining and len(remaining) > 0:
+            print(f"⚠ {len(remaining)} blocks still remain, running cleanup again...")
+            # Recursive cleanup for remaining blocks
+            return AdvancedExecutor.clean_workspace_reverse()
+        else:
+            print("✓ Workspace cleaned successfully")
+            return True
+
+
+    @staticmethod
+    def clean_workspace_new():
+        """
+        Clean the workspace by dragging all used blocks back to the palette.
+        Uses a loop that refreshes block positions after each removal to avoid coordinate issues.
+        """
+        from tools.filter import find_used_blocks
+        from tools.browserUseClient import send_task
+        
+        print("🧹 Cleaning workspace...")
+        
+        max_iterations = 50  # Safety limit to prevent infinite loops
+        iteration = 0
+        
+        while iteration < max_iterations:
+            # CRITICAL: Get fresh block positions on each iteration
+            send_task("refresh")  # Refresh DOM to get updated positions
+            time.sleep(0.5)
+            
+            used_blocks = find_used_blocks()
+            
+            if not used_blocks or len(used_blocks) == 0:
+                print("✓ Workspace is now empty")
+                return True
+            
+            print(f"\nIteration {iteration + 1}: Found {len(used_blocks)} blocks to remove")
+            
+            # Remove ONLY the first block, then refresh and check again
+            block = used_blocks[0]  # Always take the first block
+            
+            try:
+                x_current = block["x"]
+                y_current = block["y"]
+                x_target = 100  # Left side (palette area)
+                y_target = 300  # Middle height
+                
+                print(f"  Removing: '{block['text_content']}' from ({x_current}, {y_current})")
+                
+                # Perform reverse drag
+                drag_tool.drag_and_drop(
+                    x_start=x_current,
+                    y_start=y_current,
+                    x_end=x_target,
+                    y_end=y_target
+                )
+                
+                time.sleep(0.5)  # Wait for block to be removed
+                
+            except Exception as e:
+                print(f"  ⚠ Error removing block: {e}")
+                # If error, try to continue anyway
+            
+            iteration += 1
+        
+        # If we hit max iterations, check one more time
+        send_task("refresh")
+        time.sleep(0.5)
+        final_blocks = find_used_blocks()
+        
+        if final_blocks and len(final_blocks) > 0:
+            print(f"⚠ Warning: {len(final_blocks)} blocks still remain after {max_iterations} iterations")
+            return False
+        else:
+            print("✓ Workspace cleaned successfully")
+            return True
+
+
     def clean_and_execute(self, json_plan, delay=0.5):
         """Clean workspace then execute with nesting"""
         print("\n" + "="*60)
@@ -680,7 +813,9 @@ class AdvancedExecutor:
         # Clean
         print("\n[STEP 1] Cleaning workspace...")
         try:
-            self.clean_workspace()
+            # self.clean_workspace()
+            # self.clean_workspace_reverse()
+            self.clean_workspace_new()
             time.sleep(1)
         except Exception as e:
             print(f"⚠ Error during cleanup: {e}")
@@ -698,3 +833,5 @@ class AdvancedExecutor:
         result = self.execute_with_nesting(json_plan, delay)
         
         return result
+
+    

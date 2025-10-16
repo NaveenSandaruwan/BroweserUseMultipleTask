@@ -80,8 +80,13 @@ User Query: "{query}"
   CRITICAL DISTINCTION:
 - "My code isn't working, what's wrong?" -> code_debugging (find the problem)
 - "My code isn't working, fix it" -> code_fixing (fix the problem)
+- "Make my code work properly" -> code_fixing
+- "Solve this issue for me" -> code_fixing
+- "Fix my code" -> code_fixing (fix existing)
 - "Create blocks to move sprite" -> make_blocks (create new)
-- "Fix my movement code" -> code_fixing (fix existing)
+- "Make blocks that" -> make_blocks
+- "Show me blocks for" -> make_blocks
+
 
   specially identify if the user is asking for instructions on how to do something in Scratch, or if they want you to create blocks for them. In these cases, you must choose "give_instructions" or "make_blocks" respectively.
   always choose one of these options: code_explain, code_debugging, give_instructions, make_blocks, default. According to the definitions given above.

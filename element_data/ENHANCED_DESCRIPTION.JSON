@@ -57,8 +57,8 @@
         "can_be_nested_in_condition": false
       },
       {
-        "name": "glide",
-        "description": "Face sprite in specific direction.",
+        "name": "glide secs to x: y:",
+        "description": "Smoothly move sprite to specific coordinates over a duration.",
         "coordinates": "x: 74.5, y: 440",
         "block_type": "standard",
         "accepts_condition": false,
@@ -179,7 +179,7 @@
         "can_be_nested_in_condition": false
       },
       {
-        "name": "say message",
+        "name": "say",
         "description": "Display a speech bubble.",
         "coordinates": "x: 74.5, y: 196",
         "block_type": "standard",
@@ -197,7 +197,7 @@
         "can_be_nested_in_condition": false
       },
       {
-        "name": "think message",
+        "name": "think",
         "description": "Display a thought bubble.",
         "coordinates": "x: 74.5, y: 285",
         "block_type": "standard",
