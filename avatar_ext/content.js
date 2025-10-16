@@ -1,4 +1,25 @@
 // =========================
+// Global Voice State Management
+// =========================
+// Initialize global voice state (only once)
+if (typeof window.isVoiceEnabled === "undefined") {
+  window.isVoiceEnabled = true;
+  console.log("Initialized global voice state:", window.isVoiceEnabled);
+}
+
+// Debug function to test voice disable from console
+window.testVoiceDisable = function () {
+  console.log("=== Voice Disable Test ===");
+  console.log("Current voice status:", window.isVoiceEnabled);
+  console.log("Testing speakText with 'test' message...");
+  if (typeof window.speakText === "function") {
+    window.speakText("test");
+  } else {
+    console.log("speakText function not available");
+  }
+};
+
+// =========================
 // Markdown Parsing Utility
 // =========================
 // Correct the markdown parsing function
@@ -42,16 +63,15 @@ function createAvatarUI() {
   container.id = "avatar-extension-container";
   container.style.cssText = `
         position: fixed;
-        top: 20px;   /* Top positioning */
-        right: 20px; /* Right positioning */
+        top: 20px;
+        right: 20px;
         z-index: 10000;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end; /* Align avatar/mic button to the right */
-        cursor: move; /* Show move cursor */
+        width: 120px;
+        height: 120px;
+        cursor: move;
     `;
 
-  // --- Avatar Graphic Element with drag handle ---
+  // --- Avatar Graphic Element (Center of the circular menu) ---
   const avatar = document.createElement("div");
   avatar.id = "python-avatar";
   avatar.innerHTML = `
@@ -82,13 +102,30 @@ function createAvatarUI() {
         </svg>
     `;
   avatar.style.cssText = `
+        position: absolute;
+        top: 20px;
+        left: 20px;
         width: 80px;
         height: 80px;
         border-radius: 50%;
-        margin-bottom: 15px; 
-        box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-        position: relative;
-        cursor: grab; /* Show grab cursor */
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        cursor: grab;
+        transition: transform 0.3s ease;
+    `;
+
+  // --- Circular Button Menu (Hidden by default, shows on hover) ---
+  const buttonMenu = document.createElement("div");
+  buttonMenu.id = "avatar-button-menu";
+  buttonMenu.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 120px;
+        height: 120px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
     `;
 
   // --- Speech Bubble (Scrollable and fixed height/width) ---
@@ -99,139 +136,159 @@ function createAvatarUI() {
         border: 2px solid #333;
         border-radius: 10px;
         padding: 10px 15px;
-        max-width: 400px; /* Increased width from 300px */
-        min-width: 300px; /* Add minimum width */
+        max-width: 400px;
+        min-width: 300px;
         max-height: 250px; 
-        overflow-y: auto; /* Enable vertical scrolling */
+        overflow-y: auto;
         opacity: 0; 
         transition: opacity 0.3s ease;
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        
-        /* Positioning to the left of the avatar */
         position: absolute;
         top: 0;
-        right: 90px; /* Position to the left of the avatar */
+        right: 130px;
         font-size: 14px;
         line-height: 1.4;
-        cursor: default; /* Indicates scrollability */
+        cursor: default;
     `;
 
-  // --- Mic button ---
-  const micBtn = document.createElement("button");
-  micBtn.id = "mic";
-  micBtn.innerHTML = "🎤";
-  micBtn.style.cssText = `
-        width: 50px;
-        height: 50px;
+  // Function to create a circular menu button
+  function createMenuButton(id, emoji, title, background, angle) {
+    const btn = document.createElement("button");
+    btn.id = id;
+    btn.innerHTML = emoji;
+    btn.title = title;
+
+    // Calculate position on circle (60px radius from center)
+    const radius = 60;
+    const radian = (angle * Math.PI) / 180;
+    const x = radius * Math.cos(radian);
+    const y = radius * Math.sin(radian);
+
+    btn.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(calc(-50% + ${x}px), calc(-50% + ${y}px));
+        width: 35px;
+        height: 35px;
         border-radius: 50%;
-        background: #4285f4;
+        background: ${background};
         color: white;
-        font-size: 20px;
+        font-size: 16px;
         border: none;
         cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        margin-bottom: 10px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        transition: all 0.3s ease;
+        pointer-events: auto;
+        z-index: 1;
     `;
 
-  // --- Test TTS button ---
-  const ttsBtn = document.createElement("button");
-  ttsBtn.id = "tts-test";
-  ttsBtn.innerHTML = "🔊";
-  ttsBtn.title = "Test text-to-speech";
-  ttsBtn.style.cssText = `
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: #34A853;
-        color: white;
-        font-size: 14px;
-        border: none;
-        cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        margin-right: 5px;
-    `;
+    // Hover effects
+    btn.addEventListener("mouseenter", () => {
+      btn.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(1.2)`;
+      btn.style.boxShadow = "0 5px 15px rgba(0,0,0,0.4)";
+    });
 
-  // --- ElevenLabs Config button ---
-  const elevenLabsBtn = document.createElement("button");
-  elevenLabsBtn.id = "elevenlabs-config";
-  elevenLabsBtn.innerHTML = "🎵";
-  elevenLabsBtn.title = "Configure ElevenLabs TTS";
-  elevenLabsBtn.style.cssText = `
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: #FF6B35;
-        color: white;
-        font-size: 14px;
-        border: none;
-        cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        margin-right: 5px;
-    `;
+    btn.addEventListener("mouseleave", () => {
+      btn.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(1)`;
+      btn.style.boxShadow = "0 3px 10px rgba(0,0,0,0.3)";
+    });
 
-  // --- Emotion Test button ---
-  const emotionBtn = document.createElement("button");
-  emotionBtn.id = "emotion-test";
-  emotionBtn.innerHTML = "🎭";
-  emotionBtn.title = "Test avatar emotions";
-  emotionBtn.style.cssText = `
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: #FBBC05;
-        color: white;
-        font-size: 14px;
-        border: none;
-        cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-    `;
+    return btn;
+  }
+
+  // Create circular menu buttons
+  const micBtn = createMenuButton("mic", "🎤", "Voice input", "#4285f4", 0); // Right
+  const ttsBtn = createMenuButton(
+    "tts-test",
+    "🔊",
+    "Test text-to-speech",
+    "#34A853",
+    45
+  ); // Top-right
+  const elevenLabsBtn = createMenuButton(
+    "elevenlabs-config",
+    "🎵",
+    "Configure ElevenLabs TTS",
+    "#FF6B35",
+    90
+  ); // Top
+  const emotionBtn = createMenuButton(
+    "emotion-test",
+    "🎭",
+    "Test avatar emotions",
+    "#FBBC05",
+    135
+  ); // Top-left
+  const disableVoiceBtn = createMenuButton(
+    "disable-voice",
+    "🔇",
+    "Disable/Enable voice",
+    "#EA4335",
+    180
+  ); // Left
+  const helpBtn = createMenuButton(
+    "help-guide",
+    "❓",
+    "Help & Guide",
+    "#9C27B0",
+    225
+  ); // Bottom-left
+  const savePositionBtn = createMenuButton(
+    "save-position",
+    "📌",
+    "Save current position",
+    "#607D8B",
+    270
+  ); // Bottom
+
+  // Add buttons to menu
+  buttonMenu.appendChild(micBtn);
+  buttonMenu.appendChild(ttsBtn);
+  buttonMenu.appendChild(elevenLabsBtn);
+  buttonMenu.appendChild(emotionBtn);
+  buttonMenu.appendChild(disableVoiceBtn);
+  buttonMenu.appendChild(helpBtn);
+  buttonMenu.appendChild(savePositionBtn);
 
   // --- Status element ---
   const statusEl = document.createElement("div");
   statusEl.id = "status";
   statusEl.style.cssText = `
-        margin-top: 10px;
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
         font-family: Arial, sans-serif;
-        font-size: 14px;
+        font-size: 12px;
         color: #333;
+        background: rgba(255,255,255,0.9);
+        padding: 4px 8px;
+        border-radius: 12px;
+        white-space: nowrap;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        opacity: 0;
+        transition: opacity 0.3s ease;
     `;
-
-  // Save position button
-  const savePositionBtn = document.createElement("button");
-  savePositionBtn.id = "save-position";
-  savePositionBtn.innerHTML = "📌";
-  savePositionBtn.title = "Save current position";
-  savePositionBtn.style.cssText = `
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: #4285f4;
-        color: white;
-        font-size: 14px;
-        border: none;
-        cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        margin-right: 5px;
-    `;
-
-  // Create a button container for all the small buttons
-  const buttonContainer = document.createElement("div");
-  buttonContainer.style.cssText = `
-        display: flex;
-        gap: 10px;
-        margin-bottom: 10px;
-    `;
-  buttonContainer.appendChild(ttsBtn);
-  buttonContainer.appendChild(elevenLabsBtn);
-  buttonContainer.appendChild(emotionBtn);
-  buttonContainer.appendChild(savePositionBtn);
 
   // Append elements to container
   container.appendChild(avatar);
+  container.appendChild(buttonMenu);
   container.appendChild(speechBubble);
-  container.appendChild(micBtn);
-  container.appendChild(buttonContainer);
   container.appendChild(statusEl);
+
+  // Add hover effects for the entire container
+  container.addEventListener("mouseenter", () => {
+    buttonMenu.style.opacity = "1";
+    buttonMenu.style.pointerEvents = "auto";
+    avatar.style.transform = "scale(1.1)";
+  });
+
+  container.addEventListener("mouseleave", () => {
+    buttonMenu.style.opacity = "0";
+    buttonMenu.style.pointerEvents = "none";
+    avatar.style.transform = "scale(1)";
+  });
 
   console.log("Appending avatar container to document body");
   document.body.appendChild(container);
@@ -320,7 +377,59 @@ function createAvatarUI() {
     saveAvatarPosition(true); // Show notification when button is clicked
   });
 
-  return { micBtn, statusEl, ttsBtn, emotionBtn, elevenLabsBtn };
+  // Add event listener for disable voice button
+  disableVoiceBtn.addEventListener("click", () => {
+    window.isVoiceEnabled = !window.isVoiceEnabled; // Toggle global state directly
+
+    console.log(
+      "Voice disable button clicked - New status:",
+      window.isVoiceEnabled
+    );
+
+    if (window.isVoiceEnabled) {
+      disableVoiceBtn.innerHTML = "🔊";
+      disableVoiceBtn.title = "Disable voice";
+      statusEl.textContent = "Voice enabled";
+      statusEl.style.opacity = "1";
+    } else {
+      disableVoiceBtn.innerHTML = "🔇";
+      disableVoiceBtn.title = "Enable voice";
+      statusEl.textContent = "Voice disabled";
+      statusEl.style.opacity = "1";
+      // Stop any current speech
+      if (window.elevenLabsTTS && window.elevenLabsTTS.stopSpeaking) {
+        window.elevenLabsTTS.stopSpeaking();
+      }
+    }
+    setTimeout(() => {
+      statusEl.style.opacity = "0";
+    }, 2000);
+  });
+
+  // Initialize button state based on current voice status
+  if (window.isVoiceEnabled) {
+    disableVoiceBtn.innerHTML = "🔇";
+    disableVoiceBtn.title = "Disable voice";
+  } else {
+    disableVoiceBtn.innerHTML = "🔊";
+    disableVoiceBtn.title = "Enable voice";
+  }
+
+  // Add event listener for help button
+  helpBtn.addEventListener("click", () => {
+    showHelpGuide();
+  });
+
+  return {
+    micBtn,
+    statusEl,
+    ttsBtn,
+    emotionBtn,
+    elevenLabsBtn,
+    disableVoiceBtn,
+    helpBtn,
+    savePositionBtn,
+  };
 }
 
 // Helper function to get UI elements
@@ -331,6 +440,9 @@ function getUIElements() {
     ttsBtn: document.getElementById("tts-test"),
     emotionBtn: document.getElementById("emotion-test"),
     elevenLabsBtn: document.getElementById("elevenlabs-config"),
+    disableVoiceBtn: document.getElementById("disable-voice"),
+    helpBtn: document.getElementById("help-guide"),
+    savePositionBtn: document.getElementById("save-position"),
   };
 }
 
@@ -387,6 +499,150 @@ function toggleAvatarUI() {
     createAvatarUI();
     restoreAvatarPosition();
   }
+}
+
+// Show comprehensive help guide
+function showHelpGuide() {
+  // Remove existing help modal if present
+  const existingModal = document.getElementById("avatar-help-modal");
+  if (existingModal) {
+    existingModal.remove();
+  }
+
+  const modal = document.createElement("div");
+  modal.id = "avatar-help-modal";
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 25000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+  `;
+
+  const helpContent = document.createElement("div");
+  helpContent.style.cssText = `
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    position: relative;
+  `;
+
+  helpContent.innerHTML = `
+    <div style="text-align: center; margin-bottom: 25px;">
+      <h2 style="margin: 0; font-size: 28px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">🤖 Avatar Assistant Guide</h2>
+      <p style="margin: 10px 0 0 0; opacity: 0.9;">Your AI companion with voice interaction</p>
+    </div>
+
+    <div style="margin-bottom: 25px;">
+      <h3 style="color: #FFD700; margin-bottom: 15px;">✨ How to Use</h3>
+      <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+        <p><strong>🎯 Hover over the avatar</strong> to reveal the circular button menu</p>
+        <p><strong>🎤 Click the microphone</strong> to start voice input</p>
+        <p><strong>💬 Speak naturally</strong> - the AI will respond with both text and voice</p>
+        <p><strong>🖱️ Drag the avatar</strong> to move it around your screen</p>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 25px;">
+      <h3 style="color: #FFD700; margin-bottom: 15px;">🔘 Button Functions</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px;">
+        <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
+          <strong>🎤 Microphone</strong><br>Start/stop voice input
+        </div>
+        <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
+          <strong>🔊 Test TTS</strong><br>Test text-to-speech
+        </div>
+        <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
+          <strong>🎵 ElevenLabs</strong><br>Configure AI voice
+        </div>
+        <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
+          <strong>🎭 Emotions</strong><br>Test avatar emotions
+        </div>
+        <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
+          <strong>🔇 Disable Voice</strong><br>Mute/unmute speech
+        </div>
+        <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px;">
+          <strong>📌 Save Position</strong><br>Remember location
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 25px;">
+      <h3 style="color: #FFD700; margin-bottom: 15px;">🎵 ElevenLabs Setup</h3>
+      <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
+        <p><strong>1.</strong> Click the 🎵 button to open ElevenLabs configuration</p>
+        <p><strong>2.</strong> Your API key is already configured in the code</p>
+        <p><strong>3.</strong> Select your preferred voice from the dropdown</p>
+        <p><strong>4.</strong> Click "Test TTS" to verify it works</p>
+        <p><strong>5.</strong> Save configuration to enable high-quality AI voice</p>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 25px;">
+      <h3 style="color: #FFD700; margin-bottom: 15px;">🎯 Features</h3>
+      <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
+        <p>✅ <strong>Voice Recognition:</strong> Speak naturally to interact</p>
+        <p>✅ <strong>AI Responses:</strong> Get intelligent replies to your questions</p>
+        <p>✅ <strong>Emotion Detection:</strong> Avatar shows emotions based on conversation</p>
+        <p>✅ <strong>High-Quality TTS:</strong> ElevenLabs integration for natural speech</p>
+        <p>✅ <strong>Text Display:</strong> See responses in the speech bubble</p>
+        <p>✅ <strong>Draggable Interface:</strong> Move avatar anywhere on screen</p>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 25px;">
+      <h3 style="color: #FFD700; margin-bottom: 15px;">🔧 Troubleshooting</h3>
+      <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; font-size: 14px;">
+        <p><strong>🔴 No voice input:</strong> Check microphone permissions</p>
+        <p><strong>🔴 No speech output:</strong> Check audio permissions and volume</p>
+        <p><strong>🔴 ElevenLabs not working:</strong> Verify API key is set correctly</p>
+        <p><strong>🔴 Avatar not responding:</strong> Check WebSocket connection (see console)</p>
+        <p><strong>💡 Tip:</strong> Press F12 and check Console tab for error messages</p>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+      <button id="close-help-btn" style="
+        background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-size: 16px;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        transition: transform 0.2s ease;
+      " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        Got it! ✨
+      </button>
+    </div>
+  `;
+
+  modal.appendChild(helpContent);
+  document.body.appendChild(modal);
+
+  // Close button event
+  document.getElementById("close-help-btn").addEventListener("click", () => {
+    modal.remove();
+  });
+
+  // Close when clicking outside
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  });
 }
 
 // Listen for messages from background script
@@ -829,9 +1085,17 @@ async function speakText(text) {
     return;
   }
 
+  // Check if voice is disabled
+  console.log("speakText called - Voice status:", window.isVoiceEnabled);
+  if (window.isVoiceEnabled === false) {
+    console.log("Voice is disabled, skipping speech");
+    return;
+  }
+
   const statusEl = document.getElementById("status");
   if (statusEl) {
     statusEl.textContent = "Speaking...";
+    statusEl.style.opacity = "1";
   }
 
   try {
@@ -852,13 +1116,19 @@ async function speakText(text) {
             case "completed":
               statusEl.textContent = "Speech completed";
               setTimeout(() => {
-                statusEl.textContent = "";
+                statusEl.style.opacity = "0";
+                setTimeout(() => {
+                  statusEl.textContent = "";
+                }, 300);
               }, 2000);
               break;
             case "error":
               statusEl.textContent = `TTS Error: ${progress.error}`;
               setTimeout(() => {
-                statusEl.textContent = "";
+                statusEl.style.opacity = "0";
+                setTimeout(() => {
+                  statusEl.textContent = "";
+                }, 300);
               }, 3000);
               break;
           }
@@ -936,9 +1206,10 @@ async function speakText(text) {
 // =========================
 // Initialization
 // =========================
-// Add SVG animation styles
+// Add Avatar and Menu Styles
 const avatarStyles = document.createElement("style");
 avatarStyles.textContent = `
+  /* Avatar animations */
   #avatar-mouth, #left-eyebrow, #right-eyebrow, #left-pupil, #right-pupil {
     transition: all 0.5s ease-in-out;
   }
@@ -954,6 +1225,44 @@ avatarStyles.textContent = `
   #eyes {
     transform-origin: center;
     animation: blink 4s infinite;
+  }
+
+  /* Avatar container hover effects */
+  #avatar-extension-container {
+    transition: all 0.3s ease;
+  }
+
+  #avatar-extension-container:hover {
+    filter: drop-shadow(0 0 20px rgba(55, 118, 171, 0.3));
+  }
+
+  /* Circular menu animations */
+  #avatar-button-menu button {
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Status element improvements */
+  #status {
+    transition: all 0.3s ease;
+  }
+
+  /* Help modal scrollbar */
+  #avatar-help-modal div::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  #avatar-help-modal div::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+  }
+  
+  #avatar-help-modal div::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3);
+    border-radius: 4px;
+  }
+  
+  #avatar-help-modal div::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.5);
   }
   
   /* Thinking animation styles */
@@ -1229,3 +1538,31 @@ function safeInitialize() {
 // Start initialization
 console.log("Avatar Extension content script loaded");
 safeInitialize();
+
+// Demo function for testing (can be called from console)
+window.avatarDemo = function () {
+  console.log("🤖 Avatar Demo Started!");
+
+  // Show help guide first
+  setTimeout(() => {
+    showHelpGuide();
+  }, 500);
+
+  // Demo the speech
+  setTimeout(() => {
+    speakText("Welcome to your new avatar assistant!");
+    showSpeech(
+      "🎉 **Welcome!** Your avatar now has a beautiful circular menu design. Hover over me to see all the new buttons!"
+    );
+  }, 2000);
+
+  // Demo emotion
+  setTimeout(() => {
+    updateAvatarEmotion("happy");
+  }, 3000);
+
+  console.log("💡 Try these commands:");
+  console.log("- avatarDemo() - Run this demo again");
+  console.log("- Hover over the avatar to see the circular menu");
+  console.log("- Click the ❓ button for the full help guide");
+};

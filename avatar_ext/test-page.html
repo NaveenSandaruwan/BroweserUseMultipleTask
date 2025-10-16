@@ -54,6 +54,7 @@
             <li><strong>Load the extension</strong> in Chrome (chrome://extensions/ → Developer mode → Load unpacked)</li>
             <li><strong>Refresh this page</strong> after loading the extension</li>
             <li><strong>Look for the avatar</strong> in the top-right corner of the page</li>
+            <li><strong>🎯 HOVER over the avatar</strong> to see the new circular menu!</li>
             <li><strong>Click the buttons below</strong> to test various functions</li>
         </ol>
     </div>
@@ -63,26 +64,30 @@
         <button class="button" onclick="checkExtension()">Check Extension Status</button>
         <button class="button" onclick="toggleAvatar()">Toggle Avatar Visibility</button>
         <button class="button" onclick="testElevenLabs()">Test ElevenLabs Integration</button>
+        <button class="button" onclick="runDemo()">🎉 Run Avatar Demo</button>
         <button class="button" onclick="showConsoleInstructions()">Show Console Debug</button>
     </div>
 
     <div id="test-results"></div>
 
     <div class="test-section">
-        <h2>🎯 Expected Behavior</h2>
+        <h2>🎯 NEW! Expected Behavior</h2>
         <ul>
-            <li><strong>Avatar should appear</strong> in the top-right corner with a Python logo</li>
-            <li><strong>Buttons should be visible:</strong>
+            <li><strong>Avatar appears</strong> in the top-right corner with a Python logo</li>
+            <li><strong>✨ NEW: Circular Menu</strong> - Hover over avatar to reveal buttons in a circle:
                 <ul>
-                    <li>🎤 Microphone (blue)</li>
-                    <li>🔊 Test TTS (green)</li>
-                    <li>🎵 ElevenLabs Config (orange)</li>
-                    <li>🎭 Emotion Test (yellow)</li>
-                    <li>📌 Save Position (blue)</li>
+                    <li>🎤 Microphone (blue) - Right position</li>
+                    <li>🔊 Test TTS (green) - Top-right position</li>
+                    <li>🎵 ElevenLabs Config (orange) - Top position</li>
+                    <li>🎭 Emotion Test (yellow) - Top-left position</li>
+                    <li>🔇 Disable Voice (red) - Left position</li>
+                    <li>❓ Help Guide (purple) - Bottom-left position</li>
+                    <li>📌 Save Position (gray) - Bottom position</li>
                 </ul>
             </li>
-            <li><strong>Avatar should be draggable</strong> (click and drag to move)</li>
-            <li><strong>Speech bubble</strong> should appear to the left of the avatar</li>
+            <li><strong>Avatar is draggable</strong> (click and drag to move around)</li>
+            <li><strong>Speech bubble</strong> appears to the left of the avatar</li>
+            <li><strong>Status messages</strong> appear below avatar and fade out smoothly</li>
         </ul>
     </div>
 
@@ -180,6 +185,15 @@
                 }
             } else {
                 addResult('❌ ElevenLabs integration not found. Check console for errors.', 'error');
+            }
+        }
+
+        function runDemo() {
+            if (typeof window.avatarDemo === 'function') {
+                window.avatarDemo();
+                addResult('🎉 Avatar demo started! Check the avatar and console for more info.', 'status');
+            } else {
+                addResult('❌ Avatar demo function not found. Extension may not be loaded.', 'error');
             }
         }
 
