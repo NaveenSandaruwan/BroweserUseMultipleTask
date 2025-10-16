@@ -8,7 +8,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), '../..')))
 from browseruse.tools.browserUseClient import send_task
 from browseruse.tools.filter import filter_json
 
-from browseruse.tools.filter import filter_json
 import pychrome
 import time
 

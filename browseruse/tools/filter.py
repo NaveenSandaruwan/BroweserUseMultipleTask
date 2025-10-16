@@ -40,10 +40,10 @@ def filter_json():
     Filter JSON objects based on starting words from a text file.
     Returns a list of web elements current context.
     """
-    print("Base directory:", BASE_DIR)
-    print("Words file path:", WORDS_FILE)
-    print("JSON file path:", JSON_FILE)
-    print("Description file path:", DESCRIPTION_FILE)
+    # print("Base directory:", BASE_DIR)
+    # print("Words file path:", WORDS_FILE)
+    # print("JSON file path:", JSON_FILE)
+    # print("Description file path:", DESCRIPTION_FILE)
     try:
         # Step 1: Load words
         try:

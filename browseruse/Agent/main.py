@@ -19,6 +19,10 @@ detector = EmotionIdentifier()
 # Store recent emotions to avoid duplicating work
 recent_emotions: Dict[str, str] = {}
 
+
+# Store chat history per WebSocket connection
+websocket_histories: Dict[WebSocket, list] = {}
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -36,6 +40,10 @@ async def websocket_endpoint(websocket: WebSocket):
     Sends JSON: {"reply": "...", "emotion": "..."} or {"emotion": "..."}
     """
     await websocket.accept()
+    
+    # Initialize chat history for this WebSocket connection
+    websocket_histories[websocket] = []
+    
     try:
         while True:
             # Receive and parse the WebSocket message
@@ -50,7 +58,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     "error": "No message provided"
                 })
                 continue
-            send_task("refresh")
+
             print(f"[WebSocket] Received {request_type} request: '{user_message[:30]}...'")
 
             try:
@@ -67,9 +75,38 @@ async def websocket_endpoint(websocket: WebSocket):
                         # Remove from cache after use
                         del recent_emotions[user_message]
                     
-                    # Now get the chat reply using the agent (which takes longer)
-                    chat_result = chat.invoke({"query": user_message})
+                    # Get chat history for this WebSocket connection
+                    current_history = websocket_histories.get(websocket, [])
+                    
+                    # Keep only the last 5 conversations
+                    history = current_history[-5:] if len(current_history) > 5 else current_history
+                    conversation = ""
+                    
+                    if len(history) > 0:
+                        # Create a formatted conversation string
+                        n = 1
+                        for turn in history:
+                            conversation += f" Conversation {n}\nUser: {turn['User']}\nAI agent: {turn['AI agent']}\n"
+                            n += 1
+                    
+                    # print(f"[WebSocket] Chat history: {conversation}")
+                    
+                    # Now get the chat reply using the agent with history
+                    chat_result = chat.invoke({
+                        "query": user_message,
+                        "chat_history": conversation
+                    })
                     reply_text = chat_result['result']['formatted_response']
+                    
+                    # Add this conversation to history
+                    websocket_histories[websocket].append({
+                        "User": user_message,
+                        "AI agent": reply_text
+                    })
+                    
+                    # Keep only the last 5 conversations in memory
+                    if len(websocket_histories[websocket]) > 5:
+                        websocket_histories[websocket] = websocket_histories[websocket][-5:]
 
                     # Send combined response with both reply and emotion
                     await websocket.send_json({
@@ -117,6 +154,9 @@ async def websocket_endpoint(websocket: WebSocket):
 
     except WebSocketDisconnect:
         print("[WebSocket] Client disconnected")
+        # Clean up chat history for this WebSocket
+        if websocket in websocket_histories:
+            del websocket_histories[websocket]
 
 
 @app.get("/health")

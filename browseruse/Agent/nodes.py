@@ -3,41 +3,37 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 import os
 import sys
 import json
-from dotenv import load_dotenv
-from typing import Dict, List, Any
 from typing import Literal
 from langgraph.graph import StateGraph, END, START
-import pprint
-
-from tools.execution import Executor
-from langchain_core.messages import HumanMessage
-
-from langchain_core.tools import tool
 from pathlib import Path
-
-load_dotenv()
+from langchain_core.messages import HumanMessage
 
 # Import your existing functions
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-from browseruse.Agent.utils.jsonextract import extract_first_steps_json,extract_and_format_first_json
+from browseruse.Agent.utils.jsonextract import extract_and_format_first_json
 from browseruse.tools.browserUseClient import send_task
 from browseruse.tools.dragTool import Toolbox
-from browseruse.tools.filter import filter_json, find_used_blocks, get_list_of_used_blocks, get_category_coordinates, generate_detailed_blocks_summary
-from browseruse.tools.execution import Executor
-from browseruse.Agent.reactAgents import command_agent,explaining_agent,debugging_agent,general_coding_agent,format_agent,general_agent,code_fixing_agent
+from browseruse.tools.filter import  get_list_of_used_blocks, generate_detailed_blocks_summary
+from browseruse.Agent.reactAgents import command_agent,explaining_agent,debugging_agent,general_coding_agent,format_agent,general_agent,code_fixing_agent,fromat_query_agent
 from browseruse.Agent.utils.state import State
-from browseruse.Agent.utils.tool import make_blocks, clean_and_make_blocks
+from browseruse.tools.execution import  AdvancedExecutor
+from browseruse.Agent.utils.tool import clean_and_make_blocks_advanced,make_blocks_advanced
 
 def get_base_path():
     """Return folder where exe/script is located (for reading/writing files)."""
-    if getattr(sys, "frozen", False):
-        # Running as PyInstaller exe
-        return Path(sys.executable).parent
-    else:
-        # Running as Python script
-        return Path(__file__).parent.parent.parent
+    try:
+        if getattr(sys, "frozen", False):
+            # Running as PyInstaller exe
+            return Path(sys.executable).parent
+        else:
+            # Running as Python script
+            return Path(__file__).parent.parent.parent
+    except Exception as e:
+        print(f"Error determining base path: {e}")
+        # Fallback to current directory
+        return Path.cwd()
 
 BASE_DIR = get_base_path()
 USER_DATA_DIR = BASE_DIR / "userdata" / "user_data.json"
@@ -61,7 +57,20 @@ model2 = ChatGoogleGenerativeAI(
     temperature=0.1  # Lower temperature for more consistent responses
 )
 
-executor = Executor()
+executor = AdvancedExecutor()
+
+def format_query(state: State) -> State:
+    ''' Formats the user query to ensure clarity and context.
+    This node helps to refine the user's input for better processing by subsequent nodes.
+    Some times child's query is not clear, so this node will help to make it clear.
+    '''
+    query = state["query"]
+
+    response = fromat_query_agent.invoke({"messages": [HumanMessage(content=query)]})
+    
+    state["query"] = response["messages"][-1].content
+    print(f"Formatted Query: {state['query']}")
+    return state
 
 
 def llm_router(state: State) -> Literal["code_explain", "code_debugging", "give_instructions","make_blocks", "code_fixing"]:
@@ -113,12 +122,18 @@ def code_explain_node(state: State) -> State:
     # Compose a message that includes the query, coding summary, and working space
     message = (
         f"User Query: {state['query']}\n\n"
+        f"Conversation history between user and AI agent (USE ONLY IF NEED PAST INFORMATION): {state['chat_history']}\n\n"
         f"Scratch Block Summary and functionalities of blocks in each category:\n{web_application_coding_summary}\n\n"
         f"Current Workspace ( you can see what user have done):\n{working_space}"
     )
 
     result = explaining_agent.invoke({"messages": [HumanMessage(content=message)]})
-    return {"result": {"explanation": result["messages"][-1].content}}
+    # Update the existing state instead of replacing it
+    new_state = state.copy()
+    if "result" not in new_state:
+        new_state["result"] = {}
+    new_state["result"]["explanation"] = result["messages"][-1].content
+    return new_state
 
 def code_debugging_node(state: State) -> State:
 
@@ -130,46 +145,88 @@ def code_debugging_node(state: State) -> State:
     # Compose a message that includes the query, coding summary, and working space
     message = (
         f"User Query: {state['query']}\n\n"
+        f"Conversation history between user and AI agent (USE ONLY IF NEED PAST INFORMATION): {state['chat_history']}\n\n"
         f"Scratch Block Summary and functionalities of blocks in each category:\n{web_application_coding_summary}\n\n"
         f"Current Workspace ( you can see what user have done):\n{working_space}"
     )
 
     result = debugging_agent.invoke({"messages": [HumanMessage(content=message)]})
-    return {"result": {"debugging_advice": result["messages"][-1].content}}
+    # Update the existing state instead of replacing it
+    new_state = state.copy()
+    if "result" not in new_state:
+        new_state["result"] = {}
+    new_state["result"]["debugging_advice"] = result["messages"][-1].content
+    return new_state
 
 def give_instructions_node(state: State) -> State:
     web_application_coding_summary = generate_detailed_blocks_summary(include_all_blocks=True)
     message = (
         f"User Query: {state['query']}\n\n"
+        f"Conversation history between user and AI agent (USE ONLY IF NEED PAST INFORMATION): {state['chat_history']}\n\n"
         f"Scratch Block Summary and functionalities of blocks in each category:\n{web_application_coding_summary}\n\n"
-        
-        )
+    )
     result = general_coding_agent.invoke({"messages": [HumanMessage(content=message)]})
-    return {"result": {"instructions": result["messages"][-1].content}}
+    # Update the existing state instead of replacing it
+    new_state = state.copy()
+    if "result" not in new_state:
+        new_state["result"] = {}
+    new_state["result"]["instructions"] = result["messages"][-1].content
+    return new_state
 
 def make_blocks_node(state: State) -> State:
     result = command_agent.invoke({"messages": [state['result']['instructions']]})
-    return {"result": {"make_blocks": result["messages"][-1].content}}
+    # Update the existing state instead of replacing it
+    new_state = state.copy()
+    if "result" not in new_state:
+        new_state["result"] = {}
+    new_state["result"]["make_blocks"] = result["messages"][-1].content
+    return new_state
+
+# def execute_blocks_node(state: State) -> State:
+#     # take state['result']['make_blocks'] and extract json object from it
+#     json_object = extract_and_format_first_json(state['result']['make_blocks'])
+#     # print("Extracted JSON:", json_object)
+#     try:
+#         result = make_blocks(json_object)
+#         # time.sleep(10)  # wait for 2 seconds to ensure the workspace is updated
+#         result = "true"
+#     except Exception as e:
+#         result = f"false"
+#         # print(f"Error occurred: {e}")
+#     # print(json_object)
+#     finally:
+#     # result = command_executor.invoke({"messages": [state['result']['make_blocks']]})
+#         return {"result": {"execute_blocks": result}}
+
 
 def execute_blocks_node(state: State) -> State:
-    # take state['result']['make_blocks'] and extract json object from it
     json_object = extract_and_format_first_json(state['result']['make_blocks'])
-    # print("Extracted JSON:", json_object)
     try:
-        result = make_blocks(json_object)
-        # time.sleep(10)  # wait for 2 seconds to ensure the workspace is updated
+
+        result = make_blocks_advanced(json_object)  # CHANGED
         result = "true"
+        # print(json_object)
     except Exception as e:
-        result = f"false"
-        # print(f"Error occurred: {e}")
-    # print(json_object)
+        result = "false"
     finally:
-    # result = command_executor.invoke({"messages": [state['result']['make_blocks']]})
-        return {"result": {"execute_blocks": result}}
+        # Update the existing state instead of replacing it
+        new_state = state.copy()
+        if "result" not in new_state:
+            new_state["result"] = {}
+        new_state["result"]["execute_blocks"] = result
+        return new_state
+
 
 def general_agent_node(state: State) -> State:
-    result = general_agent.invoke({"messages": [HumanMessage(content=state["query"])]})
-    return {"result": {"general_response": result["messages"][-1].content}}
+    message = (f"User Query: {state['query']}\n\n"
+               f"Conversation history between user and AI agent (USE ONLY IF NEED PAST INFORMATION): {state['chat_history']}\n\n")
+    result = general_agent.invoke({"messages": [HumanMessage(content=message)]})
+    # Update the existing state instead of replacing it
+    new_state = state.copy()
+    if "result" not in new_state:
+        new_state["result"] = {}
+    new_state["result"]["general_response"] = result["messages"][-1].content
+    return new_state
 
 
 def format_response(state: State) -> State:
@@ -180,7 +237,13 @@ def format_response(state: State) -> State:
         
         # Pass the string content to HumanMessage
         result = format_agent.invoke({"messages": [HumanMessage(content=result_content)]})
-        return {"result": {"formatted_response": result["messages"][-1].content}}
+        
+        # Update the existing state instead of replacing it
+        new_state = state.copy()
+        if "result" not in new_state:
+            new_state["result"] = {}
+        new_state["result"]["formatted_response"] = result["messages"][-1].content
+        return new_state
     return state
 
 def code_fixing_node(state: State) -> State:
@@ -189,7 +252,7 @@ def code_fixing_node(state: State) -> State:
     """
     # Get current workspace state
     send_task("refresh")
-    time.sleep(2)
+    time.sleep(1)
     
     web_application_coding_summary = generate_detailed_blocks_summary(include_all_blocks=True)
     working_space = get_list_of_used_blocks()
@@ -197,6 +260,7 @@ def code_fixing_node(state: State) -> State:
     # Compose analysis message
     message = (
         f"User Query: {state['query']}\n\n"
+        f"Conversation history between user and AI agent (USE ONLY IF NEED PAST INFORMATION): {state['chat_history']}\n\n"
         f"Scratch Block Summary:\n{web_application_coding_summary}\n\n"
         f"Current Workspace (CURRENT STATE - NEEDS FIXING):\n{working_space}\n\n"
         f"Task: Analyze the workspace and generate the CORRECT sequence of blocks to fix the issue."
@@ -205,7 +269,12 @@ def code_fixing_node(state: State) -> State:
     # Get fixing instructions from the code_fixing_agent
     result = code_fixing_agent.invoke({"messages": [HumanMessage(content=message)]})
     
-    return {"result": {"fixing_instructions": result["messages"][-1].content}}
+    # Update the existing state instead of replacing it
+    new_state = state.copy()
+    if "result" not in new_state:
+        new_state["result"] = {}
+    new_state["result"]["fixing_instructions"] = result["messages"][-1].content
+    return new_state
 
 def execute_fix_node(state: State) -> State:
     """
@@ -218,22 +287,43 @@ def execute_fix_node(state: State) -> State:
     result = command_agent.invoke({"messages": [HumanMessage(content=fixing_instructions)]})
     json_commands = result["messages"][-1].content
     
-    return {"result": {"fix_commands": json_commands}}
+    # Update the existing state instead of replacing it
+    new_state = state.copy()
+    if "result" not in new_state:
+        new_state["result"] = {}
+    new_state["result"]["fix_commands"] = json_commands
+    return new_state
 
+
+# def execute_fix_blocks_node(state: State) -> State:
+#     """
+#     Executes the fix by cleaning workspace and placing blocks in correct order.
+#     Uses the NEW clean_and_make_blocks tool.
+#     """
+#     json_object = extract_and_format_first_json(state['result']['fix_commands'])
+    
+#     try:
+#         # Use the NEW tool that cleans THEN executes
+#         result = clean_and_make_blocks(json_object)
+#         result = "true" if result == "true" else "false"
+#     except Exception as e:
+#         result = "false"
+#         print(f"Error executing fix: {e}")
+    
+#     return {"result": {"execute_fix": result}}
 
 def execute_fix_blocks_node(state: State) -> State:
-    """
-    Executes the fix by cleaning workspace and placing blocks in correct order.
-    Uses the NEW clean_and_make_blocks tool.
-    """
     json_object = extract_and_format_first_json(state['result']['fix_commands'])
-    
     try:
-        # Use the NEW tool that cleans THEN executes
-        result = clean_and_make_blocks(json_object)
+        result = clean_and_make_blocks_advanced(json_object)  # CHANGED
         result = "true" if result == "true" else "false"
     except Exception as e:
         result = "false"
         print(f"Error executing fix: {e}")
-    
-    return {"result": {"execute_fix": result}}
+ 
+    # Update the existing state instead of replacing it
+    new_state = state.copy()
+    if "result" not in new_state:
+        new_state["result"] = {}
+    new_state["result"]["execute_fix"] = result
+    return new_state
