@@ -38,6 +38,13 @@ class LipSyncManager {
     this.smoothingFactor = 0.7; // For smooth animation
     this.currentMouthValue = this.minMouthValue;
 
+    // Dynamic fluctuation tracking
+    this.energyHistory = []; // Store recent energy values
+    this.historySize = 30; // Keep last 60 frames (about 1 second at 60fps)
+    this.dynamicMidPoint = 0; // Running average of energy
+    this.dynamicRange = 10; // Dynamic range for normalization
+    this.adaptationRate = 0.1; // How quickly to adapt to new levels
+
     console.log("LipSyncManager initialized");
   }
 
@@ -93,6 +100,8 @@ class LipSyncManager {
     }
 
     this.isAnalyzing = true;
+    // Reset dynamic tracking for new session
+    this.resetDynamicTracking();
     console.log("Starting lip sync animation");
     this.animateMouth();
   }
@@ -132,10 +141,43 @@ class LipSyncManager {
 
     const avgEnergy = sum / (endFreq - startFreq);
 
-    // Normalize energy value (0-1)
-    const normalizedEnergy = Math.min(avgEnergy / 128, 1);
+    // Update energy history for dynamic adaptation
+    this.energyHistory.push(avgEnergy);
+    if (this.energyHistory.length > this.historySize) {
+      this.energyHistory.shift(); // Remove oldest value
+    }
 
-    // Calculate target mouth opening
+    // Calculate dynamic midpoint (running average)
+    const currentAverage =
+      this.energyHistory.reduce((a, b) => a + b, 0) / this.energyHistory.length;
+    this.dynamicMidPoint =
+      this.dynamicMidPoint * (1 - this.adaptationRate) +
+      currentAverage * this.adaptationRate;
+
+    // Calculate dynamic range based on standard deviation
+    const variance =
+      this.energyHistory.reduce(
+        (acc, val) => acc + Math.pow(val - currentAverage, 2),
+        0
+      ) / this.energyHistory.length;
+    const stdDev = Math.sqrt(variance);
+    this.dynamicRange = Math.max(5, stdDev * 2); // Minimum range of 5, or 2 standard deviations
+
+    // Normalize energy value relative to dynamic midpoint and range
+    const relativeEnergy =
+      (avgEnergy - this.dynamicMidPoint) / this.dynamicRange;
+    const normalizedEnergy = Math.max(0, Math.min(1, relativeEnergy + 0.5)); // Center around 0.5
+
+    // Log dynamic values to console
+    console.log(`Energy Values:`, {
+      avgEnergy: avgEnergy.toFixed(3),
+      dynamicMidPoint: this.dynamicMidPoint.toFixed(3),
+      dynamicRange: this.dynamicRange.toFixed(3),
+      relativeEnergy: relativeEnergy.toFixed(3),
+      normalizedEnergy: normalizedEnergy.toFixed(3),
+    });
+
+    // Calculate target mouth opening with enhanced sensitivity
     const targetMouthValue =
       this.minMouthValue +
       normalizedEnergy * (this.maxMouthValue - this.minMouthValue);
@@ -231,6 +273,14 @@ class LipSyncManager {
   // Reset mouth to neutral position
   resetMouth() {
     this.updateMouthShape(this.minMouthValue);
+  }
+
+  // Reset dynamic tracking parameters
+  resetDynamicTracking() {
+    this.energyHistory = [];
+    this.dynamicMidPoint = 0;
+    this.dynamicRange = 20;
+    console.log("Dynamic tracking reset for new lip sync session");
   }
 }
 
