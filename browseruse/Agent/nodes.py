@@ -66,6 +66,7 @@ executor = Executor()
 
 def llm_router(state: State) -> Literal["code_explain", "code_debugging", "give_instructions","make_blocks", "code_fixing"]:
     query = state["query"]
+    send_task("refresh")
     response = model2.invoke(
         f"""
 You are a router agent that decides which expert agent should handle the user's request based on its content.
