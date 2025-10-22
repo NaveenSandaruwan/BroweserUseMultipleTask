@@ -10,7 +10,7 @@
 // 3. Keep the quotes around your API key
 // Example: const ELEVENLABS_API_KEY = "sk-1234567890abcdef...";
 
-const ELEVENLABS_API_KEY = "sk_785f04a503c3f00abab0a7b853e2cffcd2585b083d9fb960";
+const ELEVENLABS_API_KEY = "sk_f4b3bb0d47ca1343ea38c5a2542652559fffe589bddeccf5";
 
 // Create configuration modal for ElevenLabs
 function createElevenLabsConfigModal() {
