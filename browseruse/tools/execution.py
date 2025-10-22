@@ -402,7 +402,7 @@ class AdvancedExecutor:
         # Base workspace coordinates
         base_x = 350
         base_y = 140
-        standard_spacing = 37  # Vertical spacing between blocks
+        standard_spacing = 38  # Vertical spacing between blocks
         
         print(f"  Calculating position for: {block_name}")
         print(f"  Placement: {placement}, Parent: {parent_step}")
@@ -434,7 +434,7 @@ class AdvancedExecutor:
                 
                 # Get nesting offsets from parent
                 x_offset = parent_meta.get("nesting_offset_x", 11)
-                y_offset = parent_meta.get("nesting_offset_y", 47)
+                y_offset = parent_meta.get("nesting_offset_y", 39)
                 
                 # Check if there are already blocks inside this container
                 siblings_inside = [
@@ -536,7 +536,7 @@ class AdvancedExecutor:
                 None, block["name"].lower(), block_query.lower()
             ).ratio()
             
-            if ratio > highest_ratio and ratio > 0.6:
+            if ratio > highest_ratio and ratio > 0.4:
                 highest_ratio = ratio
                 best_match = block
         
