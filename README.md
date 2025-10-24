@@ -55,10 +55,25 @@ OBO is built on a robust and modern technology stack to ensure a seamless and re
 | **FastAPI** | Enables fast and efficient communication between the frontend and the AI backend. |
 | **Browser-use** | Technology used to precisely identify elements within the Scratch browser. |
 | **ElevenLabs** | Used for Text-to-Speech when answering the child's queries. |
-| **Rive** | Powers the animated avatars, enabling smooth, interactive, and dynamic animations for an engaging user experience.
+| **LangGraph** | Used for build the Agent state graph |
 
 ---
+
+## How to setup 
+
+1.Download the pakage file here := https://drive.google.com/file/d/1XmNQntie2juHbZuLwIV61ozyapbu-Q53/view?usp=drive_link
+2.Run the BrowserUse.exe
+3.Enter Chome/Edge exe path
+4.Enter Gemini API key
+5.Start the application 
+6.Go to manage extension and enable developer mode
+7.Go to load unpack
+8.Select 'Obo Aavatar extension' folder 
+9.Refersh the Scrach web page
+
 
 ## 🤝 Join Us
 
 We are committed to empowering the next generation of innovators, problem-solvers, and digital creators. Join us in shaping a brighter future for educational technology!
+
+
