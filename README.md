@@ -63,7 +63,7 @@ OBO is built on a robust and modern technology stack to ensure a seamless and re
 
 1.Download the pakage file here := https://drive.google.com/file/d/1XmNQntie2juHbZuLwIV61ozyapbu-Q53/view?usp=drive_link
 2.Run the BrowserUse.exe
-3.Enter Chome/Edge exe path
+3.Enter Chrome/Edge exe path
 4.Enter Gemini API key
 5.Start the application 
 6.Go to manage extension and enable developer mode
