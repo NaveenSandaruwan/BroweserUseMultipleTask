@@ -59,17 +59,69 @@ OBO is built on a robust and modern technology stack to ensure a seamless and re
 
 ---
 
-## How to setup 
+## Architecture
 
-1.Download the pakage file here := https://drive.google.com/file/d/1XmNQntie2juHbZuLwIV61ozyapbu-Q53/view?usp=drive_link
-2.Run the BrowserUse.exe
-3.Enter Chrome/Edge exe path
-4.Enter Gemini API key
-5.Start the application 
-6.Go to manage extension and enable developer mode
-7.Go to load unpack
-8.Select 'Obo Aavatar extension' folder 
-9.Refersh the Scrach web page
+![alt text](image.png)
+
+## Agent Architecture
+
+![alt text](image-1.png)
+
+## 📺 Learn More: Watch the Demo Video
+
+For a detailed walkthrough and demonstration of OBO in action, check out our YouTube video:
+
+[![OBO Demo Video](https://img.youtube.com/vi/kLL2LD9P4Xs/0.jpg)](https://www.youtube.com/watch?v=kLL2LD9P4Xs)
+
+[Watch on YouTube](https://www.youtube.com/watch?v=kLL2LD9P4Xs)
+
+## 🛠️ How to Set Up OBO
+
+### Quick Start (Using Pre-built Package)
+
+1. **Download the Package:**  
+    [Download OBO package](https://drive.google.com/file/d/1XmNQntie2juHbZuLwIV61ozyapbu-Q53/view?usp=drive_link)
+2. **Run the Application:**  
+    Double-click `BrowserUse.exe`.
+3. **Configure Paths:**  
+    - Enter the path to your Chrome or Edge executable.
+    - Enter your Gemini API key.
+4. **Start OBO:**  
+    Click to launch the application.
+5. **Enable Extension in Browser:**  
+    - Open your browser’s Extensions page.
+    - Enable **Developer mode**.
+    - Click **Load unpacked** and select the `Obo Avatar extension` folder.
+6. **Refresh Scratch:**  
+    Reload the Scratch web page to activate OBO.
+
+---
+
+### Advanced: Run from Source
+
+1. **Set Up Environment:**  
+    - Create a virtual environment:  
+      `python -m venv venv`
+    - Activate it and install dependencies:  
+      `pip install -r requirements.txt`
+2. **Start Backend Services:**  
+    - Run the server:  
+      `python ./browseruse/tools/browserUseServer.py`
+    - Once the server is running, start the client:  
+      `python ./browseruse/tools/browserUseClient.py`
+    - Start the agent:  
+      `python ./browseruse/Agent/main.py`
+3. **Load the Extension:**  
+    Follow the steps above to load the extension in your browser.
+4. **Refresh Scratch:**  
+    Reload the Scratch page to begin using OBO.
+
+---
+
+**Note:**  
+- Ensure you have the required permissions to install browser extensions and run executables.
+- For any issues, please refer to the project’s documentation or open an issue.
+                                                 
 
 
 ## 🤝 Join Us
