@@ -38,19 +38,19 @@ with open(USER_DATA_DIR, "r", encoding="utf-8") as f:
 GEMINIAPI = user_data['gemini_api_key']
 
 model = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash",
+    model="gemini-2.5-flash",
     google_api_key=GEMINIAPI,
     temperature=0.3  # Lower temperature for more consistent responses
 )
 
 model2 = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash",
+    model="gemini-2.5-flash",
     google_api_key=GEMINIAPI,
     temperature=0.1  # Lower temperature for more consistent responses
 )
 
 model3 = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash",
+    model="gemini-2.5-flash",
     google_api_key=GEMINIAPI,
     temperature=0.3  # Lower temperature for more consistent responses
 )

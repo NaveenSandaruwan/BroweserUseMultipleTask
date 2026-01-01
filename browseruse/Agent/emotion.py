@@ -29,7 +29,7 @@ GEMINIAPI = user_data['gemini_api_key']
 class EmotionIdentifier:
     def __init__(self):
         self.model = ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash",
+            model="gemini-2.5-flash",
             google_api_key=GEMINIAPI,
             temperature=0.3
         )

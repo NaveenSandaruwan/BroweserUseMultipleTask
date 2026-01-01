@@ -19,7 +19,7 @@ T = TypeVar('T', bound=BaseModel)
 
 
 VerifiedGeminiModels = Literal[
-	'gemini-2.0-flash', 'gemini-2.0-flash-exp', 'gemini-2.0-flash-lite-preview-02-05', 'Gemini-2.0-exp'
+	'gemini-2.5-flash', 'gemini-2.5-flash-exp', 'gemini-2.5-flash-lite-preview-02-05', 'Gemini-2.0-exp'
 ]
 
 
@@ -64,7 +64,7 @@ class ChatGoogle(BaseChatModel):
 		from google.genai import types
 
 		llm = ChatGoogle(
-			model='gemini-2.0-flash-exp',
+			model='gemini-2.5-flash-exp',
 			config={
 				'tools': [types.Tool(code_execution=types.ToolCodeExecution())]
 			}

@@ -41,7 +41,7 @@ from browseruse.browser_use.browser.permissions_manager import BrowserPermission
 
 
 
-llm = ChatGoogle(model="gemini-2.0-flash")
+llm = ChatGoogle(model="gemini-2.5-flash")
 
 task_queue = asyncio.Queue()
 
